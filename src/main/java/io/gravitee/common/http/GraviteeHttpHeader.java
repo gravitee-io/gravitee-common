@@ -25,7 +25,12 @@ public enum GraviteeHttpHeader {
     /**
      * Response time used to compute the entire Policy chain, in ms.
      */
-    X_GRAVITEE_RESPONSE_TIME("X-Gravitee-ResponseTime");
+    X_GRAVITEE_RESPONSE_TIME("X-Gravitee-ResponseTime"),
+
+    /**
+     * Key to access to an API through the Gravitee gateway.
+     */
+    X_GRAVITEE_API_KEY("X-Gravitee-Api-Key");
 
     private String headerKey;
 

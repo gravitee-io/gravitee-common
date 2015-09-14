@@ -30,7 +30,13 @@ public enum GraviteeHttpHeader {
     /**
      * Key to access to an API through the Gravitee gateway.
      */
-    X_GRAVITEE_API_KEY("X-Gravitee-Api-Key");
+    X_GRAVITEE_API_KEY("X-Gravitee-Api-Key"),
+
+    /**
+     * The name of the API handle by Gravitee gateway.
+     * This header must always be set by the gateway.
+     */
+    X_GRAVITEE_API_NAME("X-Gravitee-Api-Name");
 
     private String headerKey;
 

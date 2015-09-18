@@ -20,33 +20,22 @@ package io.gravitee.common.http;
  *
  * @author Aurélien Bourdon (aurelien.bourdon at gmail.com)
  */
-public enum GraviteeHttpHeader {
+public interface GraviteeHttpHeader {
 
     /**
      * Response time used to compute the entire Policy chain, in ms.
      */
-    X_GRAVITEE_RESPONSE_TIME("X-Gravitee-ResponseTime"),
+    String X_GRAVITEE_RESPONSE_TIME = "X-Gravitee-ResponseTime";
 
     /**
      * Key to access to an API through the Gravitee gateway.
      */
-    X_GRAVITEE_API_KEY("X-Gravitee-Api-Key"),
+    String X_GRAVITEE_API_KEY = "X-Gravitee-Api-Key";
 
     /**
      * The name of the API handle by Gravitee gateway.
      * This header must always be set by the gateway.
      */
-    X_GRAVITEE_API_NAME("X-Gravitee-Api-Name");
-
-    private String headerKey;
-
-    GraviteeHttpHeader(String headerKey) {
-        this.headerKey = headerKey;
-    }
-
-    @Override
-    public String toString() {
-        return headerKey;
-    }
+    String X_GRAVITEE_API_NAME = "X-Gravitee-Api-Name";
 
 }

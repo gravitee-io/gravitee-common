@@ -109,6 +109,10 @@ public class HttpHeaders implements MultiValueMap<String, String> {
         this.headers = new LinkedCaseInsensitiveMap<>(8);
     }
 
+    public HttpHeaders(int initialCapacity) {
+        this.headers = new LinkedCaseInsensitiveMap<>(initialCapacity);
+    }
+
     @Override
     public int size() {
         return headers.size();

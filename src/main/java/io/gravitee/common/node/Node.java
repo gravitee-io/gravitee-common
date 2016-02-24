@@ -15,10 +15,14 @@
  */
 package io.gravitee.common.node;
 
+import io.gravitee.common.utils.UUIDGenerator;
+
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
 public interface Node {
+
+    String ID = UUIDGenerator.generate().toString();
 
     /**
      * Start the node. If the node is already started, this method is no-op.
@@ -36,4 +40,13 @@ public interface Node {
      * @return The node name.
      */
     String name();
+
+    /**
+     * Returns the node id.
+     *
+     * @return The node id.
+     */
+    default String id() {
+        return ID;
+    }
 }

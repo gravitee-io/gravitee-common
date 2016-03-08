@@ -35,7 +35,7 @@ public abstract class AbstractNode extends AbstractService<Node> implements Node
 
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private ApplicationContext applicationContext;
+    protected ApplicationContext applicationContext;
 
     @Override
     protected void doStart() throws Exception {

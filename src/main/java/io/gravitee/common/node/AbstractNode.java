@@ -56,7 +56,7 @@ public abstract class AbstractNode extends AbstractService<Node> implements Node
 
         long endTime = System.currentTimeMillis(); // Get the end Time
 
-        LOGGER.info("{} [{}] started in {} ms.", name(), Version.RUNTIME_VERSION, (endTime - startTime));
+        LOGGER.info("{} [id: {} - version: {}] started in {} ms.", name(), id(), Version.RUNTIME_VERSION, (endTime - startTime));
     }
 
     @Override

@@ -15,24 +15,15 @@
  */
 package io.gravitee.common.node;
 
+import io.gravitee.common.component.LifecycleComponent;
 import io.gravitee.common.utils.UUIDGenerator;
 
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
-public interface Node {
+public interface Node extends LifecycleComponent<Node> {
 
     String ID = UUIDGenerator.generate().toString();
-
-    /**
-     * Start the node. If the node is already started, this method is no-op.
-     */
-    void start();
-
-    /**
-     * Stops the node. If the node is already stopped, this method is no-op.
-     */
-    void stop();
 
     /**
      * Returns the node name.

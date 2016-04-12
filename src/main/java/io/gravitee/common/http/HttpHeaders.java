@@ -209,6 +209,10 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public static final String MIME_VERSION = "MIME-Version";
     /**
+     * https://tools.ietf.org/id/draft-abarth-origin-03.html#rfc.section.2
+     */
+    public static final String ORIGIN = "Origin";
+    /**
      * See {@link <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.32">HTTP/1.1 documentation</a>}.
      */
     public static final String PRAGMA = "Pragma";

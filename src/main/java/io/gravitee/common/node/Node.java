@@ -16,14 +16,14 @@
 package io.gravitee.common.node;
 
 import io.gravitee.common.component.LifecycleComponent;
-import io.gravitee.common.utils.UUIDGenerator;
+import io.gravitee.common.utils.UUID;
 
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
 public interface Node extends LifecycleComponent<Node> {
 
-    String ID = UUIDGenerator.generate().toString();
+    String ID = UUID.random().toString();
 
     /**
      * Returns the node name.

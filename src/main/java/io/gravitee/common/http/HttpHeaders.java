@@ -286,6 +286,11 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public static final String WWW_AUTHENTICATE = "WWW-Authenticate";
 
+    public static final String X_FORWARDED_FOR = "X-Forwarded-For";
+    public static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
+    public static final String X_FORWARDED_SERVER = "X-Forwarded-Server";
+    public static final String X_FORWARDED_HOST = "X-Forwarded-Host";
+
     private final Map<String, List<String>> headers;
 
     /**

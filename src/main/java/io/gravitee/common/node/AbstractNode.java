@@ -15,6 +15,7 @@
  */
 package io.gravitee.common.node;
 
+import io.gravitee.common.component.Lifecycle;
 import io.gravitee.common.component.LifecycleComponent;
 import io.gravitee.common.service.AbstractService;
 import io.gravitee.common.util.ListReverser;
@@ -28,7 +29,7 @@ import org.springframework.context.ApplicationContextAware;
 import java.util.List;
 
 /**
- * @author David BRASSELY (brasseld at gmail.com)
+ * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author GraviteeSource Team
  */
 public abstract class AbstractNode extends AbstractService<Node> implements Node, ApplicationContextAware {
@@ -51,6 +52,7 @@ public abstract class AbstractNode extends AbstractService<Node> implements Node
                 lifecyclecomponent.start();
             } catch (Exception e) {
                 LOGGER.error("An error occurs while starting component {}", componentClass.getSimpleName(), e);
+                throw e;
             }
         }
 
@@ -66,11 +68,12 @@ public abstract class AbstractNode extends AbstractService<Node> implements Node
         ListReverser<Class<? extends LifecycleComponent>> components =
                 new ListReverser<>(getLifecycleComponents());
         for(Class<? extends LifecycleComponent> componentClass: components) {
-            LOGGER.info("\tStopping component: {}", componentClass.getSimpleName());
-
             try {
                 LifecycleComponent lifecyclecomponent = applicationContext.getBean(componentClass);
-                lifecyclecomponent.stop();
+                if (lifecyclecomponent.lifecycleState() == Lifecycle.State.STARTED) {
+                    LOGGER.info("\tStopping component: {}", componentClass.getSimpleName());
+                    lifecyclecomponent.stop();
+                }
             } catch (Exception e) {
                 LOGGER.error("An error occurs while stopping component {}", componentClass.getSimpleName(), e);
             }

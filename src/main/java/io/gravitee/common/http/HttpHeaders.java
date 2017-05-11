@@ -304,6 +304,11 @@ public class HttpHeaders implements MultiValueMap<String, String> {
         this.headers = new LinkedCaseInsensitiveMap<>(initialCapacity);
     }
 
+    public HttpHeaders(HttpHeaders httpHeaders) {
+        this(httpHeaders.size());
+        httpHeaders.forEach((headerName, headerValues) -> put(headerName, new LinkedList(headerValues)));
+    }
+
     @Override
     public int size() {
         return headers.size();

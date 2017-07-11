@@ -26,6 +26,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.lang.management.ManagementFactory;
 import java.util.List;
 
 /**
@@ -58,7 +59,16 @@ public abstract class AbstractNode extends AbstractService<Node> implements Node
 
         long endTime = System.currentTimeMillis(); // Get the end Time
 
-        LOGGER.info("{} [id: {} - version: {}] started in {} ms.", name(), id(), Version.RUNTIME_VERSION, (endTime - startTime));
+        String processId = ManagementFactory.getRuntimeMXBean().getName();
+        if (processId.contains("@")) {
+            processId = processId.split("@")[0];
+        }
+
+        LOGGER.info("{} id[{}] version[{}] pid[{}] build[{}#{}] jvm[{}/{}/{}] started in {} ms.", name(), id(),
+                Version.RUNTIME_VERSION.MAJOR_VERSION, processId, Version.RUNTIME_VERSION.BUILD_NUMBER,
+                Version.RUNTIME_VERSION.REVISION, ManagementFactory.getRuntimeMXBean().getVmVendor(),
+                ManagementFactory.getRuntimeMXBean().getVmName(), ManagementFactory.getRuntimeMXBean().getVmVersion(),
+                (endTime - startTime));
     }
 
     @Override

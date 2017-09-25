@@ -15,6 +15,7 @@
  */
 package io.gravitee.common.spring.factory;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -44,6 +45,10 @@ public abstract class AbstractAutowiringFactoryBean<T> extends
 
             if (instance instanceof ApplicationContextAware) {
                 ((ApplicationContextAware) instance).setApplicationContext(applicationContext);
+            }
+
+            if (instance instanceof InitializingBean) {
+                ((InitializingBean) instance).afterPropertiesSet();
             }
         }
         return instance;

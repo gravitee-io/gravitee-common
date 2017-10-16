@@ -18,9 +18,30 @@ package io.gravitee.common.http;
 /**
  * Represents an HTTP method.
  *
- * @author David BRASSELY (brasseld at gmail.com)
+ * @author David BRASSELY (david.brassely at graviteesource.com)
+ * @author GraviteeSource Team
  */
 public enum HttpMethod {
 
-  CONNECT, DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, TRACE;
+  CONNECT(1), DELETE(2), GET(3), HEAD(4), OPTIONS(5), PATCH(6), POST(7), PUT(8), TRACE(9);
+
+  private int code;
+
+  HttpMethod(int code) {
+    this.code = code;
+  }
+
+  public int code() {
+    return code;
+  }
+
+  public static HttpMethod get(int code) {
+    for(HttpMethod method : HttpMethod.values()) {
+      if (method.code == code) {
+        return method;
+      }
+    }
+
+    throw new IllegalArgumentException("Invalid HTTP method code");
+  }
 }

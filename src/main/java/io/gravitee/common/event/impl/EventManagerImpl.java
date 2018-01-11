@@ -30,7 +30,7 @@ public class EventManagerImpl implements EventManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EventManagerImpl.class);
 
-  private Map<ComparableEventType, Set<EventListenerWrapper>> listenersMap = new TreeMap();
+  private Map<ComparableEventType, List<EventListenerWrapper>> listenersMap = new TreeMap();
 
   public void publishEvent(Enum type, Object content) {
     this.publishEvent(new SimpleEvent(type, content));
@@ -39,7 +39,7 @@ public class EventManagerImpl implements EventManager {
   public void publishEvent(Event event) {
     LOGGER.debug("Publish event {} - {}", event.type(), event.content());
 
-    Set<EventListenerWrapper> listeners = getEventListeners(event.type().getClass());
+    List<EventListenerWrapper> listeners = getEventListeners(event.type().getClass());
     for(EventListenerWrapper listener : listeners) {
       listener.eventListener().onEvent(event);
     }
@@ -58,15 +58,15 @@ public class EventManagerImpl implements EventManager {
   private <T extends Enum> void addEventListener(EventListener<T, ?> eventListener, Class<T> enumClass, Collection<T> events) {
     LOGGER.info("Register new listener {} for event type {}", eventListener.getClass().getSimpleName(), enumClass);
 
-    Set<EventListenerWrapper> listeners = getEventListeners(enumClass);
+    List<EventListenerWrapper> listeners = getEventListeners(enumClass);
     listeners.add(new EventListenerWrapper(eventListener, events));
   }
 
-  private <T extends Enum> Set<EventListenerWrapper> getEventListeners(Class<T> eventType) {
-    Set<EventListenerWrapper> listeners = this.listenersMap.get(new ComparableEventType(eventType));
+  private <T extends Enum> List<EventListenerWrapper> getEventListeners(Class<T> eventType) {
+    List<EventListenerWrapper> listeners = this.listenersMap.get(new ComparableEventType(eventType));
 
     if (listeners == null) {
-      listeners = new HashSet();
+      listeners = new ArrayList<>();
       this.listenersMap.put(new ComparableEventType(eventType), listeners);
     }
 

@@ -23,7 +23,7 @@ package io.gravitee.common.http;
  */
 public enum HttpMethod {
 
-  CONNECT(1), DELETE(2), GET(3), HEAD(4), OPTIONS(5), PATCH(6), POST(7), PUT(8), TRACE(9);
+  CONNECT(1), DELETE(2), GET(3), HEAD(4), OPTIONS(5), PATCH(6), POST(7), PUT(8), TRACE(9), OTHER(0);
 
   private int code;
 
@@ -42,6 +42,7 @@ public enum HttpMethod {
       }
     }
 
-    throw new IllegalArgumentException("Invalid HTTP method code");
+
+    return HttpMethod.OTHER;
   }
 }

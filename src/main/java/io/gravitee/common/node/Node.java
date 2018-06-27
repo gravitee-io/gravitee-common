@@ -23,7 +23,7 @@ import io.gravitee.common.utils.UUID;
  */
 public interface Node extends LifecycleComponent<Node> {
 
-    String ID = UUID.random().toString();
+    String ID = UUID.toString(UUID.random());
 
     /**
      * Returns the node name.

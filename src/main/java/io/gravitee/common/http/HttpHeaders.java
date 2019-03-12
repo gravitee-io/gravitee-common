@@ -15,10 +15,10 @@
  */
 package io.gravitee.common.http;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -293,148 +293,51 @@ public interface HttpHeaders {
 
     boolean isEmpty();
 
-    @Override
-    boolean containsKey(Object key) {
-        return headers.containsKey(key);
+    /**
+     * @deprecated this method will break in future version, please use {@code contains()} instead.
+     */
+    @Deprecated
+    default boolean containsKey(String name) {
+        return contains(name);
     }
 
-    @Override
-    boolean containsValue(Object value) {
-        return headers.containsValue(value);
+    boolean contains(String name);
+
+    List<String> get(String name);
+
+    HttpHeaders put(String name, List<String> values);
+
+    List<String> remove(String name);
+
+    void clear();
+
+    /**
+     * @deprecated this method will break in future version, please use {@code names()} instead.
+     */
+    @Deprecated
+    default Set<String> keySet() {
+        return names();
     }
 
-    @Override
-    List<String> get(Object key) {
-        return headers.get(key);
+    Set<String> names();
+
+    /**
+     * @deprecated this method will break in future version, please use {@code entries()} instead.
+     */
+    @Deprecated
+    default List<Map.Entry<String, List<String>>> entrySet() {
+        return entries();
     }
 
-    @Override
-    List<String> put(String key, List<String> value) {
-        return headers.put(key, value);
-    }
+    List<Map.Entry<String, List<String>>> entries();
 
-    @Override
-    List<String> remove(Object key) {
-        return headers.remove(key);
-    }
+    void forEach(BiConsumer<String, String> action);
 
-    @Override
-    void putAll(Map<? extends String, ? extends List<String>> m) {
-        headers.putAll(m);
-    }
+    String getFirst(String name);
 
-    @Override
-    void clear() {
-        headers.clear();
-    }
+    HttpHeaders add(String name, String value);
 
-    @Override
-    Set<String> keySet() {
-        return headers.keySet();
-    }
+    HttpHeaders set(String name, String value);
 
-    @Override
-    Collection<List<String>> values() {
-        return headers.values();
-    }
-
-    @Override
-    Set<Entry<String, List<String>>> entrySet() {
-        return headers.entrySet();
-    }
-
-    @Override
-    boolean equals(Object o) {
-        return headers.equals(o);
-    }
-
-    @Override
-    int hashCode() {
-        return headers.hashCode();
-    }
-
-    @Override
-    List<String> getOrDefault(Object key, List<String> defaultValue) {
-        return headers.getOrDefault(key, defaultValue);
-    }
-
-    @Override
-    void forEach(BiConsumer<? super String, ? super List<String>> action) {
-        headers.forEach(action);
-    }
-
-    @Override
-    void replaceAll(BiFunction<? super String, ? super List<String>, ? extends List<String>> function) {
-        headers.replaceAll(function);
-    }
-
-    @Override
-    List<String> putIfAbsent(String key, List<String> value) {
-        return headers.putIfAbsent(key, value);
-    }
-
-    @Override
-    boolean remove(Object key, Object value) {
-        return headers.remove(key, value);
-    }
-
-    @Override
-    boolean replace(String key, List<String> oldValue, List<String> newValue) {
-        return headers.replace(key, oldValue, newValue);
-    }
-
-    @Override
-    List<String> replace(String key, List<String> value) {
-        return headers.replace(key, value);
-    }
-
-    @Override
-    List<String> computeIfAbsent(String key, Function<? super String, ? extends List<String>> mappingFunction) {
-        return headers.computeIfAbsent(key, mappingFunction);
-    }
-
-    @Override
-    List<String> computeIfPresent(String key, BiFunction<? super String, ? super List<String>, ? extends List<String>> remappingFunction) {
-        return headers.computeIfPresent(key, remappingFunction);
-    }
-
-    @Override
-    List<String> compute(String key, BiFunction<? super String, ? super List<String>, ? extends List<String>> remappingFunction) {
-        return headers.compute(key, remappingFunction);
-    }
-
-    @Override
-    List<String> merge(String key, List<String> value, BiFunction<? super List<String>, ? super List<String>, ? extends List<String>> remappingFunction) {
-        return headers.merge(key, value, remappingFunction);
-    }
-
-    @Override
-    String getFirst(String headerName) {
-        List<String> headerValues = this.headers.get(headerName);
-        return (headerValues != null ? headerValues.get(0) : null);
-    }
-
-    @Override
-    void add(String headerName, String headerValue) {
-        List<String> headerValues = this.headers.get(headerName);
-        if (headerValues == null) {
-            headerValues = new LinkedList<>();
-            this.headers.put(headerName, headerValues);
-        }
-        headerValues.add(headerValue);
-    }
-
-    @Override
-    void set(String headerName, String headerValue) {
-        List<String> headerValues = new LinkedList<String>();
-        headerValues.add(headerValue);
-        this.headers.put(headerName, headerValues);
-    }
-
-    @Override
-    void setAll(Map<String, String> values) {
-        for (Entry<String, String> entry : values.entrySet()) {
-            set(entry.getKey(), entry.getValue());
-        }
-    }
+    HttpHeaders setAll(Map<String, String> values);
 }

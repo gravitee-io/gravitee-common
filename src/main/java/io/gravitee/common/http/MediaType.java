@@ -53,6 +53,10 @@ public class MediaType {
      */
     public final static String APPLICATION_JSON = "application/json";
     /**
+     * A {@code String} constant representing {@value #APPLICATION_JWT} media type.
+     */
+    public final static String APPLICATION_JWT = "application/jwt";
+    /**
      * A {@code String} constant representing {@value #APPLICATION_FORM_URLENCODED} media type.
      */
     public final static String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";

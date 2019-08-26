@@ -71,4 +71,19 @@ public interface HttpStatusCode {
   int GATEWAY_TIMEOUT_504 = 504;
   int HTTP_VERSION_NOT_SUPPORTED_505 = 505;
   int INSUFFICIENT_STORAGE_507 = 507;
+
+  static String getMessage(int code) {
+    switch (code) {
+      case(SWITCHING_PROTOCOLS_101):
+        return "Switching Protocols";
+      case(BAD_REQUEST_400):
+        return "Bas Request";
+      case(BAD_GATEWAY_502):
+        return "Bad Gateway";
+      case(SERVICE_UNAVAILABLE_503):
+        return "Service Unavailable";
+      default:
+        return "";
+    }
+  }
 }

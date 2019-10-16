@@ -128,7 +128,6 @@ public class URIUtilsTest {
         assertEquals("v", parameters.get("k").get(0));
         assertEquals("bar", parameters.get("foo").get(0));
         assertEquals("b", parameters.get("a").get(0));
-
     }
 
     @Test
@@ -156,4 +155,47 @@ public class URIUtilsTest {
         assertEquals(null, parameters.get("j").get(0));
     }
 
+    @Test
+    public void test19() {
+        MultiValueMap<String, String> parameters = URIUtils.parameters("?foo=bar&k");
+        assertEquals(2, parameters.size());
+        assertTrue(parameters.containsKey("k"));
+        assertEquals(null, parameters.get("k").get(0));
+        assertTrue(parameters.containsKey("foo"));
+        assertEquals("bar", parameters.get("foo").get(0));
+    }
+
+    @Test
+    public void test20() {
+        MultiValueMap<String, String> parameters = URIUtils.parameters("?k&foo=bar");
+        assertEquals(2, parameters.size());
+        assertTrue(parameters.containsKey("k"));
+        assertEquals(null, parameters.get("k").get(0));
+        assertTrue(parameters.containsKey("foo"));
+        assertEquals("bar", parameters.get("foo").get(0));
+    }
+
+    @Test
+    public void test21() {
+        MultiValueMap<String, String> parameters = URIUtils.parameters("?foo1=bar&k&foo=bar");
+        assertEquals(3, parameters.size());
+        assertTrue(parameters.containsKey("k"));
+        assertEquals(null, parameters.get("k").get(0));
+        assertTrue(parameters.containsKey("foo"));
+        assertEquals("bar", parameters.get("foo").get(0));
+        assertTrue(parameters.containsKey("foo1"));
+        assertEquals("bar", parameters.get("foo1").get(0));
+    }
+
+    @Test
+    public void test22() {
+        MultiValueMap<String, String> parameters = URIUtils.parameters("?foo1&k=v&foo");
+        assertEquals(3, parameters.size());
+        assertTrue(parameters.containsKey("foo1"));
+        assertEquals(null, parameters.get("foo1").get(0));
+        assertTrue(parameters.containsKey("foo"));
+        assertEquals(null, parameters.get("foo").get(0));
+        assertTrue(parameters.containsKey("k"));
+        assertEquals("v", parameters.get("k").get(0));
+    }
 }

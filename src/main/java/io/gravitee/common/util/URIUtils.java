@@ -69,7 +69,7 @@ public class URIUtils {
 
 
     private static void addParameter(MultiValueMap<String, String> queryParameters, String uri, int paramNameStart, int paramValueStart, int end) {
-        if (paramValueStart == -1) {
+        if (paramValueStart == -1 || paramValueStart < paramNameStart) {
             queryParameters.add(uri.substring(paramNameStart, end), null);
         } else {
             String k = uri.substring(paramNameStart, paramValueStart - 1);

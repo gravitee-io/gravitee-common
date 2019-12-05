@@ -80,4 +80,8 @@ public class MediaType {
      * A {@code String} constant representing {@value #TEXT_HTML} media type.
      */
     public final static String TEXT_HTML = "text/html";
+    /**
+     * A {@code String} constant representing {@value #TEXT_EVENT_STREAM} media type.
+     */
+    public final static String TEXT_EVENT_STREAM = "text/event-stream";
 }

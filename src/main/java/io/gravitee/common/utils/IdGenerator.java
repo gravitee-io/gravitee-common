@@ -15,18 +15,40 @@
  */
 package io.gravitee.common.utils;
 
+import java.text.Normalizer;
+
 /**
- * @author David BRASSELY (brasseld at gmail.com)
+ * @author David BRASSELY (brasseld at graviteesource.com)
+ * @author Jeoffrey HAEYAERT (jeoffrey.haeyaert at graviteesource.com)
+ * @author GraviteeSource Team
  */
 public final class IdGenerator {
 
+    /**
+     * Generate a human readable identifier from a name.
+     * It basically replace all accented characters by its corresponding regular letter, removes all non alphabetic characters,
+     * replace all spaces with a dash ('-').
+     * Ex: 'Héhé It's my wonderful name !' will result to "hehe-its-my-wonderful-name".
+     *
+     * <b>Important note</b>: this method only apply a basic transformation and do not guaranty the uniqueness of id.
+     * So, 'It is not unique !' and 'it IS not UNIQUE' will result to the same 'it-is-not-unique' id.
+     * Then, you still have to check uniqueness on your side.
+     *
+     * @param name the name to generate from.
+     *
+     * @return a string which can be used as human readable id.
+     */
     public static String generate(String name) {
-        return name
+
+        if(name == null) {
+            return null;
+        }
+
+        return Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
                 .toLowerCase()
+                .replaceAll("[^a-z\\d\\s-]", "")
                 .trim()
-                .replaceAll(" +", " ")
-                .replaceAll(" ", "-")
-                .replaceAll("[^\\w\\s]","-")
-                .replaceAll("-+", "-");
+                .replaceAll("[^a-z\\d]+", "-");
     }
 }

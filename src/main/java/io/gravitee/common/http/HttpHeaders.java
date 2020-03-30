@@ -507,4 +507,8 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     public void contentType(String contentType) {
         set(CONTENT_TYPE, contentType);
     }
+
+    public List<MediaType> getAccept() {
+        return MediaType.parseMediaTypes(this.get("Accept"));
+    }
 }

@@ -290,6 +290,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     public static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
     public static final String X_FORWARDED_SERVER = "X-Forwarded-Server";
     public static final String X_FORWARDED_HOST = "X-Forwarded-Host";
+    public static final String X_FORWARDED_PORT = "X-Forwarded-Port";
 
     private final Map<String, List<String>> headers;
 

@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * @author David BRASSELY (brasseld at gmail.com)
@@ -124,6 +126,62 @@ public class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
     public void clear() {
         this.caseInsensitiveKeys.clear();
         super.clear();
+    }
+
+    @Override
+    public V getOrDefault(Object key, V defaultValue) {
+        if (key instanceof String ) {
+            return super.getOrDefault(this.caseInsensitiveKeys.get(convertKey((String) key)), defaultValue);
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public V putIfAbsent(String key, V value) {
+        if (!this.caseInsensitiveKeys.containsKey(convertKey(key))) {
+            this.caseInsensitiveKeys.put(convertKey(key), key);
+            return super.put(key, value);
+        }
+        return get(key);
+    }
+
+    @Override
+    public V computeIfAbsent(String key, Function<? super String, ? extends V> mappingFunction) {
+        if (!this.caseInsensitiveKeys.containsKey(convertKey(key))) {
+            this.caseInsensitiveKeys.put(convertKey(key), key);
+            return super.computeIfAbsent(key, mappingFunction);
+        }
+        return get(key);
+    }
+
+    @Override
+    public V computeIfPresent(String key, BiFunction<? super String, ? super V, ? extends V> remappingFunction) {
+        String oldKey = this.caseInsensitiveKeys.put(convertKey(key), key);
+        if (oldKey != null) {
+            if (!oldKey.equals(key)) {
+                super.remove(oldKey);
+            }
+            return super.compute(key, remappingFunction);
+        }
+        return null;
+    }
+
+    @Override
+    public V replace(String key, V value) {
+        String oldKey = this.caseInsensitiveKeys.put(convertKey(key), key);
+        if (oldKey != null) {
+            V oldValue = super.get(oldKey);
+            if (oldKey.equals(key)) {
+                super.replace(key, value);
+            } else {
+                super.remove(oldKey);
+                super.put(key, value);
+            }
+            return oldValue;
+        }
+        return null;
     }
 
     /**

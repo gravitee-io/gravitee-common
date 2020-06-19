@@ -17,6 +17,7 @@ package io.gravitee.common.utils;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.RandomBasedGenerator;
+import io.gravitee.common.http.IdGenerator;
 
 import java.util.Arrays;
 
@@ -24,9 +25,7 @@ import java.util.Arrays;
  * @author David BRASSELY (brasseld at gmail.com)
  * @author GraviteeSource Team
  */
-public final class UUID {
-
-    private UUID() {}
+public final class UUID implements IdGenerator {
 
     private static final RandomBasedGenerator uuidGenerator = Generators.randomBasedGenerator();
 
@@ -147,5 +146,10 @@ public final class UUID {
 
     public static java.util.UUID random() {
         return uuidGenerator.generate();
+    }
+
+    @Override
+    public String randomString() {
+        return toString(random());
     }
 }

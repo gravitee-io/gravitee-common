@@ -120,6 +120,9 @@ public class MediaType {
     public static final String TEXT_EVENT_STREAM = "text/event-stream";
     public static final MediaType MEDIA_TEXT_EVENT_STREAM = new MediaType("text", "event-stream");
 
+    public static final String APPLICATION_GRPC = "application/grpc";
+    public static final MediaType MEDIA_APPLICATION_GRPC = new MediaType("application", "grpc");
+
     public String QUALITY_FACTOR_PARAMETER = "q";
 
     public MediaType(String type, String subtype) {

@@ -18,9 +18,10 @@ package io.gravitee.common.http;
 /**
  * Represents the version of the HTTP protocol.
  *
- * @author David BRASSELY (brasseld at gmail.com)
+ * @author David BRASSELY (david.brassely at graviteesource.com)
+ * @author GraviteeSource Team
  */
 public enum HttpVersion {
 
-    HTTP_1_0, HTTP_1_1
+    HTTP_1_0, HTTP_1_1, HTTP_2
 }

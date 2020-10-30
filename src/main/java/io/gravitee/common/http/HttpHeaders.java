@@ -291,6 +291,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     public static final String X_FORWARDED_SERVER = "X-Forwarded-Server";
     public static final String X_FORWARDED_HOST = "X-Forwarded-Host";
     public static final String X_FORWARDED_PORT = "X-Forwarded-Port";
+    public static final String X_FORWARDED_PREFIX = "X-Forwarded-Prefix";
 
     private final Map<String, List<String>> headers;
 

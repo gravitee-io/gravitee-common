@@ -15,13 +15,14 @@
  */
 package io.gravitee.common.http;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * @author David BRASSELY (david at gravitee.io)
  * @author GraviteeSource Team
  */
-public final class HttpHeader {
+public final class HttpHeader implements Serializable {
 
     private String name;
 

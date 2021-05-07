@@ -63,4 +63,27 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+          <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <configuration>
+              <mapping>
+                <ts>SLASHSTAR_STYLE</ts>
+              </mapping>
+              <excludes>
+                <exclude>LICENSE.txt</exclude>
+                <exclude>Jenkinsfile</exclude>
+                <exclude>**/.*</exclude>
+                <exclude>.*</exclude>
+                <exclude>.*/**</exclude>
+                <exclude>.*</exclude>
+                <exclude>.*/**</exclude>
+                <exclude>**/*.adoc</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
 </project>

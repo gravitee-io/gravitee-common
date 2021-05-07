@@ -63,6 +63,7 @@ workflows:
               ignore:
                 - master
       - gravitee/d_pull_requests_ce_qa:
+          context: gravitee-qa
           name: process_pull_request_qa
           requires:
             - pr_secrets_resolution

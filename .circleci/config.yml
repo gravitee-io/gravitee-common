@@ -63,7 +63,7 @@ workflows:
               ignore:
                 - master
       - gravitee/d_pull_requests_ce_qa:
-          name: process_pull_request
+          name: process_pull_request_qa
           requires:
             - pr_secrets_resolution
           # "What is the maven ID of the maven profile to use to build and deploy SNAPSHOTS to Prviate Artifactory ?"

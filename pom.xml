@@ -83,7 +83,6 @@
                 <exclude>.*</exclude>
                 <exclude>.*/**</exclude>
                 <exclude>**/*.adoc</exclude>
-                <exclude>sonar-project.properties</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -95,6 +94,7 @@
           <id>gravitee-report</id>
           <properties>
             <sonar.sources>./src/main/</sonar.sources>
+            <sonar.tests>./src/test/</sonar.tests>
           </properties>
           <build>
               <plugins>

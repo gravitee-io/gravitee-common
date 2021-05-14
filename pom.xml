@@ -33,7 +33,6 @@
 
     <name>Gravitee.io APIM - Common</name>
     <properties>
-        <!-- I found primary source for this exat version of jacoco : https://medium.com/codeops/code-coverage-with-jacoco-sonarqube-and-maven-59fb04a9a383 -->
         <!-- <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version> -->
         <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
     </properties>

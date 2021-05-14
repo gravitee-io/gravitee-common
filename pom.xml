@@ -94,7 +94,7 @@
       <profile>
           <id>gravitee-report</id>
           <properties>
-            <sonar.sources>./src/</sonar.sources>
+            <sonar.sources>./src/main/</sonar.sources>
           </properties>
           <build>
               <plugins>

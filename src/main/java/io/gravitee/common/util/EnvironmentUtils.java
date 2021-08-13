@@ -22,9 +22,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.Collator;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -93,6 +93,36 @@ public final class EnvironmentUtils {
         return result;
     }
 
+    public static boolean hasMatchingTags(Optional<List<String>> configuredTags, Set<String> tags) {
+        if (configuredTags.isPresent()) {
+            List<String> tagList = configuredTags.get();
+            if (tags != null) {
+                final List<String> inclusionTags = tagList
+                        .stream()
+                        .map(String::trim)
+                        .filter(tag -> !tag.startsWith("!"))
+                        .collect(Collectors.toList());
+
+                final List<String> exclusionTags = tagList
+                        .stream()
+                        .map(String::trim)
+                        .filter(tag -> tag.startsWith("!"))
+                        .map(tag -> tag.substring(1))
+                        .collect(Collectors.toList());
+
+                if (inclusionTags.stream().anyMatch(exclusionTags::contains)) {
+                    throw new IllegalArgumentException("You must not configure a tag to be included and excluded");
+                }
+
+                return (inclusionTags.isEmpty() || tagsContains(inclusionTags, tags))
+                        && (exclusionTags.isEmpty() || !tagsContains(exclusionTags, tags));
+            }
+        }
+
+        // no tags configured on this gateway instance
+        return true;
+    }
+
     private static void addAll(Map<String, Object> aBase, Map<String, Object> aToBeAdded) {
         for (Map.Entry<String, Object> entry : aToBeAdded.entrySet()) {
             if (aBase.containsKey(entry.getKey())) {
@@ -101,5 +131,21 @@ public final class EnvironmentUtils {
 
             aBase.put(entry.getKey(), entry.getValue());
         }
+    }
+
+    private static boolean tagsContains(Collection<String> tags, Collection<String> searchedTags) {
+        return tags
+                .stream()
+                .anyMatch(
+                        tag -> searchedTags
+                                .stream()
+                                .anyMatch(
+                                        crtTag -> {
+                                            final Collator collator = Collator.getInstance();
+                                            collator.setStrength(Collator.NO_DECOMPOSITION);
+                                            return collator.compare(tag, crtTag) == 0;
+                                        }
+                                )
+                );
     }
 }

@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author David BRASSELY (brasseld at gmail.com)
@@ -473,6 +474,15 @@ public class HttpHeaders implements MultiValueMap<String, String> {
             singleValueMap.put(entry.getKey(), entry.getValue().get(0));
         }
         return singleValueMap;
+    }
+
+    @Override
+    public boolean containsAllKeys(Collection<String> keys) {
+        final LinkedCaseInsensitiveMap<Object> headers = (LinkedCaseInsensitiveMap) this.headers;
+        final List<String> lowercaseKeys = keys.stream()
+                .map(s -> s.toLowerCase(headers.getLocale()))
+                .collect(Collectors.toList());
+        return headers.insensitiveKeySet().containsAll(lowercaseKeys);
     }
 
     /**

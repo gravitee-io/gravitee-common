@@ -98,6 +98,11 @@ public class LinkedMultiValueMap<K, V> implements MultiValueMap<K, V>, Serializa
         return singleValueMap;
     }
 
+    @Override
+    public boolean containsAllKeys(Collection<K> keys) {
+        return this.keySet().containsAll(keys);
+    }
+
 
     // Map implementation
 

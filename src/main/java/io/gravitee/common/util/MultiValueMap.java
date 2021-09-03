@@ -15,6 +15,7 @@
  */
 package io.gravitee.common.util;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -57,4 +58,10 @@ public interface MultiValueMap<K, V> extends Map<K, List<V>> {
      * @return a single value representation of this map
      */
     Map<K, V> toSingleValueMap();
+
+    /**
+     * Returns true if this map key set contains all of the elements in the specified collection.
+     * @throws NullPointerException          {@inheritDoc}
+     */
+    boolean containsAllKeys(Collection<K> keys);
 }

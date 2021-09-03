@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -182,6 +183,14 @@ public class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
             return oldValue;
         }
         return null;
+    }
+
+    public Set<String> insensitiveKeySet() {
+        return this.caseInsensitiveKeys.keySet();
+    }
+
+    public Locale getLocale() {
+        return locale;
     }
 
     /**

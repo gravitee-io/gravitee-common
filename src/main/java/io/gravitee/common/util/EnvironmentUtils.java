@@ -123,14 +123,25 @@ public final class EnvironmentUtils {
         return true;
     }
 
-    private static void addAll(Map<String, Object> aBase, Map<String, Object> aToBeAdded) {
+    static void addAll(Map<String, Object> aBase, Map<String, Object> aToBeAdded) {
         for (Map.Entry<String, Object> entry : aToBeAdded.entrySet()) {
-            if (aBase.containsKey(entry.getKey())) {
+            // Precedence is managed by the order of property sources, so we should skip if the key is already present
+            // without taking care of the key's format
+            if (aBase.containsKey(encodeArrayKey(entry.getKey())) ||
+                    aBase.containsKey(encodeIndexedArrayKey(entry.getKey()))) {
                 continue;
             }
 
-            aBase.put(entry.getKey(), entry.getValue());
+            aBase.put(encodeArrayKey(entry.getKey()), entry.getValue());
         }
+    }
+
+    static String encodeArrayKey(String key) {
+        return key.replaceAll("_([0-9]+)_", "[$1]\\.").replaceAll("_", ".");
+    }
+
+    static String encodeIndexedArrayKey(String key) {
+        return key.replaceAll("\\[([0-9]+)\\].", "_$1_").replaceAll("\\.", "_");
     }
 
     private static boolean tagsContains(Collection<String> tags, Collection<String> searchedTags) {

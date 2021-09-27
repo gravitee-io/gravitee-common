@@ -53,7 +53,7 @@ public abstract class SpringFactoriesLoader<T> implements ApplicationContextAwar
 
     protected Collection<? extends T> getFactoriesInstances() {
         if (factories == null) {
-            logger.info("Loading instances for type {}", getObjectType().getName());
+            logger.debug("Loading instances for type {}", getObjectType().getName());
             factories = getSpringFactoriesInstances(getObjectType(), new Class<?>[]{});
         } else {
             logger.debug("Instances for type {} already loaded. Skipping...", getObjectType().getName());

@@ -33,6 +33,10 @@
 
     <name>Gravitee.io APIM - Common</name>
 
+    <properties>
+        <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
+    </properties>
+
     <dependencies>
         <!-- Logging -->
         <dependency>
@@ -52,7 +56,7 @@
         <dependency>
             <groupId>com.fasterxml.uuid</groupId>
             <artifactId>java-uuid-generator</artifactId>
-            <version>3.1.4</version>
+            <version>${java-uuid-generator.version}</version>
         </dependency>
 
         <!-- Unit Tests -->

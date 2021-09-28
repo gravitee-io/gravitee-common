@@ -25,7 +25,7 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
-public abstract class AbstractService<T extends io.gravitee.common.component.LifecycleComponent> extends AbstractLifecycleComponent<T> implements ApplicationContextAware, io.gravitee.common.component.LifecycleComponent<T> {
+public abstract class AbstractService<T extends io.gravitee.common.component.LifecycleComponent<T>> extends AbstractLifecycleComponent<T> implements ApplicationContextAware, io.gravitee.common.component.LifecycleComponent<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractService.class);
 

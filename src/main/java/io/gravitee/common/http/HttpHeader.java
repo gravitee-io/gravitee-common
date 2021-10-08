@@ -28,6 +28,16 @@ public final class HttpHeader implements Serializable {
 
     private String value;
 
+
+    public HttpHeader() {
+
+    }
+
+    public HttpHeader(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
     public String getName() {
         return name;
     }

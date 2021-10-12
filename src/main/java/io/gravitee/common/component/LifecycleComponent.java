@@ -22,7 +22,23 @@ public interface LifecycleComponent<T> {
 
   Lifecycle.State lifecycleState();
 
+  default T preStart() throws Exception {
+    return (T) this;
+  }
+
   T start() throws Exception;
 
+  default T postStart() throws Exception {
+    return (T) this;
+  }
+
+  default T preStop() throws Exception {
+    return (T) this;
+  }
+
   T stop() throws Exception;
+
+  default T postStop() throws Exception {
+    return (T) this;
+  }
 }

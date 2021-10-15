@@ -19,9 +19,7 @@ package io.gravitee.common.http;
  * @author David BRASSELY (brasseld at gmail.com)
  */
 public interface HttpHeadersValues {
-
     String CONNECTION_CLOSE = "close";
 
     String TRANSFER_ENCODING_CHUNKED = "chunked";
-
 }

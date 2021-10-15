@@ -28,8 +28,7 @@ import java.util.function.Supplier;
  */
 public class Maps {
 
-    private Maps() {
-    }
+    private Maps() {}
 
     public static <K, V> MapBuilder<K, V> builder() {
         return builder(HashMap::new);
@@ -106,5 +105,4 @@ public class Maps {
             return this;
         }
     }
-
 }

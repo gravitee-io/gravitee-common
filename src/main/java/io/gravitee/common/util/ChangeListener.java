@@ -20,7 +20,6 @@ package io.gravitee.common.util;
  * @author GraviteeSource Team
  */
 public interface ChangeListener<T> {
-
     boolean preAdd(T object);
 
     boolean postAdd(T object);

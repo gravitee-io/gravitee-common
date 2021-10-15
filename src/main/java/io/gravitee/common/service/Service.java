@@ -20,5 +20,4 @@ import io.gravitee.common.component.LifecycleComponent;
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
-public interface Service<T extends Service> extends LifecycleComponent<T> {
-}
+public interface Service<T extends Service> extends LifecycleComponent<T> {}

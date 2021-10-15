@@ -25,7 +25,6 @@ import java.util.Map;
  * @author David BRASSELY (brasseld at gmail.com)
  */
 public interface MultiValueMap<K, V> extends Map<K, List<V>> {
-
     /**
      * Return the first value for the given key.
      * @param key the key

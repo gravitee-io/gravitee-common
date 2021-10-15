@@ -24,24 +24,20 @@ import org.springframework.context.ApplicationContextAware;
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author GraviteeSource Team
  */
-public abstract class AbstractAutowiringFactoryBean<T> extends
-        AbstractFactoryBean<T> implements ApplicationContextAware {
+public abstract class AbstractAutowiringFactoryBean<T> extends AbstractFactoryBean<T> implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
     @Override
-    public void setApplicationContext(
-            final ApplicationContext applicationContext){
+    public void setApplicationContext(final ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
     @Override
     protected final T createInstance() throws Exception {
         final T instance = doCreateInstance();
-        if(instance != null){
-            applicationContext
-                    .getAutowireCapableBeanFactory()
-                    .autowireBean(instance);
+        if (instance != null) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(instance);
 
             if (instance instanceof ApplicationContextAware) {
                 ((ApplicationContextAware) instance).setApplicationContext(applicationContext);

@@ -15,12 +15,13 @@
  */
 package io.gravitee.common.util;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Test;
+
 public class URIUtilsTest {
+
     @Test
     public void test1() {
         MultiValueMap<String, String> parameters = URIUtils.parameters("/test?k=v");
@@ -44,6 +45,7 @@ public class URIUtilsTest {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?");
         assertEquals(0, parameters.size());
     }
+
     @Test
     public void test5() {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?k=");

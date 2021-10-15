@@ -15,10 +15,9 @@
  */
 package io.gravitee.common.http;
 
-import org.springframework.util.*;
-
 import java.nio.charset.Charset;
 import java.util.*;
+import org.springframework.util.*;
 
 /**
  * @author Azize Elamrani (azize dot elamrani at gmail dot com)
@@ -42,79 +41,79 @@ public class MediaType {
      * The value of a type or subtype wildcard {@value #MEDIA_TYPE_WILDCARD}.
      */
     public static final String MEDIA_TYPE_WILDCARD = "*";
-    public final static String WILDCARD = "*/*";
+    public static final String WILDCARD = "*/*";
     public static final MediaType MEDIA_ALL = new MediaType("*", "*");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_XML} media type.
      */
-    public final static String APPLICATION_XML = "application/xml";
+    public static final String APPLICATION_XML = "application/xml";
     public static final MediaType MEDIA_APPLICATION_XML = new MediaType("application", "xml");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_ATOM_XML} media type.
      */
-    public final static String APPLICATION_ATOM_XML = "application/atom+xml";
+    public static final String APPLICATION_ATOM_XML = "application/atom+xml";
     public static final MediaType MEDIA_APPLICATION_ATOM_XML = new MediaType("application", "atom+xml");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_XHTML_XML} media type.
      */
-    public final static String APPLICATION_XHTML_XML = "application/xhtml+xml";
+    public static final String APPLICATION_XHTML_XML = "application/xhtml+xml";
     public static final MediaType MEDIA_APPLICATION_XHTML_XML = new MediaType("application", "xhtml+xml");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_SVG_XML} media type.
      */
-    public final static String APPLICATION_SVG_XML = "application/svg+xml";
+    public static final String APPLICATION_SVG_XML = "application/svg+xml";
     public static final MediaType MEDIA_APPLICATION_SVG_XML = new MediaType("application", "svg+xml");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_JSON} media type.
      */
-    public final static String APPLICATION_JSON = "application/json";
+    public static final String APPLICATION_JSON = "application/json";
     public static final MediaType MEDIA_APPLICATION_JSON = new MediaType("application", "json");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_JWT} media type.
      */
-    public final static String APPLICATION_JWT = "application/jwt";
+    public static final String APPLICATION_JWT = "application/jwt";
     public static final MediaType MEDIA_APPLICATION_JWT = new MediaType("application", "jwt");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_FORM_URLENCODED} media type.
      */
-    public final static String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    public static final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final MediaType MEDIA_APPLICATION_FORM_URLENCODED = new MediaType("application", "x-www-form-urlencoded");
 
     /**
      * A {@code String} constant representing {@value #MULTIPART_FORM_DATA} media type.
      */
-    public final static String MULTIPART_FORM_DATA = "multipart/form-data";
+    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
     public static final MediaType MEDIA_MULTIPART_FORM_DATA = new MediaType("multipart", "form-data");
 
     /**
      * A {@code String} constant representing {@value #APPLICATION_OCTET_STREAM} media type.
      */
-    public final static String APPLICATION_OCTET_STREAM = "application/octet-stream";
+    public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public static final MediaType MEDIA_APPLICATION_OCTET_STREAM = new MediaType("application", "octet-stream");
 
     /**
      * A {@code String} constant representing {@value #TEXT_PLAIN} media type.
      */
-    public final static String TEXT_PLAIN = "text/plain";
+    public static final String TEXT_PLAIN = "text/plain";
     public static final MediaType MEDIA_TEXT_PLAIN = new MediaType("text", "plain");
 
     /**
      * A {@code String} constant representing {@value #TEXT_XML} media type.
      */
-    public final static String TEXT_XML = "text/xml";
+    public static final String TEXT_XML = "text/xml";
     public static final MediaType MEDIA_TEXT_XML = new MediaType("text", "xml");
 
     /**
      * A {@code String} constant representing {@value #TEXT_HTML} media type.
      */
-    public final static String TEXT_HTML = "text/html";
+    public static final String TEXT_HTML = "text/html";
     public static final MediaType MEDIA_TEXT_HTML = new MediaType("text", "html");
 
     public static final String TEXT_EVENT_STREAM = "text/event-stream";
@@ -161,7 +160,7 @@ public class MediaType {
     }
 
     public String getParameter(String name) {
-        return (String)this.parameters.get(name);
+        return (String) this.parameters.get(name);
     }
 
     public Map<String, String> getParameters() {
@@ -195,7 +194,7 @@ public class MediaType {
             Iterator var2 = mediaTypes.iterator();
 
             while (var2.hasNext()) {
-                String mediaType = (String)var2.next();
+                String mediaType = (String) var2.next();
                 result.addAll(parseMediaTypes(mediaType));
             }
 
@@ -212,7 +211,7 @@ public class MediaType {
             Iterator var3 = tokenizedTypes.iterator();
 
             while (var3.hasNext()) {
-                String type = (String)var3.next();
+                String type = (String) var3.next();
                 if (StringUtils.hasText(type)) {
                     result.add(parseMediaType(type));
                 }
@@ -260,8 +259,7 @@ public class MediaType {
             return false;
         }
         MediaType otherType = (MediaType) other;
-        return (this.type.equalsIgnoreCase(otherType.type) &&
-                this.subtype.equalsIgnoreCase(otherType.subtype));
+        return (this.type.equalsIgnoreCase(otherType.type) && this.subtype.equalsIgnoreCase(otherType.subtype));
     }
 
     public String toMediaString() {

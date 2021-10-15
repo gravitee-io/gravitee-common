@@ -15,19 +15,17 @@
  */
 package io.gravitee.common.util;
 
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * @author Yann TAVERNIER (yann.tavernier at graviteesource.com)
@@ -47,11 +45,7 @@ class LinkedMultiValueMapTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "first",
-            "second",
-            "third",
-    })
+    @ValueSource(strings = { "first", "second", "third" })
     public void shouldContainsKeyCaseInsensitive(String keyName) {
         final LinkedMultiValueMap<KeyObject, String> map = new LinkedMultiValueMap<>();
         map.set(testObjectHolder.get("first"), "value");
@@ -62,11 +56,7 @@ class LinkedMultiValueMapTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "first,fifth",
-            "fifth",
-            "fourth,first,third,second,fifth"
-    })
+    @ValueSource(strings = { "first,fifth", "fifth", "fourth,first,third,second,fifth" })
     public void shouldNotContainsAllKeysCaseInsensitive(String keysName) {
         final LinkedMultiValueMap<KeyObject, String> map = new LinkedMultiValueMap<>();
         map.set(testObjectHolder.get("first"), "value");
@@ -74,20 +64,16 @@ class LinkedMultiValueMapTest {
         map.set(testObjectHolder.get("third"), "value");
         map.set(testObjectHolder.get("fourth"), "value");
 
-        final List<KeyObject> toBeContained = Arrays.stream(keysName.split(","))
-                .map(key -> testObjectHolder.get(key))
-                .collect(Collectors.toList());
+        final List<KeyObject> toBeContained = Arrays
+            .stream(keysName.split(","))
+            .map(key -> testObjectHolder.get(key))
+            .collect(Collectors.toList());
 
         assertThat(map.containsAllKeys(toBeContained)).isFalse();
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "first,second",
-            "first",
-            "first,third,second",
-            "fourth,first,third,second"
-    })
+    @ValueSource(strings = { "first,second", "first", "first,third,second", "fourth,first,third,second" })
     public void shouldContainsAllKeysCaseInsensitive(String keysName) {
         final LinkedMultiValueMap<KeyObject, String> map = new LinkedMultiValueMap<>();
         map.set(testObjectHolder.get("first"), "value");
@@ -95,9 +81,10 @@ class LinkedMultiValueMapTest {
         map.set(testObjectHolder.get("third"), "value");
         map.set(testObjectHolder.get("fourth"), "value");
 
-        final List<KeyObject> toBeContained = Arrays.stream(keysName.split(","))
-                .map(key -> testObjectHolder.get(key))
-                .collect(Collectors.toList());
+        final List<KeyObject> toBeContained = Arrays
+            .stream(keysName.split(","))
+            .map(key -> testObjectHolder.get(key))
+            .collect(Collectors.toList());
 
         assertThat(map.containsAllKeys(toBeContained)).isTrue();
     }
@@ -116,7 +103,6 @@ class LinkedMultiValueMapTest {
 
     private static class KeyObject {
 
-        public KeyObject() {
-        }
+        public KeyObject() {}
     }
 }

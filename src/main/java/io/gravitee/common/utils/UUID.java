@@ -18,7 +18,6 @@ package io.gravitee.common.utils;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.RandomBasedGenerator;
 import io.gravitee.common.http.IdGenerator;
-
 import java.util.Arrays;
 
 /**
@@ -34,8 +33,9 @@ public final class UUID implements IdGenerator {
     private static final long[] lookup = buildLookup();
     private static final int DASH = -1;
     private static final int ERROR = -2;
+
     private static long[] buildLookup() {
-        long [] lu = new long[128];
+        long[] lu = new long[128];
         Arrays.fill(lu, ERROR);
         lu['0'] = 0;
         lu['1'] = 1;
@@ -76,7 +76,9 @@ public final class UUID implements IdGenerator {
         for (int i = 0; i < len; i++) {
             final int c = str.charAt(i);
             if (c >= lookup.length || lookup[c] == ERROR) {
-                throw new IllegalArgumentException("Invalid UUID string (unexpected '" + str.charAt(i) + "' at position " + i + " -> " + str + " )");
+                throw new IllegalArgumentException(
+                    "Invalid UUID string (unexpected '" + str.charAt(i) + "' at position " + i + " -> " + str + " )"
+                );
             }
 
             if (lookup[c] == DASH) {
@@ -99,6 +101,7 @@ public final class UUID implements IdGenerator {
 
     // recode is 2-byte arrays representing the hex representation of every byte value (all 256)
     private static final char[][] recode = buildByteBlocks();
+
     private static char[][] buildByteBlocks() {
         final char[][] ret = new char[256][];
         for (int i = 0; i < ret.length; i++) {
@@ -112,33 +115,33 @@ public final class UUID implements IdGenerator {
         long lsb = uuid.getLeastSignificantBits();
         char[] uuidChars = new char[36];
         int cursor = uuidChars.length;
-        while (cursor > 24 ) {
+        while (cursor > 24) {
             cursor -= 2;
-            System.arraycopy(recode[(int)(lsb & 0xff)], 0, uuidChars, cursor, 2);
+            System.arraycopy(recode[(int) (lsb & 0xff)], 0, uuidChars, cursor, 2);
             lsb >>>= 8;
         }
         uuidChars[--cursor] = '-';
         while (cursor > 19) {
             cursor -= 2;
-            System.arraycopy(recode[(int)(lsb & 0xff)], 0, uuidChars, cursor, 2);
+            System.arraycopy(recode[(int) (lsb & 0xff)], 0, uuidChars, cursor, 2);
             lsb >>>= 8;
         }
         uuidChars[--cursor] = '-';
         while (cursor > 14) {
             cursor -= 2;
-            System.arraycopy(recode[(int)(msb & 0xff)], 0, uuidChars, cursor, 2);
+            System.arraycopy(recode[(int) (msb & 0xff)], 0, uuidChars, cursor, 2);
             msb >>>= 8;
         }
         uuidChars[--cursor] = '-';
         while (cursor > 9) {
             cursor -= 2;
-            System.arraycopy(recode[(int)(msb & 0xff)], 0, uuidChars, cursor, 2);
+            System.arraycopy(recode[(int) (msb & 0xff)], 0, uuidChars, cursor, 2);
             msb >>>= 8;
         }
         uuidChars[--cursor] = '-';
         while (cursor > 0) {
             cursor -= 2;
-            System.arraycopy(recode[(int)(msb & 0xff)], 0, uuidChars, cursor, 2);
+            System.arraycopy(recode[(int) (msb & 0xff)], 0, uuidChars, cursor, 2);
             msb >>>= 8;
         }
         return new String(uuidChars);

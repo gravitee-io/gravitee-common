@@ -15,16 +15,16 @@
  */
 package io.gravitee.common.util;
 
+import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Collections;
-
 /**
- * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com) 
+ * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
  * @author GraviteeSource Team
  */
 public class RelaxedPropertySourceTest {
+
     @Test
     public void shouldManageUppercase() {
         testKeyConfig("key1.key2", "key1.key2");
@@ -80,6 +80,7 @@ public class RelaxedPropertySourceTest {
     private void testKeyConfig(String key, String config) {
         testKeyConfig(key, config, true);
     }
+
     private void testKeyConfig(String key, String config, Object expected) {
         RelaxedPropertySource test = new RelaxedPropertySource("test", Collections.singletonMap(config, true));
         Assert.assertEquals(key + "==" + config, expected, test.getProperty(key));

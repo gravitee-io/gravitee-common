@@ -22,19 +22,21 @@ import io.gravitee.common.event.Event;
  */
 public class SimpleEvent<T extends Enum, S> implements Event<T, S> {
 
-  private final T type;
-  private final S content;
+    private final T type;
+    private final S content;
 
-  public SimpleEvent(T type, S content) {
-    this.type = type;
-    this.content = content;
-  }
+    public SimpleEvent(T type, S content) {
+        this.type = type;
+        this.content = content;
+    }
 
-  @Override public S content() {
-    return this.content;
-  }
+    @Override
+    public S content() {
+        return this.content;
+    }
 
-  @Override public T type() {
-    return this.type;
-  }
+    @Override
+    public T type() {
+        return this.type;
+    }
 }

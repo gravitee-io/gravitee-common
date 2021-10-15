@@ -15,17 +15,16 @@
  */
 package io.gravitee.common.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.env.Environment;
-
-import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataEncryptorTest {

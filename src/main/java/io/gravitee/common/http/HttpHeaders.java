@@ -17,7 +17,6 @@ package io.gravitee.common.http;
 
 import io.gravitee.common.util.LinkedCaseInsensitiveMap;
 import io.gravitee.common.util.MultiValueMap;
-
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -423,7 +422,10 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     }
 
     @Override
-    public List<String> computeIfPresent(String key, BiFunction<? super String, ? super List<String>, ? extends List<String>> remappingFunction) {
+    public List<String> computeIfPresent(
+        String key,
+        BiFunction<? super String, ? super List<String>, ? extends List<String>> remappingFunction
+    ) {
         return headers.computeIfPresent(key, remappingFunction);
     }
 
@@ -433,7 +435,11 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     }
 
     @Override
-    public List<String> merge(String key, List<String> value, BiFunction<? super List<String>, ? super List<String>, ? extends List<String>> remappingFunction) {
+    public List<String> merge(
+        String key,
+        List<String> value,
+        BiFunction<? super List<String>, ? super List<String>, ? extends List<String>> remappingFunction
+    ) {
         return headers.merge(key, value, remappingFunction);
     }
 
@@ -469,7 +475,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
 
     @Override
     public Map<String, String> toSingleValueMap() {
-        LinkedHashMap<String, String> singleValueMap = new LinkedHashMap<String,String>(this.headers.size());
+        LinkedHashMap<String, String> singleValueMap = new LinkedHashMap<String, String>(this.headers.size());
         for (Entry<String, List<String>> entry : this.headers.entrySet()) {
             singleValueMap.put(entry.getKey(), entry.getValue().get(0));
         }
@@ -479,9 +485,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     @Override
     public boolean containsAllKeys(Collection<String> keys) {
         final LinkedCaseInsensitiveMap<Object> headers = (LinkedCaseInsensitiveMap) this.headers;
-        final List<String> lowercaseKeys = keys.stream()
-                .map(s -> s.toLowerCase(headers.getLocale()))
-                .collect(Collectors.toList());
+        final List<String> lowercaseKeys = keys.stream().map(s -> s.toLowerCase(headers.getLocale())).collect(Collectors.toList());
         return headers.insensitiveKeySet().containsAll(lowercaseKeys);
     }
 

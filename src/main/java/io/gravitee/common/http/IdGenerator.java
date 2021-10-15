@@ -20,6 +20,5 @@ package io.gravitee.common.http;
  * @author GraviteeSource Team
  */
 public interface IdGenerator {
-
     String randomString();
 }

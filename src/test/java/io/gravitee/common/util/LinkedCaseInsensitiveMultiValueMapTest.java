@@ -15,17 +15,9 @@
  */
 package io.gravitee.common.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-
 import java.util.*;
-import java.util.stream.Collectors;
-import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Florent CHAMFROY (florent.chamfroy at graviteesource.com)
@@ -39,7 +31,7 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("KEYUP", "k");
         map.add("keydown", "k");
 
-        assertTrue(map.containsAllKeys(Arrays.asList("KEYUP", "keyUP", "kEyUp", "keyDown", "KEYDOWN")));
+        Assertions.assertTrue(map.containsAllKeys(Arrays.asList("KEYUP", "keyUP", "kEyUp", "keyDown", "KEYDOWN")));
     }
 
     @Test
@@ -48,10 +40,10 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("KEYUP", "k");
         map.add("keydown", "k");
 
-        assertTrue(map.containsKey("KEYUP"));
-        assertTrue(map.containsKey("keyup"));
-        assertTrue(map.containsKey("KEYDOWN"));
-        assertTrue(map.containsKey("keydown"));
+        Assertions.assertTrue(map.containsKey("KEYUP"));
+        Assertions.assertTrue(map.containsKey("keyup"));
+        Assertions.assertTrue(map.containsKey("KEYDOWN"));
+        Assertions.assertTrue(map.containsKey("keydown"));
     }
 
     @Test
@@ -60,14 +52,14 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("UP", "VALUP");
         map.add("up", "valdown");
 
-        assertEquals(Arrays.asList("VALUP", "valdown"), map.get("UP"));
-        assertEquals(Arrays.asList("VALUP", "valdown"), map.get("up"));
+        Assertions.assertEquals(Arrays.asList("VALUP", "valdown"), map.get("UP"));
+        Assertions.assertEquals(Arrays.asList("VALUP", "valdown"), map.get("up"));
 
         map.add("down", "valdown");
         map.add("DOWN", "VALUP");
 
-        assertEquals(Arrays.asList("valdown", "VALUP"), map.get("DOWN"));
-        assertEquals(Arrays.asList("valdown", "VALUP"), map.get("down"));
+        Assertions.assertEquals(Arrays.asList("valdown", "VALUP"), map.get("DOWN"));
+        Assertions.assertEquals(Arrays.asList("valdown", "VALUP"), map.get("down"));
     }
 
     @Test
@@ -76,10 +68,10 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("KEYUP", "k");
         map.add("keydown", "k");
 
-        assertEquals(Arrays.asList("k"), map.getOrDefault("KEYUP", Collections.singletonList("a")));
-        assertEquals(Arrays.asList("k"), map.getOrDefault("keyup", Collections.singletonList("a")));
-        assertEquals(Arrays.asList("k"), map.getOrDefault("KEYDOWN", Collections.singletonList("a")));
-        assertEquals(Arrays.asList("k"), map.getOrDefault("keydown", Collections.singletonList("a")));
+        Assertions.assertEquals(Arrays.asList("k"), map.getOrDefault("KEYUP", Collections.singletonList("a")));
+        Assertions.assertEquals(Arrays.asList("k"), map.getOrDefault("keyup", Collections.singletonList("a")));
+        Assertions.assertEquals(Arrays.asList("k"), map.getOrDefault("KEYDOWN", Collections.singletonList("a")));
+        Assertions.assertEquals(Arrays.asList("k"), map.getOrDefault("keydown", Collections.singletonList("a")));
     }
 
     @Test
@@ -88,14 +80,14 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("KEYUP", "k");
         map.add("keydown", "k");
 
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYUP", key -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("keyup", key -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYDOWN", key -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("keydown", key -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("xxxxxxx", key -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("XXXXXXX", key -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("YYYYYYY", key -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("yyyyyyy", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYUP", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("k"), map.computeIfAbsent("keyup", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYDOWN", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("k"), map.computeIfAbsent("keydown", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("xxxxxxx", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("XXXXXXX", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("YYYYYYY", key -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("yyyyyyy", key -> Collections.singletonList(key)));
     }
 
     @Test
@@ -104,11 +96,11 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("KEYUP", "k");
         map.add("keydown", "k");
 
-        assertEquals(Arrays.asList("KEYUP"), map.computeIfPresent("KEYUP", (key, v) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("keyup"), map.computeIfPresent("keyup", (key, v) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("KEYDOWN"), map.computeIfPresent("KEYDOWN", (key, v) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("keydown"), map.computeIfPresent("keydown", (key, v) -> Collections.singletonList(key)));
-        assertNull(map.computeIfPresent("xxxxxxx", (key, v) -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("KEYUP"), map.computeIfPresent("KEYUP", (key, v) -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("keyup"), map.computeIfPresent("keyup", (key, v) -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("KEYDOWN"), map.computeIfPresent("KEYDOWN", (key, v) -> Collections.singletonList(key)));
+        Assertions.assertEquals(Arrays.asList("keydown"), map.computeIfPresent("keydown", (key, v) -> Collections.singletonList(key)));
+        Assertions.assertNull(map.computeIfPresent("xxxxxxx", (key, v) -> Collections.singletonList(key)));
     }
 
     @Test
@@ -121,7 +113,7 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.replace("keyup", kbis);
         map.replace("KEYDOWN", kbis);
 
-        assertEquals(kbis, map.get("KEYUP"));
-        assertEquals(kbis, map.get("keydown"));
+        Assertions.assertEquals(kbis, map.get("KEYUP"));
+        Assertions.assertEquals(kbis, map.get("keydown"));
     }
 }

@@ -15,10 +15,8 @@
  */
 package io.gravitee.common.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jeoffrey HAEYAERT (jeoffrey.haeyaert at graviteesource.com)
@@ -28,7 +26,7 @@ public class IdGeneratorTest {
 
     @Test
     public void generateWithAccentedChars() {
-        assertEquals(
+        Assertions.assertEquals(
             "aaaaaaaaaaaaaaaaaaaaaaaaaaabbbccccccddddddeeeeeeeeeeeeeeeeeeeeeeeeefggggggghhhhhhhiiiiiiiiiiiiiiiijkkkkklllllllmmmnnnnnnnnnoooooooooooooooooooooooooooooooooopprrrrrrrrrsssssssssstttttttuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuvvwwwwwwxxyyyyyyyyyzzzzzzaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbccccccddddddeeeeeeeeeeeeeeeeeeeeeeeeefggggggghhhhhhhhiiiiiiiiiiiiiiijjkkkkklllllllmmmnnnnnnnnnoooooooooooooooooooooooooooooooooopprrrrrrrrrssssssssssttttttttuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuvvwwwwwwwxxyyyyyyyyyyzzzzzz",
             IdGenerator.generate(
                 "ĂẮẶẰẲẴǍÂẤẬẦẨẪÄǞȦǠȀÀẢȂĀĄÅǺḀȺÃÆǼǢꜴꜶꜸꜺꜼḂḄƁḆɃƂĆČÇḈĈĊƇȻĎḐḒḊḌƊḎǲǅĐƋǱǄÉĔĚȨḜÊẾỆỀỂỄḘËĖẸȄÈẺȆĒḖḔĘɆẼḚꝪḞƑǴĞǦĢĜĠƓḠǤḪȞḨĤⱧḦḢḤĦÍĬǏÎÏḮİỊȈÌỈȊĪĮƗĨḬꝹꝻꝽꞂꞄꞆꝬĴɈḰǨĶⱩꝂḲƘḴꝀꝄĹȽĽĻḼḶḸⱠꝈḺĿⱢǈŁǇḾṀṂⱮŃŇŅṊṄṆǸƝṈȠǋÑǊÓŎǑÔỐỘỒỔỖÖȪȮȰỌŐȌÒỎƠỚỢỜỞỠȎꝊꝌŌṒṐƟǪǬØǾÕṌṎȬƢꝎƐƆȢṔṖꝒƤꝔⱣꝐꝘꝖŔŘŖṘṚṜȐȒṞɌⱤꜾƎŚṤŠṦŞŜȘṠṢṨŤŢṰȚȾṪṬƬṮƮŦⱯꞀƜɅꜨÚŬǓÛṶÜǗǙǛǕṲỤŰȔÙỦƯỨỰỪỬỮȖŪṺŲŮŨṸṴꝞṾƲṼꝠẂŴẄẆẈẀⱲẌẊÝŶŸẎỴỲƳỶỾȲɎỸŹŽẐⱫŻẒȤẔƵĲŒᴀᴁʙᴃᴄᴅᴇꜰɢʛʜɪʁᴊᴋʟᴌᴍɴᴏɶᴐᴕᴘʀᴎᴙꜱᴛⱻᴚᴜᴠᴡʏᴢáăắặằẳẵǎâấậầẩẫäǟȧǡạȁàảȃāąᶏẚåǻḁⱥãꜳæǽǣꜵꜷꜹꜻꜽḃḅɓḇᵬᶀƀƃɵćčçḉĉɕċƈȼďḑḓȡḋḍɗᶑḏᵭᶁđɖƌıȷɟʄǳǆéĕěȩḝêếệềểễḙëėẹȅèẻȇēḗḕⱸęᶒɇẽḛꝫḟƒᵮᶂǵğǧģĝġɠḡᶃǥḫȟḩĥⱨḧḣḥɦẖħƕíĭǐîïḯịȉìỉȋīįᶖɨĩḭꝺꝼᵹꞃꞅꞇꝭǰĵʝɉḱǩķⱪꝃḳƙḵᶄꝁꝅĺƚɬľļḽȴḷḹⱡꝉḻŀɫᶅɭłǉẜẛẝḿṁṃɱᵯᶆńňņṋȵṅṇǹɲṉƞᵰᶇɳñǌóŏǒôốộồổỗöȫȯȱọőȍòỏơớợờởỡȏꝋꝍⱺōṓṑǫǭøǿõṍṏȭƣꝏɛᶓɔᶗȣṕṗꝓƥᵱᶈꝕᵽꝑꝙʠɋꝗŕřŗṙṛṝȑɾᵳȓṟɼᵲᶉɍɽↄꜿɘɿśṥšṧşŝșṡṣṩʂᵴᶊȿɡᴑᴓᴝťţṱțȶẗⱦṫṭƭṯᵵƫʈŧᵺɐᴂǝᵷɥʮʯᴉʞꞁɯɰᴔɹɻɺⱹʇʌʍʎꜩúŭǔûṷüǘǚǜǖṳụűȕùủưứựừửữȗūṻųᶙůũṹṵᵫꝸⱴꝟṿʋᶌⱱṽꝡẃŵẅẇẉẁⱳẘẍẋᶍýŷÿẏỵỳƴỷỿȳẙɏỹźžẑʑⱬżẓȥẕᵶᶎʐƶɀ\n"
@@ -38,31 +36,31 @@ public class IdGeneratorTest {
 
     @Test
     public void generateWithNonAlphabeticChars() {
-        assertEquals("", IdGenerator.generate("'\"'(§!)#°}][{_^¨$*€`£=+:/.;,?<>~|\\'"));
+        Assertions.assertEquals("", IdGenerator.generate("'\"'(§!)#°}][{_^¨$*€`£=+:/.;,?<>~|\\'"));
     }
 
     @Test
     public void generateWithSpacesTrimmed() {
-        assertEquals("test-test", IdGenerator.generate("     test   !   test    "));
+        Assertions.assertEquals("test-test", IdGenerator.generate("     test   !   test    "));
     }
 
     @Test
     public void generateWithInternalSpacesTrimmed() {
-        assertEquals("test", IdGenerator.generate("test      !"));
+        Assertions.assertEquals("test", IdGenerator.generate("test      !"));
     }
 
     @Test
     public void generateWithLoweredCase() {
-        assertEquals("test", IdGenerator.generate("TEST"));
+        Assertions.assertEquals("test", IdGenerator.generate("TEST"));
     }
 
     @Test
     public void generateWithDashes() {
-        assertEquals("test-test", IdGenerator.generate("Test-Test"));
+        Assertions.assertEquals("test-test", IdGenerator.generate("Test-Test"));
     }
 
     @Test
     public void generateWithNullValue() {
-        assertNull(IdGenerator.generate(null));
+        Assertions.assertNull(IdGenerator.generate(null));
     }
 }

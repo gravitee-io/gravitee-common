@@ -15,9 +15,8 @@
  */
 package io.gravitee.common.util;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class LinkedCaseInsensitiveMapTest {
 
@@ -27,10 +26,10 @@ public class LinkedCaseInsensitiveMapTest {
         map.put("KEYUP", "k");
         map.put("keydown", "k");
 
-        assertTrue(map.containsKey("KEYUP"));
-        assertTrue(map.containsKey("keyup"));
-        assertTrue(map.containsKey("KEYDOWN"));
-        assertTrue(map.containsKey("keydown"));
+        Assertions.assertTrue(map.containsKey("KEYUP"));
+        Assertions.assertTrue(map.containsKey("keyup"));
+        Assertions.assertTrue(map.containsKey("KEYDOWN"));
+        Assertions.assertTrue(map.containsKey("keydown"));
     }
 
     @Test
@@ -39,14 +38,14 @@ public class LinkedCaseInsensitiveMapTest {
         map.putIfAbsent("UP", "VALUP");
         map.putIfAbsent("up", "valdown");
 
-        assertEquals("VALUP", map.get("UP"));
-        assertEquals("VALUP", map.get("up"));
+        Assertions.assertEquals("VALUP", map.get("UP"));
+        Assertions.assertEquals("VALUP", map.get("up"));
 
         map.putIfAbsent("down", "valdown");
         map.putIfAbsent("DOWN", "VALUP");
 
-        assertEquals("valdown", map.get("DOWN"));
-        assertEquals("valdown", map.get("down"));
+        Assertions.assertEquals("valdown", map.get("DOWN"));
+        Assertions.assertEquals("valdown", map.get("down"));
     }
 
     @Test
@@ -55,10 +54,10 @@ public class LinkedCaseInsensitiveMapTest {
         map.put("KEYUP", "k");
         map.put("keydown", "k");
 
-        assertEquals("k", map.getOrDefault("KEYUP", "a"));
-        assertEquals("k", map.getOrDefault("keyup", "a"));
-        assertEquals("k", map.getOrDefault("KEYDOWN", "a"));
-        assertEquals("k", map.getOrDefault("keydown", "a"));
+        Assertions.assertEquals("k", map.getOrDefault("KEYUP", "a"));
+        Assertions.assertEquals("k", map.getOrDefault("keyup", "a"));
+        Assertions.assertEquals("k", map.getOrDefault("KEYDOWN", "a"));
+        Assertions.assertEquals("k", map.getOrDefault("keydown", "a"));
     }
 
     @Test
@@ -67,14 +66,14 @@ public class LinkedCaseInsensitiveMapTest {
         map.put("KEYUP", "k");
         map.put("keydown", "k");
 
-        assertEquals("k", map.computeIfAbsent("KEYUP", key -> key));
-        assertEquals("k", map.computeIfAbsent("keyup", key -> key));
-        assertEquals("k", map.computeIfAbsent("KEYDOWN", key -> key));
-        assertEquals("k", map.computeIfAbsent("keydown", key -> key));
-        assertEquals("xxxxxxx", map.computeIfAbsent("xxxxxxx", key -> key));
-        assertEquals("xxxxxxx", map.computeIfAbsent("XXXXXXX", key -> key));
-        assertEquals("YYYYYYY", map.computeIfAbsent("YYYYYYY", key -> key));
-        assertEquals("YYYYYYY", map.computeIfAbsent("yyyyyyy", key -> key));
+        Assertions.assertEquals("k", map.computeIfAbsent("KEYUP", key -> key));
+        Assertions.assertEquals("k", map.computeIfAbsent("keyup", key -> key));
+        Assertions.assertEquals("k", map.computeIfAbsent("KEYDOWN", key -> key));
+        Assertions.assertEquals("k", map.computeIfAbsent("keydown", key -> key));
+        Assertions.assertEquals("xxxxxxx", map.computeIfAbsent("xxxxxxx", key -> key));
+        Assertions.assertEquals("xxxxxxx", map.computeIfAbsent("XXXXXXX", key -> key));
+        Assertions.assertEquals("YYYYYYY", map.computeIfAbsent("YYYYYYY", key -> key));
+        Assertions.assertEquals("YYYYYYY", map.computeIfAbsent("yyyyyyy", key -> key));
     }
 
     @Test
@@ -83,11 +82,11 @@ public class LinkedCaseInsensitiveMapTest {
         map.put("KEYUP", "k");
         map.put("keydown", "k");
 
-        assertEquals("KEYUP", map.computeIfPresent("KEYUP", (key, v) -> key));
-        assertEquals("keyup", map.computeIfPresent("keyup", (key, v) -> key));
-        assertEquals("KEYDOWN", map.computeIfPresent("KEYDOWN", (key, v) -> key));
-        assertEquals("keydown", map.computeIfPresent("keydown", (key, v) -> key));
-        assertNull(map.computeIfPresent("xxxxxxx", (key, v) -> key));
+        Assertions.assertEquals("KEYUP", map.computeIfPresent("KEYUP", (key, v) -> key));
+        Assertions.assertEquals("keyup", map.computeIfPresent("keyup", (key, v) -> key));
+        Assertions.assertEquals("KEYDOWN", map.computeIfPresent("KEYDOWN", (key, v) -> key));
+        Assertions.assertEquals("keydown", map.computeIfPresent("keydown", (key, v) -> key));
+        Assertions.assertNull(map.computeIfPresent("xxxxxxx", (key, v) -> key));
     }
 
     @Test
@@ -99,7 +98,7 @@ public class LinkedCaseInsensitiveMapTest {
         map.replace("keyup", "kbis");
         map.replace("KEYDOWN", "kbis");
 
-        assertEquals("kbis", map.get("KEYUP"));
-        assertEquals("kbis", map.get("keydown"));
+        Assertions.assertEquals("kbis", map.get("KEYUP"));
+        Assertions.assertEquals("kbis", map.get("keydown"));
     }
 }

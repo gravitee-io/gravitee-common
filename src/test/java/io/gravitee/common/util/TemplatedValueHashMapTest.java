@@ -15,9 +15,11 @@
  */
 package io.gravitee.common.util;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author David BRASSELY (david at gravitee.io)
@@ -29,14 +31,14 @@ public class TemplatedValueHashMapTest {
     public void should_returnNull() {
         Map<String, String> properties = new TemplatedValueHashMap();
 
-        Assert.assertNull(properties.get("dummy_key"));
+        Assertions.assertNull(properties.get("dummy_key"));
     }
 
     @Test
     public void should_returnValue() {
         Map<String, String> properties = new TemplatedValueHashMap();
         properties.put("my_key", "my_value");
-        Assert.assertEquals("my_value", properties.get("my_key"));
+        Assertions.assertEquals("my_value", properties.get("my_key"));
     }
 
     @Test
@@ -44,7 +46,7 @@ public class TemplatedValueHashMapTest {
         Map<String, String> properties = new TemplatedValueHashMap();
         properties.put("my_key", "my_value");
         properties.put("other_key", "{{my_key}}");
-        Assert.assertEquals("my_value", properties.get("other_key"));
+        Assertions.assertEquals("my_value", properties.get("other_key"));
     }
 
     @Test
@@ -53,14 +55,14 @@ public class TemplatedValueHashMapTest {
         properties.put("my_key", "my_value");
         properties.put("my_key2", "other_value");
         properties.put("other_key", "{{my_key}} - {{my_key2}}");
-        Assert.assertEquals("my_value - other_value", properties.get("other_key"));
+        Assertions.assertEquals("my_value - other_value", properties.get("other_key"));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void should_returnResolveUnknownValue() {
         Map<String, String> properties = new TemplatedValueHashMap();
         properties.put("my_key", "my_value");
         properties.put("other_key", "{{my_key2}}");
-        Assert.assertNull(properties.get("other_key"));
+        assertThrows(IllegalStateException.class, () -> properties.get("other_key"));
     }
 }

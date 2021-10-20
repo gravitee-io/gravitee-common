@@ -15,10 +15,11 @@
  */
 package io.gravitee.common.http;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -29,42 +30,42 @@ public class MediaTypeTest {
     @Test
     public void shouldParseNull() {
         MediaType type = MediaType.parseMediaType(null);
-        Assert.assertNull(type);
+        assertNull(type);
     }
 
     @Test
     public void shouldParseEmpty() {
         MediaType type = MediaType.parseMediaType("");
-        Assert.assertNull(type);
+        assertNull(type);
     }
 
     @Test
     public void shouldParseSingle() {
         MediaType type = MediaType.parseMediaType("application/json");
-        Assert.assertNotNull(type);
-        Assert.assertEquals(MediaType.MEDIA_APPLICATION_JSON, type);
+        assertNotNull(type);
+        assertEquals(MediaType.MEDIA_APPLICATION_JSON, type);
     }
 
     @Test
     public void shouldParseMultipleEmptyString() {
         List<MediaType> types = MediaType.parseMediaTypes("");
-        Assert.assertEquals(Collections.emptyList(), types);
+        assertEquals(Collections.emptyList(), types);
     }
 
     @Test
     public void shouldParseMultipleEmptyList() {
         List<MediaType> types = MediaType.parseMediaTypes(Collections.emptyList());
-        Assert.assertEquals(Collections.emptyList(), types);
+        assertEquals(Collections.emptyList(), types);
     }
 
     @Test
     public void shouldParseMultiple() {
         List<MediaType> types = MediaType.parseMediaTypes("text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8");
-        Assert.assertNotNull(types);
-        Assert.assertEquals(4, types.size());
+        assertNotNull(types);
+        assertEquals(4, types.size());
 
-        Assert.assertEquals(0.9d, types.get(2).getQualityFactor(), 0.0d);
-        Assert.assertEquals(0.8d, types.get(3).getQualityFactor(), 0.0d);
+        assertEquals(0.9d, types.get(2).getQualityFactor(), 0.0d);
+        assertEquals(0.8d, types.get(3).getQualityFactor(), 0.0d);
     }
 
     @Test
@@ -72,10 +73,10 @@ public class MediaTypeTest {
         List<MediaType> types = MediaType.parseMediaTypes("text/html, application/xhtml+xml, */*;q=0.8, application/xml;q=0.9");
         MediaType.sortByQualityValue(types);
 
-        Assert.assertNotNull(types);
-        Assert.assertEquals(4, types.size());
+        assertNotNull(types);
+        assertEquals(4, types.size());
 
-        Assert.assertEquals(0.9d, types.get(2).getQualityFactor(), 0.0d);
-        Assert.assertEquals(0.8d, types.get(3).getQualityFactor(), 0.0d);
+        assertEquals(0.9d, types.get(2).getQualityFactor(), 0.0d);
+        assertEquals(0.8d, types.get(3).getQualityFactor(), 0.0d);
     }
 }

@@ -15,19 +15,17 @@
  */
 package io.gravitee.common.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Florent CHAMFROY (florent.chamfroy at graviteesource.com)
@@ -42,7 +40,6 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("keydown", "k");
 
         assertTrue(map.containsAllKeys(Arrays.asList("KEYUP", "keyUP", "kEyUp", "keyDown", "KEYDOWN")));
-
     }
 
     @Test
@@ -91,14 +88,14 @@ public class LinkedCaseInsensitiveMultiValueMapTest {
         map.add("KEYUP", "k");
         map.add("keydown", "k");
 
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYUP", (key) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("keyup", (key) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYDOWN", (key) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("k"), map.computeIfAbsent("keydown", (key) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("xxxxxxx", (key) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("XXXXXXX", (key) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("YYYYYYY", (key) -> Collections.singletonList(key)));
-        assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("yyyyyyy", (key) -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYUP", key -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("k"), map.computeIfAbsent("keyup", key -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("k"), map.computeIfAbsent("KEYDOWN", key -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("k"), map.computeIfAbsent("keydown", key -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("xxxxxxx", key -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("xxxxxxx"), map.computeIfAbsent("XXXXXXX", key -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("YYYYYYY", key -> Collections.singletonList(key)));
+        assertEquals(Arrays.asList("YYYYYYY"), map.computeIfAbsent("yyyyyyy", key -> Collections.singletonList(key)));
     }
 
     @Test

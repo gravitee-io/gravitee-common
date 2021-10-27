@@ -22,27 +22,34 @@ package io.gravitee.common.http;
  * @author GraviteeSource Team
  */
 public enum HttpMethod {
+    CONNECT(1),
+    DELETE(2),
+    GET(3),
+    HEAD(4),
+    OPTIONS(5),
+    PATCH(6),
+    POST(7),
+    PUT(8),
+    TRACE(9),
+    OTHER(0);
 
-  CONNECT(1), DELETE(2), GET(3), HEAD(4), OPTIONS(5), PATCH(6), POST(7), PUT(8), TRACE(9), OTHER(0);
+    private int code;
 
-  private int code;
-
-  HttpMethod(int code) {
-    this.code = code;
-  }
-
-  public int code() {
-    return code;
-  }
-
-  public static HttpMethod get(int code) {
-    for(HttpMethod method : HttpMethod.values()) {
-      if (method.code == code) {
-        return method;
-      }
+    HttpMethod(int code) {
+        this.code = code;
     }
 
+    public int code() {
+        return code;
+    }
 
-    return HttpMethod.OTHER;
-  }
+    public static HttpMethod get(int code) {
+        for (HttpMethod method : HttpMethod.values()) {
+            if (method.code == code) {
+                return method;
+            }
+        }
+
+        return HttpMethod.OTHER;
+    }
 }

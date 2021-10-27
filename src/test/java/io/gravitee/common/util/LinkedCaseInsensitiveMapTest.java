@@ -15,11 +15,12 @@
  */
 package io.gravitee.common.util;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
 
+import org.junit.Test;
+
 public class LinkedCaseInsensitiveMapTest {
+
     @Test
     public void containsKeyShouldBeCaseInsensitive() {
         LinkedCaseInsensitiveMap<String> map = new LinkedCaseInsensitiveMap<>();
@@ -66,14 +67,14 @@ public class LinkedCaseInsensitiveMapTest {
         map.put("KEYUP", "k");
         map.put("keydown", "k");
 
-        assertEquals("k", map.computeIfAbsent("KEYUP", (key) -> key));
-        assertEquals("k", map.computeIfAbsent("keyup", (key) -> key));
-        assertEquals("k", map.computeIfAbsent("KEYDOWN", (key) -> key));
-        assertEquals("k", map.computeIfAbsent("keydown", (key) -> key));
-        assertEquals("xxxxxxx", map.computeIfAbsent("xxxxxxx", (key) -> key));
-        assertEquals("xxxxxxx", map.computeIfAbsent("XXXXXXX", (key) -> key));
-        assertEquals("YYYYYYY", map.computeIfAbsent("YYYYYYY", (key) -> key));
-        assertEquals("YYYYYYY", map.computeIfAbsent("yyyyyyy", (key) -> key));
+        assertEquals("k", map.computeIfAbsent("KEYUP", key -> key));
+        assertEquals("k", map.computeIfAbsent("keyup", key -> key));
+        assertEquals("k", map.computeIfAbsent("KEYDOWN", key -> key));
+        assertEquals("k", map.computeIfAbsent("keydown", key -> key));
+        assertEquals("xxxxxxx", map.computeIfAbsent("xxxxxxx", key -> key));
+        assertEquals("xxxxxxx", map.computeIfAbsent("XXXXXXX", key -> key));
+        assertEquals("YYYYYYY", map.computeIfAbsent("YYYYYYY", key -> key));
+        assertEquals("YYYYYYY", map.computeIfAbsent("yyyyyyy", key -> key));
     }
 
     @Test

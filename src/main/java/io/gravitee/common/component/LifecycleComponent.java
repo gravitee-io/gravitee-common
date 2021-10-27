@@ -19,26 +19,25 @@ package io.gravitee.common.component;
  * @author David BRASSELY (brasseld at gmail.com)
  */
 public interface LifecycleComponent<T> {
+    Lifecycle.State lifecycleState();
 
-  Lifecycle.State lifecycleState();
+    default T preStart() throws Exception {
+        return (T) this;
+    }
 
-  default T preStart() throws Exception {
-    return (T) this;
-  }
+    T start() throws Exception;
 
-  T start() throws Exception;
+    default T postStart() throws Exception {
+        return (T) this;
+    }
 
-  default T postStart() throws Exception {
-    return (T) this;
-  }
+    default T preStop() throws Exception {
+        return (T) this;
+    }
 
-  default T preStop() throws Exception {
-    return (T) this;
-  }
+    T stop() throws Exception;
 
-  T stop() throws Exception;
-
-  default T postStop() throws Exception {
-    return (T) this;
-  }
+    default T postStop() throws Exception {
+        return (T) this;
+    }
 }

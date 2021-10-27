@@ -15,10 +15,9 @@
  */
 package io.gravitee.common.util;
 
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Map;
 
 /**
  * @author David BRASSELY (david at gravitee.io)

@@ -15,15 +15,13 @@
  */
 package io.gravitee.common.http;
 
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Yann TAVERNIER (yann.tavernier at graviteesource.com)
@@ -32,11 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HttpHeadersTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "X-Header",
-            "X-HeaDER",
-            "x-header",
-    })
+    @ValueSource(strings = { "X-Header", "X-HeaDER", "x-header" })
     public void shouldContainsKeyCaseInsensitive(String header) {
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("X-Header", "value");
@@ -46,11 +40,7 @@ public class HttpHeadersTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "X-Header,x-another-header,HOST,accept-EnCoDing",
-            "X-HeaDER,X-Another-HEADER",
-            "x-header"
-    })
+    @ValueSource(strings = { "X-Header,x-another-header,HOST,accept-EnCoDing", "X-HeaDER,X-Another-HEADER", "x-header" })
     public void shouldContainsAllKeysCaseInsensitive(String headers) {
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("X-Header", "value");

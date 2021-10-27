@@ -16,7 +16,6 @@
 package io.gravitee.common.utils;
 
 import io.gravitee.common.http.IdGenerator;
-
 import java.util.Random;
 
 /**

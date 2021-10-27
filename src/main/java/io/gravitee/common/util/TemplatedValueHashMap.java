@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public class TemplatedValueHashMap extends HashMap<String, String> {
 
-    private final static Pattern PATTERN = Pattern.compile("\\{\\{(.*?)\\}\\}");
+    private static final Pattern PATTERN = Pattern.compile("\\{\\{(.*?)\\}\\}");
 
     @Override
     public String get(Object key) {

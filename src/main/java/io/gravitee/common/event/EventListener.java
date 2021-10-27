@@ -19,6 +19,5 @@ package io.gravitee.common.event;
  * @author David BRASSELY (brasseld at gmail.com)
  */
 public interface EventListener<T extends Enum, S> {
-
-  void onEvent(Event<T, S> event);
+    void onEvent(Event<T, S> event);
 }

@@ -32,7 +32,6 @@ public class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
 
     private final Locale locale;
 
-
     /**
      * Create a new LinkedCaseInsensitiveMap for the default Locale.
      * @see java.lang.String#toLowerCase()
@@ -78,7 +77,6 @@ public class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
         this.locale = (locale != null ? locale : Locale.getDefault());
     }
 
-
     @Override
     public V put(String key, V value) {
         String oldKey = this.caseInsensitiveKeys.put(convertKey(key), key);
@@ -107,18 +105,16 @@ public class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
     public V get(Object key) {
         if (key instanceof String) {
             return super.get(this.caseInsensitiveKeys.get(convertKey((String) key)));
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     @Override
     public V remove(Object key) {
-        if (key instanceof String ) {
+        if (key instanceof String) {
             return super.remove(this.caseInsensitiveKeys.remove(convertKey((String) key)));
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -131,10 +127,9 @@ public class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        if (key instanceof String ) {
+        if (key instanceof String) {
             return super.getOrDefault(this.caseInsensitiveKeys.get(convertKey((String) key)), defaultValue);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -204,5 +199,4 @@ public class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
     protected String convertKey(String key) {
         return key.toLowerCase(this.locale);
     }
-
 }

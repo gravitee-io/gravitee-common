@@ -61,7 +61,4 @@ public class LinkedCaseInsensitiveMultiValueMap<V> extends LinkedMultiValueMap<S
     public LinkedCaseInsensitiveMultiValueMap(int initialCapacity, Locale locale) {
         this.targetMap = new LinkedCaseInsensitiveMap(initialCapacity, locale);
     }
-
-
-
 }

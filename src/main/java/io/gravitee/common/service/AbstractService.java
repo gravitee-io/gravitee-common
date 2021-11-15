@@ -51,4 +51,15 @@ public abstract class AbstractService<T extends io.gravitee.common.component.Lif
     protected void doStop() throws Exception {
         LOGGER.info("Destroying service {}", name());
     }
+
+    /**
+     * Service startup order.
+     * ServiceManager will start all services plugins using this order, starting with lower ones at first.
+     * And will stop them starting with higher ones at first.
+     *
+     * @return order
+     */
+    public int getOrder() {
+        return 1000;
+    }
 }

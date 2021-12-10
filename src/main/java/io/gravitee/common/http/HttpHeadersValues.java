@@ -24,4 +24,7 @@ public interface HttpHeadersValues {
 
     String TRANSFER_ENCODING_CHUNKED = "chunked";
 
+    // Special value used for HTTP2 to force a goAway frame.
+    String CONNECTION_GO_AWAY = "goAway";
+
 }

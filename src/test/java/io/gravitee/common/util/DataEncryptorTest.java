@@ -15,18 +15,19 @@
  */
 package io.gravitee.common.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DataEncryptorTest {
 
     private static final String SECRET_PROPERTY_KEY = "environment.property.key";
@@ -52,16 +53,16 @@ public class DataEncryptorTest {
         assertEquals(PLAIN_VALUE, decryptedString);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void should_throw_exception_when_decrypting_invalid_encrypted_value() throws GeneralSecurityException {
         mockEnvironmentContainingSecretKey();
-        buildDataEncryptor().decrypt("this is not encrypted");
+        assertThrows(IllegalArgumentException.class, () -> buildDataEncryptor().decrypt("this is not encrypted"));
     }
 
-    @Test(expected = InvalidKeyException.class)
+    @Test
     public void should_throw_exception_when_using_a_wrong_secret() throws GeneralSecurityException {
         mockEnvironmentContainingWrongSecretKey();
-        buildDataEncryptor().encrypt(PLAIN_VALUE);
+        assertThrows(InvalidKeyException.class, () -> buildDataEncryptor().encrypt(PLAIN_VALUE));
     }
 
     private DataEncryptor buildDataEncryptor() {

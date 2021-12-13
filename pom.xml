@@ -36,6 +36,7 @@
     <properties>
         <gravitee-bom.version>1.4</gravitee-bom.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
+        <bouncycastle.version>1.69</bouncycastle.version>
     </properties>
 
     <dependencyManagement>
@@ -71,15 +72,30 @@
             <version>${java-uuid-generator.version}</version>
         </dependency>
 
+
+        <!-- Bouncy Castle -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Unit Tests -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

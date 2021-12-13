@@ -16,8 +16,8 @@
 package io.gravitee.common.util;
 
 import java.util.Collections;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
@@ -83,6 +83,6 @@ public class RelaxedPropertySourceTest {
 
     private void testKeyConfig(String key, String config, Object expected) {
         RelaxedPropertySource test = new RelaxedPropertySource("test", Collections.singletonMap(config, true));
-        Assert.assertEquals(key + "==" + config, expected, test.getProperty(key));
+        Assertions.assertEquals(expected, test.getProperty(key), key + "==" + config);
     }
 }

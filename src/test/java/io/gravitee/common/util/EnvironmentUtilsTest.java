@@ -15,12 +15,10 @@
  */
 package io.gravitee.common.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -31,25 +29,25 @@ public class EnvironmentUtilsTest {
     @Test
     public void shouldEncodeArrayKey() {
         String key = EnvironmentUtils.encodeArrayKey("properties_0_values_1_key");
-        Assert.assertEquals("properties[0].values[1].key", key);
+        assertEquals("properties[0].values[1].key", key);
     }
 
     @Test
     public void shouldEncodeArrayKey2() {
         String key = EnvironmentUtils.encodeArrayKey("properties_0_values[1].key");
-        Assert.assertEquals("properties[0].values[1].key", key);
+        assertEquals("properties[0].values[1].key", key);
     }
 
     @Test
     public void shouldEncodeIndexedArrayKey() {
         String key = EnvironmentUtils.encodeIndexedArrayKey("properties[0].values[1].key");
-        Assert.assertEquals("properties_0_values_1_key", key);
+        assertEquals("properties_0_values_1_key", key);
     }
 
     @Test
     public void shouldEncodeIndexedArrayKey2() {
         String key = EnvironmentUtils.encodeIndexedArrayKey("properties[0].values_1_key");
-        Assert.assertEquals("properties_0_values_1_key", key);
+        assertEquals("properties_0_values_1_key", key);
     }
 
     @Test
@@ -60,20 +58,20 @@ public class EnvironmentUtilsTest {
 
         EnvironmentUtils.addAll(entries, map1);
 
-        Assert.assertFalse(entries.isEmpty());
+        assertFalse(entries.isEmpty());
 
         Map<String, Object> map2 = Maps.<String, Object>builder().put("properties[0].values_1_key", "value2").build();
 
         EnvironmentUtils.addAll(entries, map2);
 
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
 
         Map<String, Object> map3 = Maps.<String, Object>builder().put("properties[0].values[1].key", "value3").build();
 
         EnvironmentUtils.addAll(entries, map2);
 
-        Assert.assertEquals(1, entries.size());
-        Assert.assertEquals("value1", entries.get("properties[0].values[1].key"));
+        assertEquals(1, entries.size());
+        assertEquals("value1", entries.get("properties[0].values[1].key"));
     }
 
     @Test
@@ -86,9 +84,12 @@ public class EnvironmentUtilsTest {
         assertTrue(EnvironmentUtils.hasMatchingTags(Optional.ofNullable(null), new HashSet<>()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void should_fail_if_tag_is_included_and_excluded() {
-        EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env", "!env")), new HashSet<>());
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env", "!env")), new HashSet<>())
+        );
     }
 
     @Test

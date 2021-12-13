@@ -24,7 +24,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * @author David BRASSELY (brasseld at gmail.com)
+ * @author David BRASSELY (david.brassely at graviteesource.com)
+ * @author GraviteeSource Team
+ * @deprecated since 3.15.x
+ * Use {@link io.gravitee.gateway.api.http.HttpHeaders} instead
  */
 public class HttpHeaders implements MultiValueMap<String, String> {
 

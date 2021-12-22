@@ -23,6 +23,7 @@ public class Lifecycle {
     public static enum State {
         INITIALIZED,
         STOPPED,
+        STOPPING,
         STARTED,
         CLOSED,
     }
@@ -76,9 +77,14 @@ public class Lifecycle {
         throw new IllegalStateException("Can't move to started with unknown state");
     }
 
+    public boolean moveToStopping() {
+        state = State.STOPPING;
+        return true;
+    }
+
     public boolean moveToStopped() {
         State localState = state;
-        if (localState == State.STARTED) {
+        if (localState == State.STARTED || localState == State.STOPPING) {
             state = State.STOPPED;
             return true;
         }
@@ -86,9 +92,9 @@ public class Lifecycle {
             return false;
         }
         if (localState == State.CLOSED) {
-            throw new IllegalStateException("Can't move to started state when closed");
+            throw new IllegalStateException("Can't move to stopped state when closed");
         }
-        throw new IllegalStateException("Can't move to started with unknown state");
+        throw new IllegalStateException("Can't move to stopped with unknown state");
     }
 
     @Override

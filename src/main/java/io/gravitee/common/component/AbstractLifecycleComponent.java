@@ -43,6 +43,12 @@ public abstract class AbstractLifecycleComponent<T> implements LifecycleComponen
         return (T) this;
     }
 
+    @Override
+    public T preStop() throws Exception {
+        lifecycle.moveToStopping();
+        return (T) this;
+    }
+
     protected abstract void doStart() throws Exception;
 
     protected abstract void doStop() throws Exception;

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.PrivateKey;
 import java.util.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,13 @@ public class KeyStoreUtilsTest {
 
         Assertions.assertNotNull(keyStore);
         Assertions.assertEquals(4, keyStore.size());
+    }
+
+    @Test
+    public void shouldLoadPKCS8Key() throws IOException, KeyStoreException {
+        final PrivateKey privateKey = KeyStoreUtils.loadPemPrivateKey(readContent("rsakey.pem", false));
+
+        Assertions.assertNotNull(privateKey);
     }
 
     @Test

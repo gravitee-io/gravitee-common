@@ -64,3 +64,7 @@ keytool -importkeystore -srckeystore wildcard.p12 -destkeystore all-in-one.p12 -
 keytool -importkeystore -srckeystore all-in-one.p12 -destkeystore all-in-one.jks -srcstoretype PKCS12 -deststoretype JKS -srcstorepass secret -deststorepass secret -v
 ```
 
+Generate a PKCS#8 private key
+```bash
+openssl genpkey -out rsakey.pem -algorithm RSA -pkeyopt rsa_keygen_bits:2048
+```

@@ -23,6 +23,7 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -269,6 +270,12 @@ public class KeyStoreUtils {
             while ((o = pemParser.readObject()) != null) {
                 if (o instanceof PEMKeyPair) {
                     PrivateKey privateKey = converter.getPrivateKey(((PEMKeyPair) o).getPrivateKeyInfo());
+                    if (privateKey == null) {
+                        continue;
+                    }
+                    return privateKey;
+                } else if (o instanceof PrivateKeyInfo) {
+                    PrivateKey privateKey = converter.getPrivateKey((PrivateKeyInfo) o);
                     if (privateKey == null) {
                         continue;
                     }

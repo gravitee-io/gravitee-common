@@ -15,16 +15,15 @@
  */
 package io.gravitee.common.util;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -35,8 +34,8 @@ public final class EnvironmentUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnvironmentUtils.class);
 
     public static Map<String, Object> getPropertiesStartingWith(ConfigurableEnvironment aEnv, String aKeyPrefix) {
-        Map<String,Object> result = new HashMap<>();
-        Map<String,Object> map = getAllProperties( aEnv );
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> map = getAllProperties(aEnv);
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -58,20 +57,17 @@ public final class EnvironmentUtils {
     }
 
     public static String encodedKey(String key) {
-        return key.replaceAll("\\.", "_")
-                .replaceAll("\\[", "_")
-                .replaceAll("\\]", "")
-                .toUpperCase();
+        return key.replaceAll("\\.", "_").replaceAll("\\[", "_").replaceAll("\\]", "").toUpperCase();
     }
 
-    public static Map<String,Object> getAllProperties(ConfigurableEnvironment aEnv) {
-        Map<String,Object> result = new HashMap<>();
+    public static Map<String, Object> getAllProperties(ConfigurableEnvironment aEnv) {
+        Map<String, Object> result = new HashMap<>();
         aEnv.getPropertySources().forEach(ps -> addAll(result, getAllProperties(ps)));
         return result;
     }
 
-    public static Map<String,Object> getAllProperties(PropertySource<?> aPropSource) {
-        Map<String,Object> result = new HashMap<>();
+    public static Map<String, Object> getAllProperties(PropertySource<?> aPropSource) {
+        Map<String, Object> result = new HashMap<>();
 
         if (aPropSource instanceof CompositePropertySource) {
             CompositePropertySource cps = (CompositePropertySource) aPropSource;
@@ -87,8 +83,7 @@ public final class EnvironmentUtils {
 
         // note: Most descendants of PropertySource are EnumerablePropertySource. There are some
         // few others like JndiPropertySource or StubPropertySource
-        LOGGER.debug( "Given PropertySource is instanceof " + aPropSource.getClass().getName()
-                + " and cannot be iterated" );
+        LOGGER.debug("Given PropertySource is instanceof " + aPropSource.getClass().getName() + " and cannot be iterated");
 
         return result;
     }
@@ -97,8 +92,7 @@ public final class EnvironmentUtils {
         for (Map.Entry<String, Object> entry : aToBeAdded.entrySet()) {
             // Precedence is managed by the order of property sources, so we should skip if the key is already present
             // without taking care of the key's format
-            if (aBase.containsKey(encodeArrayKey(entry.getKey())) ||
-                    aBase.containsKey(encodeIndexedArrayKey(entry.getKey()))) {
+            if (aBase.containsKey(encodeArrayKey(entry.getKey())) || aBase.containsKey(encodeIndexedArrayKey(entry.getKey()))) {
                 continue;
             }
 

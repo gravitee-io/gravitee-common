@@ -39,16 +39,16 @@ public final class IdGenerator {
      * @return a string which can be used as human readable id.
      */
     public static String generate(String name) {
-
-        if(name == null) {
+        if (name == null) {
             return null;
         }
 
-        return Normalizer.normalize(name, Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-                .toLowerCase()
-                .replaceAll("[^a-z\\d\\s-]", "")
-                .trim()
-                .replaceAll("[^a-z\\d]+", "-");
+        return Normalizer
+            .normalize(name, Normalizer.Form.NFD)
+            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+            .toLowerCase()
+            .replaceAll("[^a-z\\d\\s-]", "")
+            .trim()
+            .replaceAll("[^a-z\\d]+", "-");
     }
 }

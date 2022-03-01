@@ -15,15 +15,14 @@
  */
 package io.gravitee.common.util;
 
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.util.Assert;
 
-import java.util.Map;
-
 /**
- * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com) 
+ * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
  * @author GraviteeSource Team
  *
  * @see org.springframework.core.env.SystemEnvironmentPropertySource
@@ -40,7 +39,6 @@ public class RelaxedPropertySource extends MapPropertySource {
     public RelaxedPropertySource(String name, Map<String, Object> source) {
         super(name, source);
     }
-
 
     /**
      * Return {@code true} if a property with the given name or any underscore/uppercase variant
@@ -64,8 +62,9 @@ public class RelaxedPropertySource extends MapPropertySource {
     public Object getProperty(String name) {
         String actualName = resolvePropertyName(name);
         if (logger.isDebugEnabled() && !name.equals(actualName)) {
-            logger.debug(String.format("PropertySource [%s] does not contain '%s', but found equivalent '%s'",
-                    getName(), name, actualName));
+            logger.debug(
+                String.format("PropertySource [%s] does not contain '%s', but found equivalent '%s'", getName(), name, actualName)
+            );
         }
         return super.getProperty(actualName);
     }
@@ -114,20 +113,19 @@ public class RelaxedPropertySource extends MapPropertySource {
             return noHyphenNameAndDotName;
         }
         // Check if name is an array
-        if(name.split(":")[0].contains("[")) {
+        if (name.split(":")[0].contains("[")) {
             return checkPropertyName(encodedArray(name));
         }
 
         // Give up
         return null;
     }
+
     private String encodedArray(String name) {
         String[] keyWithDefault = name.split(":");
         String encodedKey = keyWithDefault[0];
-        if(keyWithDefault[0].contains("[")) {
-            encodedKey = encodedKey
-                    .replace("[", ".")
-                    .replace("]", "");
+        if (keyWithDefault[0].contains("[")) {
+            encodedKey = encodedKey.replace("[", ".").replace("]", "");
         }
         return keyWithDefault.length == 1 ? encodedKey : encodedKey + ":" + keyWithDefault[1];
     }
@@ -139,5 +137,4 @@ public class RelaxedPropertySource extends MapPropertySource {
     protected boolean isSecurityManagerPresent() {
         return (System.getSecurityManager() != null);
     }
-
 }

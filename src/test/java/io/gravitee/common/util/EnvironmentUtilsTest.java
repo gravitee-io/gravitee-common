@@ -15,11 +15,10 @@
  */
 package io.gravitee.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -55,25 +54,19 @@ public class EnvironmentUtilsTest {
     public void shouldMergeMap() {
         Map<String, Object> entries = new HashMap<>();
 
-        Map<String, Object> map1 = Maps.<String, Object>builder()
-                .put("properties_0_values_1_key", "value1")
-                .build();
+        Map<String, Object> map1 = Maps.<String, Object>builder().put("properties_0_values_1_key", "value1").build();
 
         EnvironmentUtils.addAll(entries, map1);
 
         Assert.assertFalse(entries.isEmpty());
 
-        Map<String, Object> map2 = Maps.<String, Object>builder()
-                .put("properties[0].values_1_key", "value2")
-                .build();
+        Map<String, Object> map2 = Maps.<String, Object>builder().put("properties[0].values_1_key", "value2").build();
 
         EnvironmentUtils.addAll(entries, map2);
 
         Assert.assertEquals(1, entries.size());
 
-        Map<String, Object> map3 = Maps.<String, Object>builder()
-                .put("properties[0].values[1].key", "value3")
-                .build();
+        Map<String, Object> map3 = Maps.<String, Object>builder().put("properties[0].values[1].key", "value3").build();
 
         EnvironmentUtils.addAll(entries, map2);
 

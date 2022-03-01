@@ -25,7 +25,9 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
-public abstract class AbstractService<T extends io.gravitee.common.component.LifecycleComponent<T>> extends AbstractLifecycleComponent<T> implements ApplicationContextAware, io.gravitee.common.component.LifecycleComponent<T> {
+public abstract class AbstractService<T extends io.gravitee.common.component.LifecycleComponent<T>>
+    extends AbstractLifecycleComponent<T>
+    implements ApplicationContextAware, io.gravitee.common.component.LifecycleComponent<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractService.class);
 
@@ -35,15 +37,18 @@ public abstract class AbstractService<T extends io.gravitee.common.component.Lif
         return getClass().getName();
     }
 
-    @Override public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
-    @Override protected void doStart() throws Exception {
+    @Override
+    protected void doStart() throws Exception {
         LOGGER.info("Initializing service {}", name());
     }
 
-    @Override protected void doStop() throws Exception {
+    @Override
+    protected void doStop() throws Exception {
         LOGGER.info("Destroying service {}", name());
     }
 

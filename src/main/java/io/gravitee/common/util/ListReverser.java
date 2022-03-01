@@ -33,7 +33,6 @@ public class ListReverser<T> implements Iterable<T> {
 
     public Iterator<T> iterator() {
         return new Iterator<T>() {
-
             public boolean hasNext() {
                 return listIterator.hasPrevious();
             }
@@ -45,7 +44,6 @@ public class ListReverser<T> implements Iterable<T> {
             public void remove() {
                 listIterator.remove();
             }
-
         };
     }
 }

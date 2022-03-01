@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com) 
+ * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
  * @author GraviteeSource Team
  */
 public class MetadataPage<T> extends Page<T> {
@@ -34,5 +34,4 @@ public class MetadataPage<T> extends Page<T> {
     public Map<String, String> getMetadata() {
         return metadata;
     }
-
 }

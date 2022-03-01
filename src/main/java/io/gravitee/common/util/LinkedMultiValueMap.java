@@ -28,7 +28,6 @@ public class LinkedMultiValueMap<K, V> implements MultiValueMap<K, V>, Serializa
 
     private final Map<K, List<V>> targetMap;
 
-
     /**
      * Create a new LinkedMultiValueMap that wraps a {@link LinkedHashMap}.
      */
@@ -55,7 +54,6 @@ public class LinkedMultiValueMap<K, V> implements MultiValueMap<K, V>, Serializa
     public LinkedMultiValueMap(Map<K, List<V>> otherMap) {
         this.targetMap = new LinkedHashMap<>(otherMap);
     }
-
 
     // MultiValueMap implementation
 
@@ -91,13 +89,12 @@ public class LinkedMultiValueMap<K, V> implements MultiValueMap<K, V>, Serializa
 
     @Override
     public Map<K, V> toSingleValueMap() {
-        LinkedHashMap<K, V> singleValueMap = new LinkedHashMap<K,V>(this.targetMap.size());
+        LinkedHashMap<K, V> singleValueMap = new LinkedHashMap<K, V>(this.targetMap.size());
         for (Entry<K, List<V>> entry : this.targetMap.entrySet()) {
             singleValueMap.put(entry.getKey(), entry.getValue().get(0));
         }
         return singleValueMap;
     }
-
 
     // Map implementation
 
@@ -180,5 +177,4 @@ public class LinkedMultiValueMap<K, V> implements MultiValueMap<K, V>, Serializa
     public String toString() {
         return this.targetMap.toString();
     }
-
 }

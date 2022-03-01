@@ -21,7 +21,6 @@ package io.gravitee.common.http;
  * @author Aurélien Bourdon (aurelien.bourdon at gmail.com)
  */
 public interface GraviteeHttpHeader {
-
     /**
      * Response time used to compute the entire Policy chain, in ms.
      */
@@ -37,5 +36,4 @@ public interface GraviteeHttpHeader {
      * This header must always be set by the gateway.
      */
     String X_GRAVITEE_API_NAME = "X-Gravitee-Api-Name";
-
 }

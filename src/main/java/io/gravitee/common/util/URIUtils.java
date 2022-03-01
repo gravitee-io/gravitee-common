@@ -38,8 +38,7 @@ public class URIUtils {
             int i;
             int paramNameStart = questionMarkIndex + 1;
             int paramValueStart = -1;
-            loop:
-            for (i = questionMarkIndex + 1; i < end; i++) {
+            loop:for (i = questionMarkIndex + 1; i < end; i++) {
                 switch (uri.charAt(i)) {
                     case QUERYPARAM_VALUE_SEPARATOR_CHAR:
                         if (paramNameStart == i) {
@@ -53,11 +52,10 @@ public class URIUtils {
                         addParameter(queryParameters, uri, paramNameStart, paramValueStart, i);
                         paramNameStart = i + 1;
                         break;
-
                     case FRAGMENT_SEPARATOR_CHAR:
                         break loop;
                     default:
-                        // continue
+                    // continue
                 }
             }
             if (paramNameStart < i) {
@@ -67,8 +65,13 @@ public class URIUtils {
         return queryParameters;
     }
 
-
-    private static void addParameter(MultiValueMap<String, String> queryParameters, String uri, int paramNameStart, int paramValueStart, int end) {
+    private static void addParameter(
+        MultiValueMap<String, String> queryParameters,
+        String uri,
+        int paramNameStart,
+        int paramValueStart,
+        int end
+    ) {
         if (paramValueStart == -1 || paramValueStart < paramNameStart) {
             queryParameters.add(uri.substring(paramNameStart, end), null);
         } else {

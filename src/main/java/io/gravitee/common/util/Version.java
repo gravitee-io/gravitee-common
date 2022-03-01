@@ -70,14 +70,15 @@ public final class Version {
         }
 
         return new Version(
-                props.getProperty("build-id"),
-                props.getProperty("build-version"),
-                props.getProperty("major-version"),
-                props.getProperty("revision"));
+            props.getProperty("build-id"),
+            props.getProperty("build-version"),
+            props.getProperty("major-version"),
+            props.getProperty("revision")
+        );
     }
 
     private String fixNull(String v) {
-        if(v==null) return "unknown";
+        if (v == null) return "unknown";
         return v;
     }
 

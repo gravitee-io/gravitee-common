@@ -15,11 +15,10 @@
  */
 package io.gravitee.common.http;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.List;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)

@@ -60,9 +60,13 @@ public final class HttpHeader implements Serializable {
     @Override
     public String toString() {
         return new StringBuilder("HttpHeader{")
-                .append("name='").append(name).append('\'')
-                .append(", value='").append(value).append('\'')
-                .append('}')
-                .toString();
+            .append("name='")
+            .append(name)
+            .append('\'')
+            .append(", value='")
+            .append(value)
+            .append('\'')
+            .append('}')
+            .toString();
     }
 }

@@ -20,11 +20,10 @@ package io.gravitee.common.utils;
  */
 public final class ManifestUtils {
 
-  private ManifestUtils() {
-  }
+    private ManifestUtils() {}
 
-  public static String getVersion() {
-    Package aPackage = ManifestUtils.class.getPackage();
-    return aPackage.getImplementationVersion();
-  }
+    public static String getVersion() {
+        Package aPackage = ManifestUtils.class.getPackage();
+        return aPackage.getImplementationVersion();
+    }
 }

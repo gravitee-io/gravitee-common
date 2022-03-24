@@ -143,17 +143,14 @@ public final class EnvironmentUtils {
     private static boolean tagsContains(Collection<String> tags, Collection<String> searchedTags) {
         return tags
             .stream()
-            .anyMatch(
-                tag ->
-                    searchedTags
-                        .stream()
-                        .anyMatch(
-                            crtTag -> {
-                                final Collator collator = Collator.getInstance();
-                                collator.setStrength(Collator.NO_DECOMPOSITION);
-                                return collator.compare(tag, crtTag) == 0;
-                            }
-                        )
+            .anyMatch(tag ->
+                searchedTags
+                    .stream()
+                    .anyMatch(crtTag -> {
+                        final Collator collator = Collator.getInstance();
+                        collator.setStrength(Collator.NO_DECOMPOSITION);
+                        return collator.compare(tag, crtTag) == 0;
+                    })
             );
     }
 }

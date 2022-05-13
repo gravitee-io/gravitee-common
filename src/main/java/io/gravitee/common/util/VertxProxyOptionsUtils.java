@@ -15,11 +15,11 @@
  */
 package io.gravitee.common.util;
 
+import io.gravitee.node.api.configuration.Configuration;
+import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.net.ProxyOptions;
 import io.vertx.core.net.ProxyType;
 import java.util.Objects;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 
 /**
  * @author GraviteeSource Team
@@ -32,31 +32,34 @@ public class VertxProxyOptionsUtils {
     static final String PROXY_USERNAME_PROPERTY = "system.proxy.username";
     static final String PROXY_PASSWORD_PROPERTY = "system.proxy.password";
 
-    public static ProxyOptions initFromSpringContext(ApplicationContext applicationContext) {
-        final Environment environment = applicationContext.getEnvironment();
+    public static void setSystemProxy(HttpClientOptions options, Configuration configuration) {
+        options.setProxyOptions(buildProxyOptions(configuration));
+    }
+
+    public static ProxyOptions buildProxyOptions(Configuration configuration) {
         final ProxyOptions proxyOptions = new ProxyOptions();
         final StringBuilder errorMessageBuilder = new StringBuilder();
 
         try {
-            proxyOptions.setHost(environment.getProperty(PROXY_HOST_PROPERTY));
+            proxyOptions.setHost(configuration.getProperty(PROXY_HOST_PROPERTY));
         } catch (Exception e) {
             appendErrorMessage(errorMessageBuilder, PROXY_HOST_PROPERTY, e);
         }
 
         try {
-            proxyOptions.setPort(parseProxyPort(environment.getProperty(PROXY_PORT_PROPERTY)));
+            proxyOptions.setPort(parseProxyPort(configuration.getProperty(PROXY_PORT_PROPERTY)));
         } catch (Exception e) {
             appendErrorMessage(errorMessageBuilder, PROXY_PORT_PROPERTY, e);
         }
 
         try {
-            proxyOptions.setType(ProxyType.valueOf(environment.getProperty(PROXY_TYPE_PROPERTY)));
+            proxyOptions.setType(ProxyType.valueOf(configuration.getProperty(PROXY_TYPE_PROPERTY)));
         } catch (Exception e) {
             appendErrorMessage(errorMessageBuilder, PROXY_TYPE_PROPERTY, e);
         }
 
-        proxyOptions.setUsername(environment.getProperty(PROXY_USERNAME_PROPERTY));
-        proxyOptions.setPassword(environment.getProperty(PROXY_PASSWORD_PROPERTY));
+        proxyOptions.setUsername(configuration.getProperty(PROXY_USERNAME_PROPERTY));
+        proxyOptions.setPassword(configuration.getProperty(PROXY_PASSWORD_PROPERTY));
 
         if (errorMessageBuilder.length() > 0) {
             throw new IllegalStateException(errorMessageBuilder.toString());

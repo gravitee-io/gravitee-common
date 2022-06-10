@@ -1,3 +1,10 @@
+# [1.27.0](https://github.com/gravitee-io/gravitee-common/compare/1.26.1...1.27.0) (2022-06-10)
+
+
+### Features
+
+* **jupiter:** mutualize LazyJWT for reusability ([5f89228](https://github.com/gravitee-io/gravitee-common/commit/5f89228af480f1ef565475ae6f5e33f0f4fb681b))
+
 ## [1.26.1](https://github.com/gravitee-io/gravitee-common/compare/1.26.0...1.26.1) (2022-05-19)
 
 

@@ -1,3 +1,10 @@
+# [1.28.0](https://github.com/gravitee-io/gravitee-common/compare/1.27.0...1.28.0) (2022-10-04)
+
+
+### Features
+
+* add RxHelper.mergeWithFirst method ([84a70ce](https://github.com/gravitee-io/gravitee-common/commit/84a70ceba01be3b6bf621e8636d541d8c3c4bfde))
+
 # [1.27.0](https://github.com/gravitee-io/gravitee-common/compare/1.26.1...1.27.0) (2022-06-10)
 
 

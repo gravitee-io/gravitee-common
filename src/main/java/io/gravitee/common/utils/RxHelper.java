@@ -15,8 +15,8 @@
  */
 package io.gravitee.common.utils;
 
-import io.reactivex.Flowable;
-import io.reactivex.FlowableTransformer;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableTransformer;
 import org.reactivestreams.Publisher;
 
 /**
@@ -27,7 +27,7 @@ public class RxHelper {
 
     /**
      * Returns a {@link FlowableTransformer} that can be used in a composition.
-     * It basically offers the same behavior as {@link io.reactivex.Flowable#mergeWith(Publisher)} but allows completing as soon as one of the sources completes (success, error or disposed).
+     * It basically offers the same behavior as {@link io.reactivex.rxjava3.core.Flowable#mergeWith(Publisher)} but allows completing as soon as one of the sources completes (success, error or disposed).
      *
      * @param other the other source.
      * @param <R> the type of the items emitted.

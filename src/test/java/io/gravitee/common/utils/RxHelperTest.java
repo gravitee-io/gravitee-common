@@ -15,7 +15,7 @@
  */
 package io.gravitee.common.utils;
 
-import io.reactivex.Flowable;
+import io.reactivex.rxjava3.core.Flowable;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 

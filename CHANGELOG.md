@@ -1,3 +1,15 @@
+# [2.0.0-alpha.1](https://github.com/gravitee-io/gravitee-common/compare/1.28.0...2.0.0-alpha.1) (2022-10-18)
+
+
+### chore
+
+* bump to rxJava3 ([90b65d2](https://github.com/gravitee-io/gravitee-common/commit/90b65d2730765cf57e3a1945fd3853f48bc4e4c4))
+
+
+### BREAKING CHANGES
+
+* rxJava3 required
+
 # [1.28.0](https://github.com/gravitee-io/gravitee-common/compare/1.27.0...1.28.0) (2022-10-04)
 
 

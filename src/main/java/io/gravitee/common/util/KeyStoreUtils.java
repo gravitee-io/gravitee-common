@@ -72,7 +72,7 @@ public class KeyStoreUtils {
     public static KeyStore initFromPath(String format, String path, String password) {
         try (InputStream is = new File(path).toURI().toURL().openStream()) {
             final KeyStore keyStore = KeyStore.getInstance(format);
-            keyStore.load(is, null == password ? null : password.toCharArray());
+            keyStore.load(is, passwordToCharArray(password));
             return keyStore;
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Unable to load keystore from path [%s]", path), e);
@@ -92,7 +92,7 @@ public class KeyStoreUtils {
         try {
             final ByteArrayInputStream stream = new ByteArrayInputStream(Base64.getDecoder().decode(keystore));
             KeyStore keyStore = KeyStore.getInstance(format);
-            keyStore.load(stream, password.toCharArray());
+            keyStore.load(stream, passwordToCharArray(password));
             return keyStore;
         } catch (Exception e) {
             throw new IllegalArgumentException("Unable to get keystore from base64", e);
@@ -140,7 +140,7 @@ public class KeyStoreUtils {
             keyStore.setEntry(
                 DEFAULT_ALIAS,
                 new KeyStore.PrivateKeyEntry(privateKey, new Certificate[] { certificate }),
-                new KeyStore.PasswordProtection(password.toCharArray())
+                new KeyStore.PasswordProtection(passwordToCharArray(password))
             );
 
             return keyStore;

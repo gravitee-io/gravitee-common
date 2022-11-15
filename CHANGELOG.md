@@ -1,3 +1,10 @@
+# [2.0.0-alpha.2](https://github.com/gravitee-io/gravitee-common/compare/2.0.0-alpha.1...2.0.0-alpha.2) (2022-11-15)
+
+
+### Bug Fixes
+
+* use passwordToCharArray to properly handle password ([84867ac](https://github.com/gravitee-io/gravitee-common/commit/84867ac1b3717f0a460c3328d9335c5df72e36f3))
+
 # [2.0.0-alpha.1](https://github.com/gravitee-io/gravitee-common/compare/1.28.0...2.0.0-alpha.1) (2022-10-18)
 
 

@@ -15,14 +15,21 @@
  */
 package io.gravitee.common.utils;
 
+import io.reactivex.rxjava3.core.CompletableTransformer;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.FlowableTransformer;
+import io.reactivex.rxjava3.core.Maybe;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.reactivestreams.Publisher;
 
 /**
  * @author Jeoffrey HAEYAERT (jeoffrey.haeyaert at graviteesource.com)
  * @author GraviteeSource Team
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RxHelper {
 
     /**
@@ -36,5 +43,68 @@ public class RxHelper {
      */
     public static <R> FlowableTransformer<R, R> mergeWithFirst(Flowable<R> other) {
         return upstream -> other.materialize().mergeWith(upstream.materialize()).dematerialize(n -> n);
+    }
+
+    /**
+     * Returns a {@link FlowableTransformer} that can be used in a composition.
+     * It applies an interval for each element received in the {@link Flowable} upstream in opposition to {@link Flowable#delay(long, TimeUnit)} which will apply the delay only once for the {@link Flowable}
+     *
+     * @param delay the delay to apply between each element of the {@link Flowable}
+     * @param timeUnit the {@link TimeUnit}  of the delay
+     *
+     * @return a {@link FlowableTransformer} that will be applied.
+     */
+    public static <R> FlowableTransformer<R, R> delayElement(int delay, TimeUnit timeUnit) {
+        return upstream -> upstream.zipWith(Flowable.interval(delay, timeUnit), (item, interval) -> item);
+    }
+
+    /**
+     * Returns a {@link FlowableTransformer} that can be used in a composition.
+     * It retries the {@link Flowable} X times with delay between each attempt
+     *
+     * @param times the attempts number
+     * @param retryInterval the delay between each retry
+     * @param timeUnit the {@link TimeUnit} of the backOffDelay
+     *
+     * @return a {@link FlowableTransformer} that will be applied.
+     */
+    public static <R> FlowableTransformer<R, R> retryFlowable(int times, int retryInterval, TimeUnit timeUnit) {
+        return upstream ->
+            upstream.retryWhen(throwables -> throwables.compose(delayElement(retryInterval, timeUnit)).compose(takeThenThrow(times)));
+    }
+
+    /**
+     * Returns a {@link CompletableTransformer} that can be used in a composition.
+     * It retries the {@link Flowable} X times with delay between each attempt
+     *
+     * @param times the attempts number
+     * @param retryInterval the delay between each retry
+     * @param timeUnit the {@link TimeUnit} of the backOffDelay
+     *
+     * @return a {@link CompletableTransformer} that will be applied.
+     */
+    public static CompletableTransformer retry(int times, int retryInterval, TimeUnit timeUnit) {
+        return upstream ->
+            upstream.retryWhen(throwables -> throwables.compose(delayElement(retryInterval, timeUnit)).compose(takeThenThrow(times)));
+    }
+
+    /**
+     * Returns a {@link FlowableTransformer} that can be used in a composition.
+     * It ignores the N first throwable then return the N+1 in error.
+     *
+     * @param limit the number of throwables to ignore
+     *
+     * @return a {@link FlowableTransformer} that will be applied.
+     */
+    private static <R extends Throwable> FlowableTransformer<R, R> takeThenThrow(final int limit) {
+        final AtomicInteger tries = new AtomicInteger(0);
+        return upstream ->
+            upstream.flatMapMaybe(throwable -> {
+                if (tries.incrementAndGet() > limit) {
+                    return Maybe.error(throwable);
+                } else {
+                    return Maybe.just(throwable);
+                }
+            });
     }
 }

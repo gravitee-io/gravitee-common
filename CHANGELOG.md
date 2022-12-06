@@ -1,3 +1,10 @@
+# [2.0.0-alpha.4](https://github.com/gravitee-io/gravitee-common/compare/2.0.0-alpha.3...2.0.0-alpha.4) (2022-12-06)
+
+
+### Bug Fixes
+
+* missing backpressure on retry ([664f659](https://github.com/gravitee-io/gravitee-common/commit/664f659d1b984bb609f4a283e4786c9a45f7846e))
+
 # [2.0.0-alpha.3](https://github.com/gravitee-io/gravitee-common/compare/2.0.0-alpha.2...2.0.0-alpha.3) (2022-11-25)
 
 

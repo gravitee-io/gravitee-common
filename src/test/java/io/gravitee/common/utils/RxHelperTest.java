@@ -18,6 +18,8 @@ package io.gravitee.common.utils;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.observers.TestObserver;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.TestScheduler;
@@ -103,6 +105,76 @@ class RxHelperTest {
             // both exception has been thrown, values emit normally
             testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
             obs.assertComplete().assertValueAt(0, value -> value.equals(3)).assertValueAt(1, value -> value.equals(4));
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    @DisplayName("Should retry Maybe and success when attempted less than the limit")
+    void shouldRetryMaybe() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestObserver<Integer> obs = Maybe
+                .<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new RuntimeException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
+                .compose(RxHelper.retryMaybe(5, 10, TimeUnit.SECONDS))
+                .test();
+
+            for (int i = 0; i < 4; i++) {
+                // 4 errors are expected before a success.
+                obs.assertNotComplete().assertNoValues();
+                testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            }
+
+            // Finally, last attempt should work.
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertComplete().assertValue(5);
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    @DisplayName("Should retry Single and success when attempted less than the limit")
+    void shouldRetrySingle() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestObserver<Integer> obs = Single
+                .<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new RuntimeException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
+                .compose(RxHelper.retrySingle(5, 10, TimeUnit.SECONDS))
+                .test();
+
+            for (int i = 0; i < 4; i++) {
+                // 4 errors are expected before a success.
+                obs.assertNotComplete().assertNoValues();
+                testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            }
+
+            // Finally, last attempt should work.
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertComplete().assertValue(5);
         } finally {
             RxJavaPlugins.reset();
         }

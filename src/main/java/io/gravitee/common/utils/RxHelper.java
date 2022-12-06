@@ -15,10 +15,7 @@
  */
 package io.gravitee.common.utils;
 
-import io.reactivex.rxjava3.core.CompletableTransformer;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.FlowableTransformer;
-import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AccessLevel;
@@ -55,7 +52,7 @@ public class RxHelper {
      * @return a {@link FlowableTransformer} that will be applied.
      */
     public static <R> FlowableTransformer<R, R> delayElement(int delay, TimeUnit timeUnit) {
-        return upstream -> upstream.zipWith(Flowable.interval(delay, timeUnit), (item, interval) -> item);
+        return upstream -> upstream.concatMapSingle(e -> Single.just(e).delay(delay, timeUnit));
     }
 
     /**
@@ -69,6 +66,36 @@ public class RxHelper {
      * @return a {@link FlowableTransformer} that will be applied.
      */
     public static <R> FlowableTransformer<R, R> retryFlowable(int times, int retryInterval, TimeUnit timeUnit) {
+        return upstream ->
+            upstream.retryWhen(throwables -> throwables.compose(delayElement(retryInterval, timeUnit)).compose(takeThenThrow(times)));
+    }
+
+    /**
+     * Same as {@link #retryFlowable(int, int, TimeUnit)} but with a {@link Maybe} instead.
+     *
+     * @param times the attempts number
+     * @param retryInterval the delay between each retry
+     * @param timeUnit the {@link TimeUnit} of the backOffDelay
+     * @param <R> the value type.
+     *
+     * @return a {@link MaybeTransformer} that will be applied.
+     */
+    public static <R> MaybeTransformer<R, R> retryMaybe(int times, int retryInterval, TimeUnit timeUnit) {
+        return upstream ->
+            upstream.retryWhen(throwables -> throwables.compose(delayElement(retryInterval, timeUnit)).compose(takeThenThrow(times)));
+    }
+
+    /**
+     * Same as {@link #retryMaybe(int, int, TimeUnit)} but with a {@link Single} instead.
+     *
+     * @param times the attempts number
+     * @param retryInterval the delay between each retry
+     * @param timeUnit the {@link TimeUnit} of the backOffDelay
+     * @param <R> the value type.
+     *
+     * @return a {@link MaybeTransformer} that will be applied.
+     */
+    public static <R> SingleTransformer<R, R> retrySingle(int times, int retryInterval, TimeUnit timeUnit) {
         return upstream ->
             upstream.retryWhen(throwables -> throwables.compose(delayElement(retryInterval, timeUnit)).compose(takeThenThrow(times)));
     }

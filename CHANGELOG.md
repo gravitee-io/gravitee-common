@@ -1,3 +1,26 @@
+# [2.0.0](https://github.com/gravitee-io/gravitee-common/compare/1.28.0...2.0.0) (2022-12-09)
+
+
+### Bug Fixes
+
+* missing backpressure on retry ([664f659](https://github.com/gravitee-io/gravitee-common/commit/664f659d1b984bb609f4a283e4786c9a45f7846e))
+* use passwordToCharArray to properly handle password ([84867ac](https://github.com/gravitee-io/gravitee-common/commit/84867ac1b3717f0a460c3328d9335c5df72e36f3))
+
+
+### chore
+
+* bump to rxJava3 ([90b65d2](https://github.com/gravitee-io/gravitee-common/commit/90b65d2730765cf57e3a1945fd3853f48bc4e4c4))
+
+
+### Features
+
+* add rx helpers method to retry a flowable with delay between attempts ([a30cad0](https://github.com/gravitee-io/gravitee-common/commit/a30cad0662b9aad20cd729189b5c5e9674650f71))
+
+
+### BREAKING CHANGES
+
+* rxJava3 required
+
 # [2.0.0-alpha.4](https://github.com/gravitee-io/gravitee-common/compare/2.0.0-alpha.3...2.0.0-alpha.4) (2022-12-06)
 
 

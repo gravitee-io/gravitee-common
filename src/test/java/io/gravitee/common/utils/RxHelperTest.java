@@ -73,6 +73,43 @@ class RxHelperTest {
     }
 
     @Test
+    @DisplayName("Should delay element of Flowable by 10 seconds according to predicate")
+    void shouldDelayElementAccordingPredicate() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            final RuntimeException exception = new RuntimeException();
+            final TestSubscriber<Serializable> obs = Flowable
+                .fromArray(exception, "attempt1", "notDelayed", 12, "notDelayed")
+                .compose(RxHelper.delayElement(10, TimeUnit.SECONDS, o -> o == "notDelayed"))
+                .test()
+                .assertNotComplete();
+
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertNotComplete().assertValueAt(0, value -> value.equals(exception));
+
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs
+                .assertNotComplete()
+                .assertValueAt(0, value -> value.equals(exception))
+                .assertValueAt(1, value -> value.equals("attempt1"))
+                .assertValueAt(2, value -> value.equals("notDelayed"));
+
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs
+                .assertComplete()
+                .assertValueAt(0, value -> value.equals(exception))
+                .assertValueAt(1, value -> value.equals("attempt1"))
+                .assertValueAt(2, value -> value.equals("notDelayed"))
+                .assertValueAt(3, value -> value.equals(12))
+                .assertValueAt(4, value -> value.equals("notDelayed"));
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
     @DisplayName("Should retry Flowable and success when attempted less than the limit")
     void shouldRetryFlowable() {
         try {
@@ -105,6 +142,36 @@ class RxHelperTest {
             // both exception has been thrown, values emit normally
             testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
             obs.assertComplete().assertValueAt(0, value -> value.equals(3)).assertValueAt(1, value -> value.equals(4));
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    @DisplayName("Should not retry Flowable according to filter predicate")
+    void shouldNotRetryFlowableAccordingToPredicate() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestSubscriber<Object> obs = Flowable
+                .generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
+                .compose(RxHelper.retryFlowable(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
+                .test()
+                .assertNotComplete()
+                .assertNoValues();
+
+            // an exception has been thrown, flow should be in error immediately
+            obs.assertError(NonRetryableException.class).assertNoValues();
         } finally {
             RxJavaPlugins.reset();
         }
@@ -146,6 +213,34 @@ class RxHelperTest {
     }
 
     @Test
+    @DisplayName("Should not retry Maybe according to retry predicate")
+    void shouldNotRetryMaybeAccordingToPredicate() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestObserver<Integer> obs = Maybe
+                .<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
+                .compose(RxHelper.retryMaybe(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
+                .test();
+
+            // an exception has been thrown, flow should be in error immediately
+            obs.assertError(NonRetryableException.class).assertNoValues();
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
     @DisplayName("Should retry Single and success when attempted less than the limit")
     void shouldRetrySingle() {
         try {
@@ -175,6 +270,34 @@ class RxHelperTest {
             // Finally, last attempt should work.
             testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
             obs.assertComplete().assertValue(5);
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    @DisplayName("Should not retry Single according to retry predicate")
+    void shouldNotRetrySingleAccordingToPredicate() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestObserver<Integer> obs = Single
+                .<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
+                .compose(RxHelper.retrySingle(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
+                .test();
+
+            // an exception has been thrown, flow should be in error immediately
+            obs.assertError(NonRetryableException.class).assertNoValues();
         } finally {
             RxJavaPlugins.reset();
         }
@@ -292,4 +415,80 @@ class RxHelperTest {
             RxJavaPlugins.reset();
         }
     }
+
+    @Test
+    @DisplayName("Should not retry according to retry predicate")
+    void shouldNotRetryBecauseOfFilterPredicate() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestObserver<Void> obs = Completable
+                .create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 3) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
+                .compose(RxHelper.retry(2, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
+                .test()
+                .assertNotComplete()
+                .assertNoValues();
+
+            // an exception has been thrown, flow should be in error immediately
+            obs.assertError(NonRetryableException.class).assertNoValues();
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    @DisplayName("Should retry first exceptions and break on NonRetryableException according to retry predicate")
+    void shouldRetryFirstOnly() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestObserver<Void> obs = Completable
+                .create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 3) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt <= 5) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
+                .compose(RxHelper.retry(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
+                .test()
+                .assertNotComplete()
+                .assertNoValues();
+
+            // an exception has been thrown, so try to retry after ten seconds
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertNotComplete().assertNoValues();
+
+            // two exception has been thrown, retry one more time
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertNotComplete().assertNoErrors().assertNoValues();
+
+            // on the third exception, which is a NonRetryableException, flow should be in error
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertError(NonRetryableException.class);
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    /**
+     * Exception used in the predicates for retry method.
+     */
+    private static class NonRetryableException extends Throwable {}
 }

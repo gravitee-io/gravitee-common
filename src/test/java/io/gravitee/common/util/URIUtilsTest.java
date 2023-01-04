@@ -15,8 +15,12 @@
  */
 package io.gravitee.common.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class URIUtilsTest {
 
@@ -142,7 +146,7 @@ public class URIUtilsTest {
     public void test17() {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?k");
         Assertions.assertEquals(1, parameters.size());
-        Assertions.assertEquals(null, parameters.get("k").get(0));
+        Assertions.assertNull(parameters.get("k").get(0));
     }
 
     @Test
@@ -150,9 +154,9 @@ public class URIUtilsTest {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?k&j");
         Assertions.assertEquals(2, parameters.size());
         Assertions.assertTrue(parameters.containsKey("k"));
-        Assertions.assertEquals(null, parameters.get("k").get(0));
+        Assertions.assertNull(parameters.get("k").get(0));
         Assertions.assertTrue(parameters.containsKey("j"));
-        Assertions.assertEquals(null, parameters.get("j").get(0));
+        Assertions.assertNull(parameters.get("j").get(0));
     }
 
     @Test
@@ -160,7 +164,7 @@ public class URIUtilsTest {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?foo=bar&k");
         Assertions.assertEquals(2, parameters.size());
         Assertions.assertTrue(parameters.containsKey("k"));
-        Assertions.assertEquals(null, parameters.get("k").get(0));
+        Assertions.assertNull(parameters.get("k").get(0));
         Assertions.assertTrue(parameters.containsKey("foo"));
         Assertions.assertEquals("bar", parameters.get("foo").get(0));
     }
@@ -170,7 +174,7 @@ public class URIUtilsTest {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?k&foo=bar");
         Assertions.assertEquals(2, parameters.size());
         Assertions.assertTrue(parameters.containsKey("k"));
-        Assertions.assertEquals(null, parameters.get("k").get(0));
+        Assertions.assertNull(parameters.get("k").get(0));
         Assertions.assertTrue(parameters.containsKey("foo"));
         Assertions.assertEquals("bar", parameters.get("foo").get(0));
     }
@@ -180,7 +184,7 @@ public class URIUtilsTest {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?foo1=bar&k&foo=bar");
         Assertions.assertEquals(3, parameters.size());
         Assertions.assertTrue(parameters.containsKey("k"));
-        Assertions.assertEquals(null, parameters.get("k").get(0));
+        Assertions.assertNull(parameters.get("k").get(0));
         Assertions.assertTrue(parameters.containsKey("foo"));
         Assertions.assertEquals("bar", parameters.get("foo").get(0));
         Assertions.assertTrue(parameters.containsKey("foo1"));
@@ -192,10 +196,27 @@ public class URIUtilsTest {
         MultiValueMap<String, String> parameters = URIUtils.parameters("?foo1&k=v&foo");
         Assertions.assertEquals(3, parameters.size());
         Assertions.assertTrue(parameters.containsKey("foo1"));
-        Assertions.assertEquals(null, parameters.get("foo1").get(0));
+        Assertions.assertNull(parameters.get("foo1").get(0));
         Assertions.assertTrue(parameters.containsKey("foo"));
-        Assertions.assertEquals(null, parameters.get("foo").get(0));
+        Assertions.assertNull(parameters.get("foo").get(0));
         Assertions.assertTrue(parameters.containsKey("k"));
         Assertions.assertEquals("v", parameters.get("k").get(0));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "http://api.gravitee.io/echo", "https://api.gravitee.io/echo", "any://api.gravitee.io/echo" })
+    public void shouldBeAbsolute(String url) {
+        assertThat(URIUtils.isAbsolute(url)).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "a://api.gravitee.io/echo", "api.gravitee.io/echo", "/echo" })
+    public void shouldNotBeAbsolute() {
+        assertThat(URIUtils.isAbsolute("a://api.gravitee.io/echo")).isFalse();
+    }
+
+    @Test
+    public void shouldNotBeAbsoluteWithNull() {
+        assertThat(URIUtils.isAbsolute(null)).isFalse();
     }
 }

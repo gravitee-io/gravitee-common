@@ -15,17 +15,41 @@
  */
 package io.gravitee.common.util;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
  * @author GraviteeSource Team
  */
 public class URIUtils {
 
+    private static final Pattern URL_PATTERN = Pattern.compile("^\\w{2,}://.*$");
     private static final char FRAGMENT_SEPARATOR_CHAR = '#';
     private static final char QUERYPARAM_SEPARATOR_CHAR1 = '&';
     private static final char QUERYPARAM_SEPARATOR_CHAR2 = ';';
     private static final char QUERYPARAM_VALUE_SEPARATOR_CHAR = '=';
     private static final char QUERY_SEPARATOR_CHAR = '?';
+
+    /**
+     * An url is considered absolute if it starts with <code>protocol://</code>.
+     * Protocol must at least contain 2 chars, ex:
+     * <ul>
+     *     <li>https://api.gravitee.io/echo: is absolute</li>
+     *     <li>http://api.gravitee.io/echo: is absolute</li>
+     *     <li>wss://api.gravitee.io/echo: is absolute</li>
+     *     <li>kafka://kafka.gravitee.io: is absolute</li>
+     *     <li>a://kafka.gravitee.io: is not considered as absolute cause the protocol isn't valid ( < 2 chars)</li>
+     *     <li>/echo: is not absolute</li>
+     *     <li>?foo=bar: is not absolute</li>
+     *     <li><i>empty</i>: is not absolute</li>
+     * </ul>
+     *
+     * @param uri the uri to test.
+     * @return <code>true</code> if the uri is considered absolute, <code>false</code> otherwise.
+     */
+    public static boolean isAbsolute(final String uri) {
+        return uri != null && URL_PATTERN.matcher(uri).matches();
+    }
 
     public static MultiValueMap<String, String> parameters(String uri) {
         MultiValueMap<String, String> queryParameters;

@@ -1,3 +1,10 @@
+# [2.1.0-alpha.1](https://github.com/gravitee-io/gravitee-common/compare/2.0.0...2.1.0-alpha.1) (2023-01-11)
+
+
+### Features
+
+* add uri isAbsolute util function ([33768d8](https://github.com/gravitee-io/gravitee-common/commit/33768d80bfd6955ec62d60ac986a0d9402492c7f))
+
 # [2.0.0](https://github.com/gravitee-io/gravitee-common/compare/1.28.0...2.0.0) (2022-12-09)
 
 

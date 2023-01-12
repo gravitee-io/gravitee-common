@@ -1,3 +1,10 @@
+# [2.1.0-alpha.2](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.1...2.1.0-alpha.2) (2023-01-12)
+
+
+### Features
+
+* add retry on predicate capabilities ([606d7c9](https://github.com/gravitee-io/gravitee-common/commit/606d7c94fb71b5058c633482b7b04e297f54a742))
+
 # [2.1.0-alpha.1](https://github.com/gravitee-io/gravitee-common/compare/2.0.0...2.1.0-alpha.1) (2023-01-11)
 
 

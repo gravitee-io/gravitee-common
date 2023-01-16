@@ -1,3 +1,10 @@
+# [2.1.0-alpha.3](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.2...2.1.0-alpha.3) (2023-01-16)
+
+
+### Features
+
+* implement duration parser to manage simple and iso8601 format ([d26a6ae](https://github.com/gravitee-io/gravitee-common/commit/d26a6aea55c5110775c3e700beedba8ccf7ab039))
+
 # [2.1.0-alpha.2](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.1...2.1.0-alpha.2) (2023-01-12)
 
 

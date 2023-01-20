@@ -1,3 +1,10 @@
+# [2.1.0-alpha.4](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.3...2.1.0-alpha.4) (2023-01-20)
+
+
+### Bug Fixes
+
+* remove the use of Spring framework ([cbc5fc8](https://github.com/gravitee-io/gravitee-common/commit/cbc5fc8283303d0b28f9c540200a37aa24e79f92))
+
 # [2.1.0-alpha.3](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.2...2.1.0-alpha.3) (2023-01-16)
 
 

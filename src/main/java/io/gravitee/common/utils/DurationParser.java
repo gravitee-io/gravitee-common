@@ -51,7 +51,7 @@ public class DurationParser {
      */
     public static Duration parse(final String value) {
         Duration duration = null;
-        if (StringUtils.hasLength(value)) {
+        if (value != null && value.length() > 0) {
             try {
                 duration = Duration.parse(value);
             } catch (DateTimeParseException e) {

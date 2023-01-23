@@ -1,3 +1,10 @@
+# [2.1.0-alpha.5](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.4...2.1.0-alpha.5) (2023-01-23)
+
+
+### Bug Fixes
+
+* create private method to deal with empty string ([c8dbfa7](https://github.com/gravitee-io/gravitee-common/commit/c8dbfa7201db5d6df04757129c637b5834624b0f))
+
 # [2.1.0-alpha.4](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.3...2.1.0-alpha.4) (2023-01-20)
 
 

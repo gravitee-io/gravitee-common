@@ -22,7 +22,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Guillaume LAMIRAND (guillaume.lamirand at graviteesource.com)
@@ -51,7 +50,7 @@ public class DurationParser {
      */
     public static Duration parse(final String value) {
         Duration duration = null;
-        if (value != null && value.length() > 0) {
+        if (stringNotEmpty(value)) {
             try {
                 duration = Duration.parse(value);
             } catch (DateTimeParseException e) {
@@ -60,7 +59,7 @@ public class DurationParser {
                     Matcher matcher = getSimpleFormatPattern().matcher(value);
                     if (matcher.matches()) {
                         String suffix = matcher.group(2);
-                        if (StringUtils.hasLength(suffix)) {
+                        if (stringNotEmpty(suffix)) {
                             Unit unit = Unit.fromSuffix(suffix);
                             duration = unit.parse(matcher.group(1));
                         }
@@ -71,6 +70,10 @@ public class DurationParser {
             }
         }
         return duration;
+    }
+
+    private static boolean stringNotEmpty(final String value) {
+        return value != null && value.length() > 0;
     }
 
     private static Pattern getSimpleFormatPattern() {

@@ -38,7 +38,7 @@
         <gravitee-node.version>2.0.0</gravitee-node.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
         <bouncycastle.version>1.69</bouncycastle.version>
-        <nimbus-jose-jwt.version>9.15.2</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.29</nimbus-jose-jwt.version>
         <lombok.version>1.18.24</lombok.version>
     </properties>
 

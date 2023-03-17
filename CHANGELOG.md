@@ -1,3 +1,19 @@
+# [2.1.0](https://github.com/gravitee-io/gravitee-common/compare/2.0.0...2.1.0) (2023-03-17)
+
+
+### Bug Fixes
+
+* create private method to deal with empty string ([2281473](https://github.com/gravitee-io/gravitee-common/commit/2281473688a38d2b931d02dbd0da403817d73c56))
+* **deps:** upgrade gravitee-bom ([5f84a78](https://github.com/gravitee-io/gravitee-common/commit/5f84a784fbc6e76fb17a194aceda21e8951f3b45))
+* remove the use of Spring framework ([d107040](https://github.com/gravitee-io/gravitee-common/commit/d10704046343cebd0e878d4521b7dd229efe16ff))
+
+
+### Features
+
+* add retry on predicate capabilities ([50e68a8](https://github.com/gravitee-io/gravitee-common/commit/50e68a83169c972d966eded3b85f6d4f82d33973))
+* add uri isAbsolute util function ([2c30a06](https://github.com/gravitee-io/gravitee-common/commit/2c30a0691859ac5680f68aedddcac25b70163ac8))
+* implement duration parser to manage simple and iso8601 format ([7b562cb](https://github.com/gravitee-io/gravitee-common/commit/7b562cb8d580fe0f70bfbbbb46c6896527928560))
+
 # [2.1.0-alpha.5](https://github.com/gravitee-io/gravitee-common/compare/2.1.0-alpha.4...2.1.0-alpha.5) (2023-01-23)
 
 

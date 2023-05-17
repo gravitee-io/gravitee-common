@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/gravitee-io/gravitee-common/compare/2.1.0...2.1.1) (2023-05-17)
+
+
+### Bug Fixes
+
+* do not allow trailing hyphen in ID ([5fd81dd](https://github.com/gravitee-io/gravitee-common/commit/5fd81ddea6d388cdee711e4ac05a8ceaaead8349))
+
 # [2.1.0](https://github.com/gravitee-io/gravitee-common/compare/2.0.0...2.1.0) (2023-03-17)
 
 

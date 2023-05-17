@@ -63,4 +63,9 @@ public class IdGeneratorTest {
     public void generateWithNullValue() {
         Assertions.assertNull(IdGenerator.generate(null));
     }
+
+    @Test
+    public void trimTrailingHyphen() {
+        Assertions.assertEquals("test", IdGenerator.generate("test-"));
+    }
 }

@@ -49,6 +49,7 @@ public final class IdGenerator {
             .toLowerCase()
             .replaceAll("[^a-z\\d\\s-]", "")
             .trim()
-            .replaceAll("[^a-z\\d]+", "-");
+            .replaceAll("[^a-z\\d]+", "-")
+            .replaceAll("-+$", "");
     }
 }

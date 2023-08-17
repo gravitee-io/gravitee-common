@@ -17,12 +17,27 @@ package io.gravitee.common.util;
 
 import static java.util.Arrays.asList;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -196,6 +211,42 @@ public class KeyStoreUtils {
     }
 
     /**
+     * Initializes and returns a {@link KeyStore} from a list of paths to certificates in PEM format.
+     *
+     * @param pemPathCertificates the list of certificate paths.
+     * @param password the password to use to protect the keystore. <code>null</code> if not password.
+     *
+     * @return the initialized keystore or an {@link IllegalArgumentException} if the certificates or private keys cannot be read or if the keystore can't be initialized.
+     */
+    public static KeyStore initFromPemCertificateFiles(List<String> pemPathCertificates, String password) {
+        try {
+            final KeyStore keyStore = KeyStore.getInstance(DEFAULT_KEYSTORE_TYPE);
+            final char[] charPassword = passwordToCharArray(password);
+            keyStore.load(null, charPassword);
+
+            var index = 0;
+            for (String pemPathCertificate : pemPathCertificates) {
+                try (InputStream certIs = new File(pemPathCertificate).toURI().toURL().openStream()) {
+                    final Certificate[] certificates = loadPemCertificates(new String(certIs.readAllBytes()));
+
+                    for (Certificate certificate : certificates) {
+                        var currentAlias = DEFAULT_ALIAS;
+                        if (index > 0) {
+                            currentAlias = currentAlias + "_" + index;
+                        }
+                        keyStore.setCertificateEntry(currentAlias, certificate);
+                        index++;
+                    }
+                }
+            }
+
+            return keyStore;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to initialize keystore from pem certificate and private key", e);
+        }
+    }
+
+    /**
      * Initializes and returns a {@link KeyStore} from a certificate content in PEM format and a the corresponding private key content in PEM format.
      *
      * @param pemCertificate the content of the certificate in PEM format.
@@ -220,6 +271,39 @@ public class KeyStoreUtils {
             return keyStore;
         } catch (Exception e) {
             throw new IllegalArgumentException("Unable to initialize keystore from pem certificate and private key", e);
+        }
+    }
+
+    /**
+     * Initializes and returns a {@link KeyStore} from a certificate content in PEM format.
+     *
+     * @param pemCertificate the content of the certificate in PEM format.
+     * @param password the password to use to protect the keystore. <code>null</code> if not password.
+     *
+     * @return the initialized keystore or an {@link IllegalArgumentException} if the certificate cannot be read
+     * or if the keystore can't be initialized.
+     */
+    public static KeyStore initFromPemCertificate(String pemCertificate, String password, String alias) {
+        try {
+            final KeyStore keyStore = KeyStore.getInstance(DEFAULT_KEYSTORE_TYPE);
+            final Certificate[] certificates = loadPemCertificates(pemCertificate);
+
+            var certAlias = alias == null ? DEFAULT_ALIAS : alias;
+
+            keyStore.load(null, passwordToCharArray(password));
+            int index = 0;
+            for (Certificate certificate : certificates) {
+                var currentAlias = certAlias;
+                if (index > 0) {
+                    currentAlias = currentAlias + "_" + index;
+                }
+                keyStore.setCertificateEntry(currentAlias, certificate);
+                index++;
+            }
+
+            return keyStore;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to initialize keystore from pem certificate", e);
         }
     }
 

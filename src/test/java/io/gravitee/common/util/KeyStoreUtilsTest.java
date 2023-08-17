@@ -130,6 +130,39 @@ public class KeyStoreUtilsTest {
 
             assertThat(keyStore.aliases().asIterator()).toIterable().hasSize(4);
         }
+
+        @Test
+        public void should_init_from_certificate_content() throws IOException, KeyStoreException {
+            final String certPem = readContent("localhost.cer", false);
+            final KeyStore keyStore = KeyStoreUtils.initFromPemCertificate(certPem, "secret", null);
+
+            assertThat(keyStore.aliases().asIterator()).toIterable().hasSize(1).contains(DEFAULT_ALIAS);
+        }
+
+        @Test
+        public void should_init_from_certificate_content_containing_more_than_one_certificate() throws IOException, KeyStoreException {
+            final String certPem = readContent("certificates.pem", false);
+            final KeyStore keyStore = KeyStoreUtils.initFromPemCertificate(certPem, "secret", null);
+
+            assertThat(keyStore.aliases().asIterator()).toIterable().hasSize(2).contains(DEFAULT_ALIAS, DEFAULT_ALIAS + "_1");
+        }
+
+        @Test
+        public void should_init_from_certificate_paths() throws KeyStoreException {
+            List<String> certs = List.of(
+                getPath("localhost.cer"),
+                getPath("localhost2.cer"),
+                getPath("localhost3.cer"),
+                getPath("wildcard.cer")
+            );
+
+            final KeyStore keyStore = KeyStoreUtils.initFromPemCertificateFiles(certs, "secret");
+
+            assertThat(keyStore.aliases().asIterator())
+                .toIterable()
+                .hasSize(4)
+                .contains(DEFAULT_ALIAS, DEFAULT_ALIAS + "_1", DEFAULT_ALIAS + "_2", DEFAULT_ALIAS + "_3");
+        }
     }
 
     @Nested

@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/gravitee-io/gravitee-common/compare/2.1.1...2.2.0) (2023-08-18)
+
+
+### Features
+
+* initialize a keystore from PEM certifcates (files and content) ([8352886](https://github.com/gravitee-io/gravitee-common/commit/83528869f4ceaa622a190152d1d6a59430b58d8e))
+
 ## [2.1.1](https://github.com/gravitee-io/gravitee-common/compare/2.1.0...2.1.1) (2023-05-17)
 
 

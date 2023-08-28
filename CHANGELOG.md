@@ -1,3 +1,20 @@
+# [3.0.0](https://github.com/gravitee-io/gravitee-common/compare/2.2.0...3.0.0) (2023-08-28)
+
+
+### chore
+
+* **deps:** update gravitee-parent ([db20ebc](https://github.com/gravitee-io/gravitee-common/commit/db20ebc99432f84444198b3565d747d5ed4fc738))
+
+
+### Features
+
+* add utility method to get list from an object ([22f267e](https://github.com/gravitee-io/gravitee-common/commit/22f267e44b0996f03d89bd81fb4e65265b556656))
+
+
+### BREAKING CHANGES
+
+* **deps:** require Java17
+
 # [2.2.0](https://github.com/gravitee-io/gravitee-common/compare/2.1.1...2.2.0) (2023-08-18)
 
 

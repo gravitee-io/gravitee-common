@@ -51,7 +51,23 @@ public class URIUtils {
         return uri != null && URL_PATTERN.matcher(uri).matches();
     }
 
+    /**
+     * Splits an HTTP query string into key-multivalues parameters pairs.
+     * @param uri to splits to extract query parameters
+     * @return a {@link MultiValueMap<String, String>} of query parameters
+     */
     public static MultiValueMap<String, String> parameters(String uri) {
+        return parameters(uri, false);
+    }
+
+    /**
+     * Splits an HTTP query string into key-multivalues parameters pairs.
+     * Can be used considering semicolon char ";" as a separator or as a normal char (useful for url-encoded-form-data or OData queries).
+     * @param uri to splits to extract query parameters
+     * @param semicolonIsNormalChar, when true, uses netty's QueryStringDecoder to consider semicolon character as a normal one
+     * @return a {@link MultiValueMap<String, String>} of query parameters
+     */
+    public static MultiValueMap<String, String> parameters(String uri, boolean semicolonIsNormalChar) {
         MultiValueMap<String, String> queryParameters;
         int questionMarkIndex = uri.indexOf(QUERY_SEPARATOR_CHAR);
         if (questionMarkIndex < 0 || uri.length() == (questionMarkIndex + 1)) {
@@ -71,8 +87,11 @@ public class URIUtils {
                             paramValueStart = i + 1;
                         }
                         break;
-                    case QUERYPARAM_SEPARATOR_CHAR1:
                     case QUERYPARAM_SEPARATOR_CHAR2:
+                        if (semicolonIsNormalChar) {
+                            continue;
+                        }
+                    case QUERYPARAM_SEPARATOR_CHAR1:
                         addParameter(queryParameters, uri, paramNameStart, paramValueStart, i);
                         paramNameStart = i + 1;
                         break;

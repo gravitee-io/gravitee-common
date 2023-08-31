@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/gravitee-io/gravitee-common/compare/3.0.0...3.1.0) (2023-08-31)
+
+
+### Features
+
+* parse semicolon as a normal char for query parameters ([6a28430](https://github.com/gravitee-io/gravitee-common/commit/6a28430a7736b691db4ef8567a20451e218f5624))
+
 # [3.0.0](https://github.com/gravitee-io/gravitee-common/compare/2.2.0...3.0.0) (2023-08-28)
 
 

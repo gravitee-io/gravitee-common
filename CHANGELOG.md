@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/gravitee-io/gravitee-common/compare/3.1.0...3.2.0) (2023-09-05)
+
+
+### Features
+
+* add util class to extract certificate and deal with thumbprint ([8190941](https://github.com/gravitee-io/gravitee-common/commit/81909412a086618ee59ce841dd45b9d97ccab7e9))
+
 # [3.1.0](https://github.com/gravitee-io/gravitee-common/compare/3.0.0...3.1.0) (2023-08-31)
 
 

@@ -19,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -88,7 +91,7 @@ public class EnvironmentUtilsTest {
     public void should_fail_if_tag_is_included_and_excluded() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env", "!env")), new HashSet<>())
+            () -> EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env", "!env")), new HashSet<>(Arrays.asList("env")))
         );
     }
 
@@ -120,5 +123,12 @@ public class EnvironmentUtilsTest {
     @Test
     public void should_return_false_if_no_matching_tag() {
         assertFalse(EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env1", "!env2")), new HashSet<>(Arrays.asList("env3"))));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    public void should_return_false_if_empty_tags(final Set<String> tags) {
+        assertFalse(EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env1", "!env2")), tags));
     }
 }

@@ -91,19 +91,15 @@ public final class EnvironmentUtils {
     public static boolean hasMatchingTags(Optional<List<String>> configuredTags, Set<String> tags) {
         if (configuredTags.isPresent()) {
             List<String> tagList = configuredTags.get();
-            if (tags != null) {
-                final List<String> inclusionTags = tagList
-                    .stream()
-                    .map(String::trim)
-                    .filter(tag -> !tag.startsWith("!"))
-                    .collect(Collectors.toList());
+            if (tags != null && !tags.isEmpty()) {
+                final List<String> inclusionTags = tagList.stream().map(String::trim).filter(tag -> !tag.startsWith("!")).toList();
 
                 final List<String> exclusionTags = tagList
                     .stream()
                     .map(String::trim)
                     .filter(tag -> tag.startsWith("!"))
                     .map(tag -> tag.substring(1))
-                    .collect(Collectors.toList());
+                    .toList();
 
                 if (inclusionTags.stream().anyMatch(exclusionTags::contains)) {
                     throw new IllegalArgumentException("You must not configure a tag to be included and excluded");
@@ -113,6 +109,8 @@ public final class EnvironmentUtils {
                     (inclusionTags.isEmpty() || tagsContains(inclusionTags, tags)) &&
                     (exclusionTags.isEmpty() || !tagsContains(exclusionTags, tags))
                 );
+            } else {
+                return false;
             }
         }
 

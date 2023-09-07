@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/gravitee-io/gravitee-common/compare/3.2.0...3.2.1) (2023-09-07)
+
+
+### Bug Fixes
+
+* return false when given matching tags is null or empty ([4d3b206](https://github.com/gravitee-io/gravitee-common/commit/4d3b20612c5b4678e4accc0e008ea4534dacb912))
+
 # [3.2.0](https://github.com/gravitee-io/gravitee-common/compare/3.1.0...3.2.0) (2023-09-05)
 
 

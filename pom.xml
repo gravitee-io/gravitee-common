@@ -40,6 +40,7 @@
         <bouncycastle.version>1.69</bouncycastle.version>
         <nimbus-jose-jwt.version>9.15.2</nimbus-jose-jwt.version>
         <lombok.version>1.18.24</lombok.version>
+        <freemarker.version>2.3.31</freemarker.version>
     </properties>
 
     <dependencyManagement>
@@ -114,6 +115,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+        </dependency>
+
+        <!-- Templating -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
         </dependency>
 
         <!-- Unit Tests -->

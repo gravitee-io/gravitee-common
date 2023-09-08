@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>22.0.2</version>
+        <version>22.0.4</version>
     </parent>
 
     <groupId>io.gravitee.common</groupId>
@@ -34,12 +34,11 @@
     <name>Gravitee.io APIM - Common</name>
 
     <properties>
-        <gravitee-bom.version>4.0.0</gravitee-bom.version>
+        <gravitee-bom.version>6.0.4</gravitee-bom.version>
         <gravitee-node.version>2.0.0</gravitee-node.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
         <bouncycastle.version>1.69</bouncycastle.version>
         <nimbus-jose-jwt.version>9.15.2</nimbus-jose-jwt.version>
-        <lombok.version>1.18.24</lombok.version>
         <freemarker.version>2.3.31</freemarker.version>
     </properties>
 
@@ -96,6 +95,7 @@
             <version>${bouncycastle.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
@@ -114,7 +114,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
         </dependency>
 
         <!-- Templating -->
@@ -130,11 +129,13 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -153,26 +154,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <version>0.17</version>
-                <configuration>
-                    <nodeVersion>12.13.0</nodeVersion>
-                    <prettierJavaVersion>1.6.1</prettierJavaVersion>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

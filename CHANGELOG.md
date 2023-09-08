@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/gravitee-io/gravitee-common/compare/3.2.1...3.3.0) (2023-09-08)
+
+
+### Features
+
+* add reusable freemarker templating component ([b28b5f1](https://github.com/gravitee-io/gravitee-common/commit/b28b5f154ed31d5ceb951bc7a12f62b8b83f9033))
+
 ## [3.2.1](https://github.com/gravitee-io/gravitee-common/compare/3.2.0...3.2.1) (2023-09-07)
 
 

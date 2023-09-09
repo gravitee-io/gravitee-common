@@ -34,8 +34,13 @@ class FreeMarkerComponentTest {
     private static final String TEMPLATE = "template.ftl";
 
     @Test
-    void should_read_template_from_base_package() {
-        var freeMarkerComponent = new FreeMarkerComponent();
+    void should_resolve_template_from_class_template_loader_base() {
+        var freeMarkerComponent = FreeMarkerComponent
+            .builder()
+            .classLoader(getClass().getClassLoader())
+            .classLoaderTemplateBase("freemarker/")
+            .build();
+
         var result = freeMarkerComponent.generateFromTemplate(TEMPLATE, DATA);
         assertThat(result)
             .isEqualToIgnoringNewLines("""
@@ -44,18 +49,21 @@ class FreeMarkerComponentTest {
     }
 
     @Test
-    void should_read_template_from_sub_package() {
-        var freeMarkerComponent = new FreeMarkerComponent("subpackage");
-        var result = freeMarkerComponent.generateFromTemplate(TEMPLATE, DATA);
+    void should_resolve_template_with_no_class_template_loader_base() {
+        var freeMarkerComponent = FreeMarkerComponent.builder().classLoader(getClass().getClassLoader()).build();
+
+        var template = "/freemarker/" + TEMPLATE;
+        var result = freeMarkerComponent.generateFromTemplate(template, DATA);
         assertThat(result)
             .isEqualToIgnoringNewLines("""
-      { "description" : "from freemarker sub package", "message" : "It works!" }
+      { "description" : "from freemarker package", "message" : "It works!" }
       """);
     }
 
     @Test
-    void should_read_templates_from_file_system(@TempDir Path tempDir) throws IOException {
-        var freeMarkerComponent = new FreeMarkerComponent(tempDir);
+    void should_resolve_templates_from_file_system(@TempDir Path tempDir) throws IOException {
+        var freeMarkerComponent = FreeMarkerComponent.builder().path(tempDir).build();
+
         var fsTemplate = tempDir.resolve(TEMPLATE);
 
         Files.write(fsTemplate, """
@@ -65,6 +73,34 @@ class FreeMarkerComponentTest {
         var result = freeMarkerComponent.generateFromTemplate(TEMPLATE, DATA);
         assertThat(result).isEqualToIgnoringNewLines("""
       { "description" : "from file system", "message" : "It works!" }
+      """);
+    }
+
+    @Test
+    void should_resolve_templates_from_file_system_and_class_path(@TempDir Path tempDir) throws IOException {
+        var freeMarkerComponent = FreeMarkerComponent
+            .builder()
+            .path(tempDir)
+            .classLoader(getClass().getClassLoader())
+            .classLoaderTemplateBase("freemarker")
+            .build();
+
+        var fsTemplate = tempDir.resolve(TEMPLATE);
+
+        Files.write(fsTemplate, """
+    { "description" : "from file system", "message" : "${message}" }
+    """.getBytes());
+
+        var fsResult = freeMarkerComponent.generateFromTemplate(TEMPLATE, DATA);
+        assertThat(fsResult).isEqualToIgnoringNewLines("""
+      { "description" : "from file system", "message" : "It works!" }
+      """);
+
+        var template = "subpackage/" + TEMPLATE;
+        var cpResult = freeMarkerComponent.generateFromTemplate(template, DATA);
+        assertThat(cpResult)
+            .isEqualToIgnoringNewLines("""
+      { "description" : "from freemarker subpackage", "message" : "It works!" }
       """);
     }
 }

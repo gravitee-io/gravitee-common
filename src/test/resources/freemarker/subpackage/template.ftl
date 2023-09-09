@@ -1,6 +1,6 @@
 <@compress single_line=true>
   {
-  "description" : "from freemarker sub package",
+  "description" : "from freemarker subpackage",
   "message" : "${message}"
   }
 </@compress>

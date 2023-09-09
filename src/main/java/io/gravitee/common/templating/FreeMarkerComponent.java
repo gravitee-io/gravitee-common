@@ -28,10 +28,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Antoine CORDIER (antoine.cordier at graviteesource.com)
@@ -39,132 +40,100 @@ import org.slf4j.LoggerFactory;
  *
  * Utility component that compiles freemarker templates from various source to various outputs.
  *
- * This can be used in plugins as it handles template loading from the parent classloader.
- *
- * To be resolved from the class path, templates *must* reside in the `freemarker` resources package.
+ * If looking for templates in the classPath, it is the responsibility of the caller to provide a classLoader.
  */
+@Slf4j
 public class FreeMarkerComponent {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FreeMarkerComponent.class);
-
-    private static final String TEMPLATES_BASE = "/freemarker";
 
     private final Configuration freeMarkerConfiguration;
 
     /**
-     * Create a FreeMarker component with default configuration, meaning that templates are loaded from
-     * a freemarker resources package located in the classpath, using the current classloader and its parent.
-     * The parent classloader takes precedence over the current classloader.
-     * {@see #freemarker.cache.ClassTemplateLoader(Class, String)}
+     * Creates a new FreeMarkerComponent.
+     * @param path path to a template directory on the File System
+     * @param classLoader class loader to load templates from the class path
+     * @param classLoaderTemplateBase base path to load templates from the class path
+     *
+     * If path is defined (not null), templates will be looked for on the file system first, then in the class path if
+     * a class loader has been provided.
+     *
+     * If classLoaderTemplateBase is not defined (null), templates will be looked for at the root of the class path.
+     *
+     * Regarding template path resolution comments in the javadoc of {@link ClassTemplateLoader} state that
+     *
+     * """
+     * Because a ClassLoader isn't bound to any Java package,
+     * it doesn't matter if the basePackagePath starts with / or not,
+     * it will be always relative to the root of the package hierarchy.
+     * """
+     *
      */
-    public FreeMarkerComponent() {
-        this("");
-    }
-
-    /**
-     * Convenience constructor to create a FreeMarker component which will load templates from a subpackage
-     * inside the freemarker resources package.
-     * {@link FreeMarkerComponent#FreeMarkerComponent()}
-     */
-    public FreeMarkerComponent(String subPackagePath) {
-        var basePackagePath = sanitizeBasePackage(subPackagePath);
-        this.freeMarkerConfiguration = freemarkerConfiguration(basePackagePath);
-    }
-
-    /**
-     * Creates a FreeMarker component which will look for templates from a given path on the file system first,
-     * and fallback to the classpath loader.
-     */
-    public FreeMarkerComponent(Path path) {
-        this(path, "");
-    }
-
-    /**
-     * Creates a FreeMarker component which will look for templates from a given path on the file system first,
-     * and fallback to the freemarker resources subpackage.
-     * {@link FreeMarkerComponent#FreeMarkerComponent(String)}
-     * {@link FreeMarkerComponent#FreeMarkerComponent(Path)}
-     */
-    public FreeMarkerComponent(Path path, String subPackagePath) {
-        var basePackagePath = sanitizeBasePackage(subPackagePath);
-        this.freeMarkerConfiguration = freemarkerConfiguration(path, basePackagePath);
+    @Builder
+    public FreeMarkerComponent(Path path, ClassLoader classLoader, String classLoaderTemplateBase) {
+        this.freeMarkerConfiguration = freemarkerConfiguration(path, classLoader, classLoaderTemplateBase);
     }
 
     /**
      * Compiles the free marker template and writes the result to the writer.
-     * @param templateName name of the FreeMarker template
+     * @param templatePath name of the FreeMarker template
      * @param data data of the template
      * @param writer writer to write the result to
      */
-    public void generateFromTemplate(final String templateName, final Map<String, Object> data, Writer writer) {
+    public void generateFromTemplate(final String templatePath, final Map<String, Object> data, Writer writer) {
         try {
-            final Template template = freeMarkerConfiguration.getTemplate(templateName);
+            log.debug("Generating from template {}", templatePath);
+            final Template template = freeMarkerConfiguration.getTemplate(templatePath);
             template.process(data, writer);
         } catch (final IOException | TemplateException exception) {
-            LOG.error("Impossible to generate from template " + templateName, exception);
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Impossible to generate from template " + templatePath, exception);
         }
     }
 
     /**
      * Compiles the free marker template and returns the result as a string.
-     * @param templateName name of the FreeMarker template
+     * @param templatePath name of the FreeMarker template
      * @param data data of the template
      * @return compiled template as a string
      */
-    public String generateFromTemplate(final String templateName, final Map<String, Object> data) {
+    public String generateFromTemplate(final String templatePath, final Map<String, Object> data) {
         try (final StringWriter output = new StringWriter()) {
-            generateFromTemplate(templateName, data, output);
+            generateFromTemplate(templatePath, data, output);
             return output.getBuffer().toString();
         } catch (final IOException exception) {
-            LOG.error("Impossible to generate from template {}", templateName, exception);
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Impossible to generate from template " + templatePath, exception);
         }
     }
 
-    private static String sanitizeBasePackage(String subPackagePath) {
-        return subPackagePath.startsWith("/") ? TEMPLATES_BASE + subPackagePath : TEMPLATES_BASE + "/" + subPackagePath;
-    }
-
-    private static Configuration freemarkerConfiguration(String templatesLocation) {
-        var configuration = commonFreemarkerConfiguration();
-        configuration.setTemplateLoader(classTemplateLoader(templatesLocation));
-        return configuration;
-    }
-
-    private static Configuration freemarkerConfiguration(Path path, String basePackagePath) {
-        var configuration = commonFreemarkerConfiguration();
-        configuration.setTemplateLoader(fileTemplateLoader(path, basePackagePath));
-        return configuration;
-    }
-
-    private static Configuration commonFreemarkerConfiguration() {
+    private static Configuration freemarkerConfiguration(Path path, ClassLoader classLoader, String classLoaderTemplateBase) {
         var configuration = new Configuration(Configuration.VERSION_2_3_23);
         configuration.setDefaultEncoding(StandardCharsets.UTF_8.name());
         configuration.setDateFormat("iso_utc");
         configuration.setLocale(Locale.ENGLISH);
         configuration.setNumberFormat("computer");
         configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
+        configuration.setTemplateLoader(templateLoader(path, classLoader, classLoaderTemplateBase));
         return configuration;
     }
 
-    private static TemplateLoader fileTemplateLoader(Path path, String templateLocation) {
+    private static TemplateLoader templateLoader(Path path, ClassLoader classLoader, String classLoaderTemplateBase) {
         try {
-            var fileTemplateLoader = new FileTemplateLoader(path.toFile());
-            var classTemplateLoader = classTemplateLoader(templateLocation);
-            return new MultiTemplateLoader(new TemplateLoader[] { fileTemplateLoader, classTemplateLoader });
+            var templateLoaders = new ArrayList<TemplateLoader>();
+            if (path != null) {
+                log.debug("Adding file template loader for path {}", path);
+                templateLoaders.add(new FileTemplateLoader(path.toFile()));
+            }
+            if (classLoader != null) {
+                log.debug("Adding classloader {} to freemarker template loaders", classLoader);
+                if (classLoaderTemplateBase == null) {
+                    log.debug("Classpath templates will be looked for in the root package");
+                    templateLoaders.add(new ClassTemplateLoader(classLoader, "/"));
+                } else {
+                    log.debug("Classpath templates will be looked for in {}", classLoaderTemplateBase);
+                    templateLoaders.add(new ClassTemplateLoader(classLoader, classLoaderTemplateBase));
+                }
+            }
+            return new MultiTemplateLoader(templateLoaders.toArray(new TemplateLoader[] {}));
         } catch (IOException e) {
-            throw new IllegalArgumentException("Unable to initialize template loader", e);
+            throw new IllegalArgumentException("Unable to initialize freemarker template loader", e);
         }
-    }
-
-    private static TemplateLoader classTemplateLoader(String templatesLocation) {
-        var classLoader = FreeMarkerComponent.class.getClassLoader();
-        var templateLoader = new ClassTemplateLoader(classLoader, templatesLocation);
-        if (classLoader.getParent() != null) {
-            var parentTemplateLoader = new ClassTemplateLoader(classLoader.getParent(), templatesLocation);
-            return new MultiTemplateLoader(new TemplateLoader[] { parentTemplateLoader, templateLoader });
-        }
-        return templateLoader;
     }
 }

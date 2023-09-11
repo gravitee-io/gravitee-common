@@ -16,8 +16,13 @@
 package io.gravitee.common.util;
 
 import java.text.Collator;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.CompositePropertySource;
@@ -91,27 +96,20 @@ public final class EnvironmentUtils {
     public static boolean hasMatchingTags(Optional<List<String>> configuredTags, Set<String> tags) {
         if (configuredTags.isPresent()) {
             List<String> tagList = configuredTags.get();
-            if (tags != null && !tags.isEmpty()) {
-                final List<String> inclusionTags = tagList.stream().map(String::trim).filter(tag -> !tag.startsWith("!")).toList();
 
-                final List<String> exclusionTags = tagList
-                    .stream()
-                    .map(String::trim)
-                    .filter(tag -> tag.startsWith("!"))
-                    .map(tag -> tag.substring(1))
-                    .toList();
+            final List<String> inclusionTags = tagList.stream().map(String::trim).filter(tag -> !tag.startsWith("!")).toList();
 
-                if (inclusionTags.stream().anyMatch(exclusionTags::contains)) {
-                    throw new IllegalArgumentException("You must not configure a tag to be included and excluded");
-                }
+            final List<String> exclusionTags = tagList
+                .stream()
+                .map(String::trim)
+                .filter(tag -> tag.startsWith("!"))
+                .map(tag -> tag.substring(1))
+                .toList();
 
-                return (
-                    (inclusionTags.isEmpty() || tagsContains(inclusionTags, tags)) &&
-                    (exclusionTags.isEmpty() || !tagsContains(exclusionTags, tags))
-                );
-            } else {
-                return false;
-            }
+            return (
+                (inclusionTags.isEmpty() || tagsContains(inclusionTags, tags)) &&
+                (exclusionTags.isEmpty() || !tagsContains(exclusionTags, tags))
+            );
         }
 
         // no tags configured on this gateway instance
@@ -139,6 +137,9 @@ public final class EnvironmentUtils {
     }
 
     private static boolean tagsContains(Collection<String> tags, Collection<String> searchedTags) {
+        if (searchedTags == null || searchedTags.isEmpty()) {
+            return false;
+        }
         return tags
             .stream()
             .anyMatch(tag ->

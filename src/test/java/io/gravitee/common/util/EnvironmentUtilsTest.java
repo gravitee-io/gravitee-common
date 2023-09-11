@@ -15,13 +15,21 @@
  */
 package io.gravitee.common.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -88,16 +96,20 @@ public class EnvironmentUtilsTest {
     }
 
     @Test
-    public void should_fail_if_tag_is_included_and_excluded() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env", "!env")), new HashSet<>(Arrays.asList("env")))
-        );
+    public void should_return_false_if_tag_is_included_and_excluded() {
+        assertFalse(EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env", "!env")), new HashSet<>(Arrays.asList("env"))));
     }
 
     @Test
     public void should_return_true_if_one_matching_tag_in_included_list() {
         assertTrue(EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("env")), new HashSet<>(Arrays.asList("env"))));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    public void should_return_true_if_empty_matching_tag_in_excluded_list(final Set<String> tags) {
+        assertTrue(EnvironmentUtils.hasMatchingTags(Optional.of(Arrays.asList("!env")), tags));
     }
 
     @Test

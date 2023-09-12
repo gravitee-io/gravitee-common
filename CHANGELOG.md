@@ -1,3 +1,10 @@
+## [3.3.1](https://github.com/gravitee-io/gravitee-common/compare/3.3.0...3.3.1) (2023-09-12)
+
+
+### Bug Fixes
+
+* improving environment hasMatching feature ([248636a](https://github.com/gravitee-io/gravitee-common/commit/248636a45dbe82ba9e5bf25f1420fc6d34aeb5e8))
+
 # [3.3.0](https://github.com/gravitee-io/gravitee-common/compare/3.2.1...3.3.0) (2023-09-08)
 
 

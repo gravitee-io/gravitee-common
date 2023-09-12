@@ -1,3 +1,10 @@
+## [3.3.2](https://github.com/gravitee-io/gravitee-common/compare/3.3.1...3.3.2) (2023-09-12)
+
+
+### Bug Fixes
+
+* **freemarker:** pass class loader explicitely ([0620025](https://github.com/gravitee-io/gravitee-common/commit/0620025caeee5081cb8668b78fca00fa5c1d0954))
+
 ## [3.3.1](https://github.com/gravitee-io/gravitee-common/compare/3.3.0...3.3.1) (2023-09-12)
 
 

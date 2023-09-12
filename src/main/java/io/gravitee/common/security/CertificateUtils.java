@@ -49,7 +49,10 @@ public class CertificateUtils {
 
         if (certHeaderValue != null) {
             try {
-                certHeaderValue = URLDecoder.decode(certHeaderValue.replaceAll("\t", "\n"), Charset.defaultCharset());
+                if (!certHeaderValue.contains("\n")) {
+                    certHeaderValue = URLDecoder.decode(certHeaderValue, Charset.defaultCharset());
+                }
+                certHeaderValue = certHeaderValue.replaceAll("\t", "\n");
                 CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
                 certificate =
                     Optional.ofNullable(

@@ -66,9 +66,20 @@ class CertificateUtilsTest {
     }
 
     @Test
-    void should_extract_certificate_from_header() {
+    void should_extract_encoded_certificate_from_header() {
         HttpHeaders httpHeaders = HttpHeaders.create();
         httpHeaders.set(CLIENT_CERT_HEADER, URLEncoder.encode(clientCertificate, StandardCharsets.UTF_8));
+        Optional<X509Certificate> certificateOptional = CertificateUtils.extractCertificate(httpHeaders, CLIENT_CERT_HEADER);
+
+        assertThat(certificateOptional).isNotEmpty();
+        X509Certificate certificate = certificateOptional.get();
+        assertThat(certificate).isEqualTo(clientX509Certificate);
+    }
+
+    @Test
+    void should_extract_non_encoded_certificate_from_header() {
+        HttpHeaders httpHeaders = HttpHeaders.create();
+        httpHeaders.set(CLIENT_CERT_HEADER, clientCertificate);
         Optional<X509Certificate> certificateOptional = CertificateUtils.extractCertificate(httpHeaders, CLIENT_CERT_HEADER);
 
         assertThat(certificateOptional).isNotEmpty();

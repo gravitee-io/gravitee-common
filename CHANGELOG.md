@@ -1,3 +1,10 @@
+## [3.3.3](https://github.com/gravitee-io/gravitee-common/compare/3.3.2...3.3.3) (2023-09-12)
+
+
+### Bug Fixes
+
+* allow to extract non-encoded certificate ([702a807](https://github.com/gravitee-io/gravitee-common/commit/702a8072cb95c4d1c71ad4f8bd4c0fcfa457b581))
+
 ## [3.3.2](https://github.com/gravitee-io/gravitee-common/compare/3.3.1...3.3.2) (2023-09-12)
 
 

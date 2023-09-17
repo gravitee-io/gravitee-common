@@ -39,7 +39,7 @@
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
         <bouncycastle.version>1.69</bouncycastle.version>
         <nimbus-jose-jwt.version>9.15.2</nimbus-jose-jwt.version>
-        <freemarker.version>2.3.31</freemarker.version>
+        <freemarker.version>2.3.32</freemarker.version>
     </properties>
 
     <dependencyManagement>

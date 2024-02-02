@@ -1,3 +1,10 @@
+# [3.4.0](https://github.com/gravitee-io/gravitee-common/compare/3.3.3...3.4.0) (2024-02-02)
+
+
+### Features
+
+* introduce CronTrigger class ([c8d821d](https://github.com/gravitee-io/gravitee-common/commit/c8d821dd5d3f4f1adde0bda849ebbd232b0c1b76))
+
 ## [3.3.3](https://github.com/gravitee-io/gravitee-common/compare/3.3.2...3.3.3) (2023-09-12)
 
 

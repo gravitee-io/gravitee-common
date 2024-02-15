@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>22.0.4</version>
+        <version>22.0.19</version>
     </parent>
 
     <groupId>io.gravitee.common</groupId>
@@ -34,8 +34,8 @@
     <name>Gravitee.io APIM - Common</name>
 
     <properties>
-        <gravitee-bom.version>6.0.4</gravitee-bom.version>
-        <gravitee-node.version>2.0.0</gravitee-node.version>
+        <gravitee-bom.version>6.0.24</gravitee-bom.version>
+        <gravitee-node.version>4.8.2</gravitee-node.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
         <bouncycastle.version>1.69</bouncycastle.version>
         <nimbus-jose-jwt.version>9.15.2</nimbus-jose-jwt.version>

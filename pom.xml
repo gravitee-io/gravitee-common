@@ -37,7 +37,7 @@
         <gravitee-bom.version>6.0.4</gravitee-bom.version>
         <gravitee-node.version>2.0.0</gravitee-node.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
-        <bouncycastle.version>1.69</bouncycastle.version>
+        <bouncycastle.version>1.77</bouncycastle.version>
         <nimbus-jose-jwt.version>9.15.2</nimbus-jose-jwt.version>
         <freemarker.version>2.3.31</freemarker.version>
     </properties>
@@ -96,14 +96,14 @@
         <!-- Bouncy Castle -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
+            <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
+            <artifactId>bcpkix-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
             <scope>provided</scope>
         </dependency>

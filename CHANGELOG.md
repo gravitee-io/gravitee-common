@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/gravitee-io/gravitee-common/compare/3.4.0...3.4.1) (2024-03-07)
+
+
+### Bug Fixes
+
+* **deps:** update bcprov-jdk15on to bcprov-jdk18on ([b4c1eb6](https://github.com/gravitee-io/gravitee-common/commit/b4c1eb69f20dd2d87400f25eca4522b7325441ff))
+
 # [3.4.0](https://github.com/gravitee-io/gravitee-common/compare/3.3.3...3.4.0) (2024-02-02)
 
 

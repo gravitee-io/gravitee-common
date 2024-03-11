@@ -1,3 +1,16 @@
+# [4.0.0](https://github.com/gravitee-io/gravitee-common/compare/3.4.1...4.0.0) (2024-03-11)
+
+
+### Code Refactoring
+
+* remove VertxProxyOptionsUtils and gravitee-node dependency ([4d30d36](https://github.com/gravitee-io/gravitee-common/commit/4d30d3679d73a6b8def6a0af7f7b9b049c61b64f))
+
+
+### BREAKING CHANGES
+
+* Remove VertxProxyOptionsUtils, please use the one from gravitee-node from version 5.9.0
+https://gravitee.atlassian.net/browse/APIM-3800
+
 ## [3.4.1](https://github.com/gravitee-io/gravitee-common/compare/3.4.0...3.4.1) (2024-03-07)
 
 

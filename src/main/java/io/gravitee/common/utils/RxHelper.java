@@ -124,57 +124,6 @@ public class RxHelper {
     }
 
     /**
-     * Returns a {@link FlowableTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Flowable}.
-     * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay without max limitation.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay
-     * @return a {@link FlowableTransformer} that will be applied.
-     */
-    public static <R> FlowableTransformer<R, R> retryExponentialBackoffFlowable(final long initialDelay, final TimeUnit timeUnit) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, timeUnit));
-    }
-
-    /**
-     * Returns a {@link FlowableTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Flowable}.
-     * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay until it reaches the maxDelay.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @return a {@link FlowableTransformer} that will be applied.
-     */
-    public static <R> FlowableTransformer<R, R> retryExponentialBackoffFlowable(
-        final long initialDelay,
-        final long maxDelay,
-        final TimeUnit timeUnit
-    ) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, maxDelay, timeUnit));
-    }
-
-    /**
-     * Returns a {@link FlowableTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Flowable}.
-     * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @param factor        factor used to compute next delay
-     * @return a {@link FlowableTransformer} that will be applied.
-     */
-    public static <R> FlowableTransformer<R, R> retryExponentialBackoffFlowable(
-        final long initialDelay,
-        final long maxDelay,
-        final TimeUnit timeUnit,
-        final double factor
-    ) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, maxDelay, timeUnit, factor));
-    }
-
-    /**
      * Same as {@link #retryFlowable(int, int, TimeUnit)} but with a {@link Maybe} instead.
      *
      * @param times         the attempts number
@@ -209,57 +158,6 @@ public class RxHelper {
             upstream.retryWhen(throwables ->
                 throwables.compose(delayElement(retryInterval, timeUnit, skipThrowable)).compose(takeThenThrow(times, skipThrowable))
             );
-    }
-
-    /**
-     * Returns a {@link MaybeTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Maybe}.
-     * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay without max limitation.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay
-     * @return a {@link MaybeTransformer} that will be applied.
-     */
-    public static <R> MaybeTransformer<R, R> retryExponentialBackoffMaybe(final long initialDelay, final TimeUnit timeUnit) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, timeUnit));
-    }
-
-    /**
-     * Returns a {@link MaybeTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Maybe}.
-     * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay until it reaches the maxDelay.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @return a {@link MaybeTransformer} that will be applied.
-     */
-    public static <R> MaybeTransformer<R, R> retryExponentialBackoffMaybe(
-        final long initialDelay,
-        final long maxDelay,
-        final TimeUnit timeUnit
-    ) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, maxDelay, timeUnit));
-    }
-
-    /**
-     * Returns a {@link MaybeTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Maybe}.
-     * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @param factor        factor used to compute next delay
-     * @return a {@link MaybeTransformer} that will be applied.
-     */
-    public static <R> MaybeTransformer<R, R> retryExponentialBackoffMaybe(
-        final long initialDelay,
-        final long maxDelay,
-        final TimeUnit timeUnit,
-        final double factor
-    ) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, maxDelay, timeUnit, factor));
     }
 
     /**
@@ -298,57 +196,6 @@ public class RxHelper {
             upstream.retryWhen(throwables ->
                 throwables.compose(delayElement(retryInterval, timeUnit, skipThrowable)).compose(takeThenThrow(times, skipThrowable))
             );
-    }
-
-    /**
-     * Returns a {@link SingleTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Single}.
-     * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay without max limitation.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay
-     * @return a {@link SingleTransformer} that will be applied.
-     */
-    public static <R> SingleTransformer<R, R> retryExponentialBackoffSingle(final long initialDelay, final TimeUnit timeUnit) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, timeUnit));
-    }
-
-    /**
-     * Returns a {@link SingleTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Single}.
-     * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay until it reaches the maxDelay.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @return a {@link SingleTransformer} that will be applied.
-     */
-    public static <R> SingleTransformer<R, R> retryExponentialBackoffSingle(
-        final long initialDelay,
-        final long maxDelay,
-        final TimeUnit timeUnit
-    ) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, maxDelay, timeUnit));
-    }
-
-    /**
-     * Returns a {@link SingleTransformer} that can be used in a composition.
-     * It will progressively wait longer intervals between consecutive retries of the {@link Single}.
-     * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay.
-     *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @param factor        factor used to compute next delay
-     * @return a {@link SingleTransformer} that will be applied.
-     */
-    public static <R> SingleTransformer<R, R> retryExponentialBackoffSingle(
-        final long initialDelay,
-        final long maxDelay,
-        final TimeUnit timeUnit,
-        final double factor
-    ) {
-        return upstream -> upstream.retryWhen(retryExponentialBackoff(initialDelay, maxDelay, timeUnit, factor));
     }
 
     /**
@@ -418,7 +265,7 @@ public class RxHelper {
      * @param timeUnit      the {@link TimeUnit} of the initialDelay
      * @return a {@link Function} that will be applied.
      */
-    private static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
+    public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
         final long initialDelay,
         final TimeUnit timeUnit
     ) {
@@ -434,7 +281,7 @@ public class RxHelper {
      * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
      * @return a {@link Function} that will be applied.
      */
-    private static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
+    public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
         final long initialDelay,
         final long maxDelay,
         final TimeUnit timeUnit
@@ -452,14 +299,43 @@ public class RxHelper {
      * @param factor        factor used to compute next delay
      * @return a {@link Function} that will be applied.
      */
-    private static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
+    public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
         final long initialDelay,
         final long maxDelay,
         final TimeUnit timeUnit,
         final double factor
     ) {
+        return retryExponentialBackoff(initialDelay, maxDelay, timeUnit, factor, TRUE_PREDICATE);
+    }
+
+    /**
+     * It will progressively wait longer intervals between consecutive retries.
+     * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay.
+     *
+     * @param initialDelay  the initial delay to wait
+     * @param maxDelay      the max delay
+     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
+     * @param factor        factor used to compute next delay
+     * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
+     * @return a {@link Function} that will be applied.
+     */
+    public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
+        final long initialDelay,
+        final long maxDelay,
+        final TimeUnit timeUnit,
+        final double factor,
+        Predicate<Throwable> retryPredicate
+    ) {
+        Objects.requireNonNull(retryPredicate, "retryPredicate is null");
         return attempts ->
             attempts
+                .flatMapSingle(throwable -> {
+                    if (retryPredicate.test(throwable)) {
+                        return Single.just(throwable);
+                    } else {
+                        return Single.error(throwable);
+                    }
+                })
                 .zipWith(Flowable.range(1, Integer.MAX_VALUE), (throwable, attemptNumber) -> attemptNumber)
                 .map(attemptNumber -> {
                     long delayMs = Math.round(Math.pow(factor, attemptNumber.doubleValue() - 1) * timeUnit.toMillis(initialDelay));

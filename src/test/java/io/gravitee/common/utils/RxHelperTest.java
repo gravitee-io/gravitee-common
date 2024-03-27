@@ -148,46 +148,6 @@ class RxHelperTest {
     }
 
     @Test
-    @DisplayName("Should retry exponentially Flowable and finally success after 2 retries")
-    void shouldExponentiallyRetryFlowable() {
-        try {
-            final TestScheduler testScheduler = new TestScheduler();
-            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
-
-            AtomicInteger atomicCpt = new AtomicInteger(0);
-            @NonNull
-            TestSubscriber<Object> obs = Flowable
-                .generate(emitter -> {
-                    int cpt = atomicCpt.incrementAndGet();
-                    if (cpt <= 2) {
-                        emitter.onError(new RuntimeException());
-                    } else if (cpt <= 4) {
-                        emitter.onNext(cpt);
-                    } else {
-                        emitter.onComplete();
-                    }
-                })
-                .compose(RxHelper.retryExponentialBackoffFlowable(10, TimeUnit.SECONDS))
-                .test()
-                .assertNotComplete()
-                .assertNoValues();
-
-            // an exception has been thrown, so try to retry after ten seconds
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            obs.assertNotComplete().assertNoValues();
-
-            // Second retry should take longer than first one as factor equals 2
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            obs.assertNotComplete().assertNoValues();
-
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            obs.assertComplete().assertValueAt(0, value -> value.equals(3)).assertValueAt(1, value -> value.equals(4));
-        } finally {
-            RxJavaPlugins.reset();
-        }
-    }
-
-    @Test
     @DisplayName("Should not retry Flowable according to filter predicate")
     void shouldNotRetryFlowableAccordingToPredicate() {
         try {
@@ -253,40 +213,6 @@ class RxHelperTest {
     }
 
     @Test
-    @DisplayName("Should retry exponentially Maybe and finally success after 2 retries")
-    void shouldExponentiallyRetryMaybe() {
-        try {
-            final TestScheduler testScheduler = new TestScheduler();
-            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
-
-            AtomicInteger atomicCpt = new AtomicInteger(0);
-            @NonNull
-            TestObserver<Integer> obs = Maybe
-                .<Integer>create(emitter -> {
-                    int cpt = atomicCpt.incrementAndGet();
-                    if (cpt < 3) {
-                        emitter.onError(new RuntimeException());
-                    } else {
-                        emitter.onSuccess(cpt);
-                    }
-                })
-                .compose(RxHelper.retryExponentialBackoffMaybe(10, TimeUnit.SECONDS))
-                .test();
-
-            // First retry should wait 10sec
-            obs.assertNotComplete().assertNoValues();
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            // Second retry should wait 20sec
-            obs.assertNotComplete().assertNoValues();
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            obs.assertComplete().assertValueAt(0, value -> value.equals(3));
-        } finally {
-            RxJavaPlugins.reset();
-        }
-    }
-
-    @Test
     @DisplayName("Should not retry Maybe according to retry predicate")
     void shouldNotRetryMaybeAccordingToPredicate() {
         try {
@@ -344,40 +270,6 @@ class RxHelperTest {
             // Finally, last attempt should work.
             testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
             obs.assertComplete().assertValue(5);
-        } finally {
-            RxJavaPlugins.reset();
-        }
-    }
-
-    @Test
-    @DisplayName("Should retry exponentially Single and finally success after 2 retries")
-    void shouldExponentiallyRetrySingle() {
-        try {
-            final TestScheduler testScheduler = new TestScheduler();
-            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
-
-            AtomicInteger atomicCpt = new AtomicInteger(0);
-            @NonNull
-            TestObserver<Integer> obs = Single
-                .<Integer>create(emitter -> {
-                    int cpt = atomicCpt.incrementAndGet();
-                    if (cpt < 3) {
-                        emitter.onError(new RuntimeException());
-                    } else {
-                        emitter.onSuccess(cpt);
-                    }
-                })
-                .compose(RxHelper.retryExponentialBackoffSingle(10, TimeUnit.SECONDS))
-                .test();
-
-            // First retry should wait 10sec
-            obs.assertNotComplete().assertNoValues();
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            // Second retry should wait 20sec
-            obs.assertNotComplete().assertNoValues();
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-            obs.assertComplete().assertValueAt(0, value -> value.equals(3));
         } finally {
             RxJavaPlugins.reset();
         }
@@ -590,6 +482,82 @@ class RxHelperTest {
             // on the third exception, which is a NonRetryableException, flow should be in error
             testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
             obs.assertError(NonRetryableException.class);
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    @DisplayName("Should retry exponentially and finally success after 2 retries")
+    void shouldExponentiallyRetry() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestSubscriber<Object> obs = Flowable
+                .generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt <= 4) {
+                        emitter.onNext(cpt);
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
+                .retryWhen(RxHelper.retryExponentialBackoff(10, TimeUnit.SECONDS))
+                .test()
+                .assertNotComplete()
+                .assertNoValues();
+
+            // an exception has been thrown, so try to retry after ten seconds
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertNotComplete().assertNoValues();
+
+            // Second retry should take longer than first one as factor equals 2
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertNotComplete().assertNoValues();
+
+            testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+            obs.assertComplete().assertValueAt(0, value -> value.equals(3)).assertValueAt(1, value -> value.equals(4));
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    @DisplayName("Should not retry exponentially according to filter predicate ")
+    void shouldNotExponentiallyRetryFlowable() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            AtomicInteger atomicCpt = new AtomicInteger(0);
+            @NonNull
+            TestSubscriber<Object> obs = Flowable
+                .generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt == 3) {
+                        emitter.onError(new NonRetryableException());
+                    } else if (cpt == 4) {
+                        emitter.onNext(cpt);
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
+                .retryWhen(RxHelper.retryExponentialBackoff(10, 10, TimeUnit.SECONDS, 2, t -> !(t instanceof NonRetryableException)))
+                .test()
+                .assertNotComplete()
+                .assertNoValues();
+
+            // a retryable exception has been thrown twice
+            testScheduler.advanceTimeBy(20, TimeUnit.SECONDS);
+            // an non-retryable exception has been thrown, flow should be in error immediately
+            obs.assertError(NonRetryableException.class).assertNoValues();
         } finally {
             RxJavaPlugins.reset();
         }

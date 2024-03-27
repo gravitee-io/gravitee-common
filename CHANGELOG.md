@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/gravitee-io/gravitee-common/compare/4.0.0...4.1.0) (2024-03-27)
+
+
+### Features
+
+* add exponential backoff retry ([48fd342](https://github.com/gravitee-io/gravitee-common/commit/48fd342d554f893efa98df32e0b4e3cf9bcb0bea))
+
 # [4.0.0](https://github.com/gravitee-io/gravitee-common/compare/3.4.1...4.0.0) (2024-03-11)
 
 

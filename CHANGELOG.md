@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/gravitee-io/gravitee-common/compare/4.1.0...4.2.0) (2024-03-27)
+
+
+### Features
+
+* allow to filter retryable exception ([038f94c](https://github.com/gravitee-io/gravitee-common/commit/038f94c9785470ea4e25e27aa33d0e324916ef8a))
+
 # [4.1.0](https://github.com/gravitee-io/gravitee-common/compare/4.0.0...4.1.0) (2024-03-27)
 
 

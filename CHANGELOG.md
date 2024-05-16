@@ -1,3 +1,10 @@
+# [4.3.0](https://github.com/gravitee-io/gravitee-common/compare/4.2.0...4.3.0) (2024-05-16)
+
+
+### Features
+
+* add SizeUtils ([e0e83eb](https://github.com/gravitee-io/gravitee-common/commit/e0e83ebf4a33b71cf3a1303b0177ed54727379a9))
+
 # [4.2.0](https://github.com/gravitee-io/gravitee-common/compare/4.1.0...4.2.0) (2024-03-27)
 
 

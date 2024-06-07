@@ -1,3 +1,10 @@
+## [4.3.1](https://github.com/gravitee-io/gravitee-common/compare/4.3.0...4.3.1) (2024-06-07)
+
+
+### Bug Fixes
+
+* make lombok dependency provided ([5a3d129](https://github.com/gravitee-io/gravitee-common/commit/5a3d12913e25e28e4b66bba31203815065b26ce6))
+
 # [4.3.0](https://github.com/gravitee-io/gravitee-common/compare/4.2.0...4.3.0) (2024-05-16)
 
 

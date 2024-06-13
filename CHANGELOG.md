@@ -1,3 +1,10 @@
+# [4.4.0](https://github.com/gravitee-io/gravitee-common/compare/4.3.1...4.4.0) (2024-06-13)
+
+
+### Features
+
+* add unsubscribe method for EventManager ([8483a9f](https://github.com/gravitee-io/gravitee-common/commit/8483a9f513ffc46c6ac0f68844cb291bc05dd206))
+
 ## [4.3.1](https://github.com/gravitee-io/gravitee-common/compare/4.3.0...4.3.1) (2024-06-07)
 
 

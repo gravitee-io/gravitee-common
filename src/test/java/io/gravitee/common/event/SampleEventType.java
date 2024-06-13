@@ -16,8 +16,10 @@
 package io.gravitee.common.event;
 
 /**
- * @author David BRASSELY (brasseld at gmail.com)
+ * @author Guillaume LAMIRAND (guillaume.lamirand at graviteesource.com)
+ * @author GraviteeSource Team
  */
-public interface EventListener<T extends Enum<T>, S> {
-    void onEvent(Event<T, S> event);
+public enum SampleEventType {
+    DEPLOY,
+    UNDEPLOY,
 }

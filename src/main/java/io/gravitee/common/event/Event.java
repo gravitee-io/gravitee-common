@@ -18,7 +18,7 @@ package io.gravitee.common.event;
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
-public interface Event<T extends Enum, S> {
+public interface Event<T extends Enum<T>, S> {
     S content();
 
     T type();

@@ -18,96 +18,123 @@ package io.gravitee.common.event.impl;
 import io.gravitee.common.event.Event;
 import io.gravitee.common.event.EventListener;
 import io.gravitee.common.event.EventManager;
-import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author David BRASSELY (brasseld at gmail.com)
  */
+@Slf4j
 public class EventManagerImpl implements EventManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventManagerImpl.class);
+    private final Map<ComparableEventType<? extends Enum<?>>, List<EventListenerSubscription<?, ?>>> listeners = new ConcurrentHashMap<>();
 
-    private Map<ComparableEventType, List<EventListenerWrapper>> listenersMap = new TreeMap();
-
-    public void publishEvent(Enum type, Object content) {
-        this.publishEvent(new SimpleEvent(type, content));
+    public <T extends Enum<T>, S> void publishEvent(final T type, final S content) {
+        this.publishEvent(new SimpleEvent<>(type, content));
     }
 
-    public void publishEvent(Event event) {
-        LOGGER.debug("Publish event {} - {}", event.type(), event.content());
+    public <T extends Enum<T>, S> void publishEvent(final Event<T, S> event) {
+        log.debug("Publish event {} - {}", event.type(), event.content());
+        List<EventListenerSubscription<?, ?>> eventTypeListeners =
+            this.listeners.get(new ComparableEventType<>((Class<T>) event.type().getClass()));
 
-        List<EventListenerWrapper> listeners = getEventListeners(event.type().getClass());
-        for (EventListenerWrapper listener : listeners) {
-            listener.eventListener().onEvent(event);
+        if (eventTypeListeners != null && !eventTypeListeners.isEmpty()) {
+            eventTypeListeners
+                .stream()
+                .filter(wrapper -> wrapper.events().contains(event.type()))
+                .forEach(wrapper -> ((EventListenerSubscription<T, S>) wrapper).eventListener().onEvent(event));
         }
     }
 
-    public <T extends Enum> void subscribeForEvents(EventListener<T, ?> eventListener, T... events) {
-        for (T event : events) {
-            addEventListener(eventListener, (Class<T>) event.getClass(), Arrays.asList(events));
+    public <T extends Enum<T>> void subscribeForEvents(EventListener<T, ?> eventListener, T... eventTypes) {
+        if (eventTypes.length > 0) {
+            Class<T> eventTypeClass = (Class<T>) eventTypes[0].getClass();
+            EnumSet<T> eventTypesSet = EnumSet.of(eventTypes[0], eventTypes);
+            addEventListener(eventListener, eventTypeClass, eventTypesSet);
         }
     }
 
-    public <T extends Enum> void subscribeForEvents(EventListener<T, ?> eventListener, Class<T> events) {
-        addEventListener(eventListener, events, EnumSet.allOf(events));
+    public <T extends Enum<T>> void subscribeForEvents(EventListener<T, ?> eventListener, Class<T> eventTypeClass) {
+        addEventListener(eventListener, eventTypeClass, EnumSet.allOf(eventTypeClass));
     }
 
-    private <T extends Enum> void addEventListener(EventListener<T, ?> eventListener, Class<T> enumClass, Collection<T> events) {
-        LOGGER.info("Register new listener {} for event type {}", eventListener.getClass().getSimpleName(), enumClass);
+    private <T extends Enum<T>> void addEventListener(
+        final EventListener<T, ?> eventListener,
+        final Class<T> eventTypeClass,
+        final Set<T> eventTypes
+    ) {
+        log.debug("Register new listener {} for event type {}", eventListener.getClass().getSimpleName(), eventTypeClass);
 
-        List<EventListenerWrapper> listeners = getEventListeners(enumClass);
-        listeners.add(new EventListenerWrapper(eventListener, events));
+        this.listeners.compute(
+                new ComparableEventType<>(eventTypeClass),
+                (k, v) -> {
+                    if (v == null) {
+                        v = new CopyOnWriteArrayList<>();
+                    }
+                    v.add(new EventListenerSubscription<>(eventListener, eventTypes));
+                    return v;
+                }
+            );
     }
 
-    private <T extends Enum> List<EventListenerWrapper> getEventListeners(Class<T> eventType) {
-        List<EventListenerWrapper> listeners = this.listenersMap.get(new ComparableEventType(eventType));
-
-        if (listeners == null) {
-            listeners = new ArrayList<>();
-            this.listenersMap.put(new ComparableEventType(eventType), listeners);
-        }
-
-        return listeners;
+    @Override
+    public <T extends Enum<T>> void unsubscribeForEvents(final EventListener<T, ?> eventListener, final Class<T> eventTypesClass) {
+        removeEventListener(eventListener, eventTypesClass, EnumSet.allOf(eventTypesClass));
     }
 
-    private class EventListenerWrapper<T extends Enum> {
-
-        private final EventListener<T, ?> eventListener;
-        private final Set<T> events;
-
-        public EventListenerWrapper(EventListener<T, ?> eventListener, Collection<T> events) {
-            this.eventListener = eventListener;
-            this.events = new HashSet(events);
-        }
-
-        public EventListener<T, ?> eventListener() {
-            return eventListener;
-        }
-
-        public Set<T> events() {
-            return events;
+    @Override
+    public <T extends Enum<T>> void unsubscribeForEvents(final EventListener<T, ?> eventListener, final T... eventTypes) {
+        if (eventTypes.length > 0) {
+            Class<T> eventTypeClass = (Class<T>) eventTypes[0].getClass();
+            EnumSet<T> eventTypesSet = EnumSet.of(eventTypes[0], eventTypes);
+            removeEventListener(eventListener, eventTypeClass, eventTypesSet);
         }
     }
 
-    private class ComparableEventType<T> implements Comparable<ComparableEventType<T>> {
+    private <T extends Enum<T>> void removeEventListener(
+        final EventListener<T, ?> eventListener,
+        final Class<T> eventTypeClass,
+        final Set<T> eventTypes
+    ) {
+        log.debug("Unregister listener {} for event type {}", eventListener.getClass().getSimpleName(), eventTypeClass);
 
-        private static final int HASH = 7 * 89;
-        private final Class<? extends T> wrappedClass;
+        this.listeners.computeIfPresent(
+                new ComparableEventType<>(eventTypeClass),
+                (k, v) -> {
+                    Set<EventListenerSubscription<?, ?>> removedEventListener = new HashSet<>();
+                    v
+                        .stream()
+                        .filter(eventListenerSubscription -> eventListenerSubscription.eventListener.equals(eventListener))
+                        .forEach(eventListenerSubscription -> {
+                            eventListenerSubscription.events.removeAll(eventTypes);
+                            if (eventListenerSubscription.events.isEmpty()) {
+                                removedEventListener.add(eventListenerSubscription);
+                            }
+                        });
+                    for (EventListenerSubscription<?, ?> eventListenerSubscription : removedEventListener) {
+                        v.remove(eventListenerSubscription);
+                    }
 
-        public ComparableEventType(Class<? extends T> wrappedClass) {
-            this.wrappedClass = wrappedClass;
-        }
+                    if (v.isEmpty()) {
+                        return null;
+                    }
+                    return v;
+                }
+            );
+    }
 
+    private record EventListenerSubscription<T extends Enum<T>, S>(EventListener<T, S> eventListener, Set<T> events) {}
+
+    private record ComparableEventType<T extends Enum<T>>(Class<? extends T> wrappedClass) implements Comparable<ComparableEventType<T>> {
         @Override
         public int compareTo(ComparableEventType<T> o) {
             return wrappedClass.getCanonicalName().compareTo(o.wrappedClass.getCanonicalName());
-        }
-
-        @Override
-        public int hashCode() {
-            return HASH + (this.wrappedClass != null ? this.wrappedClass.hashCode() : 0);
         }
 
         @Override

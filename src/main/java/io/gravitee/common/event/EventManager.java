@@ -19,11 +19,15 @@ package io.gravitee.common.event;
  * @author David BRASSELY (brasseld at gmail.com)
  */
 public interface EventManager {
-    void publishEvent(Enum type, Object content);
+    <T extends Enum<T>, S> void publishEvent(final T type, final S content);
 
-    void publishEvent(Event event);
+    <T extends Enum<T>, S> void publishEvent(final Event<T, S> event);
 
-    <T extends Enum> void subscribeForEvents(EventListener<T, ?> eventListener, Class<T> events);
+    <T extends Enum<T>> void subscribeForEvents(final EventListener<T, ?> eventListener, final Class<T> eventTypeClass);
 
-    <T extends Enum> void subscribeForEvents(EventListener<T, ?> eventListener, T... events);
+    <T extends Enum<T>> void subscribeForEvents(final EventListener<T, ?> eventListener, final T... eventTypes);
+
+    <T extends Enum<T>> void unsubscribeForEvents(final EventListener<T, ?> eventListener, final Class<T> eventTypesClass);
+
+    <T extends Enum<T>> void unsubscribeForEvents(final EventListener<T, ?> eventListener, final T... eventTypes);
 }

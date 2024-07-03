@@ -36,7 +36,7 @@ public class Page<T> {
         this.total = total;
     }
 
-    public <U> Page<? extends U> map(Function<? super T, ? extends U> mapper) {
+    public <U> Page<U> map(Function<? super T, U> mapper) {
         return new Page<>(content.stream().map(mapper).toList(), page, size, total);
     }
 

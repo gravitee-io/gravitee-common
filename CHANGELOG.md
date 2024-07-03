@@ -1,3 +1,10 @@
+## [4.5.1](https://github.com/gravitee-io/gravitee-common/compare/4.5.0...4.5.1) (2024-07-03)
+
+
+### Bug Fixes
+
+* **Page:** fix error in typing of map() ([b82ce0c](https://github.com/gravitee-io/gravitee-common/commit/b82ce0cd26d5354c0d5431940ec9a1b22003fe6a))
+
 # [4.5.0](https://github.com/gravitee-io/gravitee-common/compare/4.4.0...4.5.0) (2024-07-03)
 
 

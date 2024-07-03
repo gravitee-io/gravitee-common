@@ -1,3 +1,10 @@
+# [4.5.0](https://github.com/gravitee-io/gravitee-common/compare/4.4.0...4.5.0) (2024-07-03)
+
+
+### Features
+
+* **Page:** add map() method to simplify usage ([a1de0b3](https://github.com/gravitee-io/gravitee-common/commit/a1de0b39431e5b3d12961eb981ce4e155d0624a9))
+
 # [4.4.0](https://github.com/gravitee-io/gravitee-common/compare/4.3.1...4.4.0) (2024-06-13)
 
 

@@ -21,14 +21,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
+import lombok.experimental.UtilityClass;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author GraviteeSource Team
  */
+@UtilityClass
 public class Maps {
-
-    private Maps() {}
 
     public static <K, V> MapBuilder<K, V> builder() {
         return builder(HashMap::new);

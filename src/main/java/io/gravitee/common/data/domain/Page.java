@@ -16,6 +16,7 @@
 package io.gravitee.common.data.domain;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
@@ -33,6 +34,10 @@ public class Page<T> {
         this.page = page;
         this.size = size;
         this.total = total;
+    }
+
+    public <U> Page<? extends U> map(Function<? super T, ? extends U> mapper) {
+        return new Page<>(content.stream().map(mapper).toList(), page, size, total);
     }
 
     public List<T> getContent() {

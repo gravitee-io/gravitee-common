@@ -15,18 +15,13 @@
  */
 package io.gravitee.common.spring.factory;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -53,7 +48,8 @@ public abstract class SpringFactoriesLoader<T> implements ApplicationContextAwar
     protected Collection<? extends T> getFactoriesInstances() {
         if (factories == null) {
             logger.debug("Loading instances for type {}", getObjectType().getName());
-            factories = getSpringFactoriesInstances(getObjectType(), new Class<?>[] {});
+            Class<T> type = getObjectType();
+            factories = createSpringFactoriesInstances(applicationContext, type);
         } else {
             logger.debug("Instances for type {} already loaded. Skipping...", getObjectType().getName());
         }
@@ -61,41 +57,10 @@ public abstract class SpringFactoriesLoader<T> implements ApplicationContextAwar
         return factories;
     }
 
-    private Collection<? extends T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        // Use names and ensure unique to protect against duplicates
-        Set<String> names = new LinkedHashSet<>(
-            org.springframework.core.io.support.SpringFactoriesLoader.loadFactoryNames(type, classLoader)
-        );
-        List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
+    // @VisibleForTesting
+    static <U> List<U> createSpringFactoriesInstances(ApplicationContext applicationContext, Class<U> type) {
+        var instances = new ArrayList<>(applicationContext.getBeansOfType(type).values());
         AnnotationAwareOrderComparator.sort(instances);
-        return instances;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> List<T> createSpringFactoriesInstances(
-        Class<T> type,
-        Class<?>[] parameterTypes,
-        ClassLoader classLoader,
-        Object[] args,
-        Set<String> names
-    ) {
-        List<T> instances = new ArrayList<>(names.size());
-        for (String name : names) {
-            try {
-                Class<?> instanceClass = ClassUtils.forName(name, classLoader);
-                Assert.isAssignable(type, instanceClass);
-                Constructor<?> constructor = instanceClass.getDeclaredConstructor(parameterTypes);
-                T instance = (T) BeanUtils.instantiateClass(constructor, args);
-                ((AbstractApplicationContext) applicationContext).getBeanFactory().autowireBean(instance);
-                if (instance instanceof ApplicationContextAware) {
-                    ((ApplicationContextAware) instance).setApplicationContext(applicationContext);
-                }
-                instances.add(instance);
-            } catch (Throwable ex) {
-                throw new IllegalArgumentException("Cannot instantiate " + type + " : " + name, ex);
-            }
-        }
         return instances;
     }
 }

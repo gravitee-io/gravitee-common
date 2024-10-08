@@ -18,7 +18,6 @@ package io.gravitee.common.spring.factory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -102,17 +101,7 @@ class SpringFactoriesLoaderTest {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringFactoriesLoaderTest.class);
 
         // When
-        List<AService> svc = SpringFactoriesLoader.createSpringFactoriesInstances(
-            ctx,
-            AService.class,
-            SpringFactoriesLoaderTest.class.getClassLoader(),
-            Set.of(
-                MyService.class.getCanonicalName(),
-                MyAnotherService.class.getCanonicalName(),
-                MyYetAnotherService.class.getCanonicalName(),
-                MyYetYetAnotherService.class.getCanonicalName()
-            )
-        );
+        List<AService> svc = SpringFactoriesLoader.createSpringFactoriesInstances(ctx, AService.class);
 
         // Then
         assertThat(svc).hasSize(4);

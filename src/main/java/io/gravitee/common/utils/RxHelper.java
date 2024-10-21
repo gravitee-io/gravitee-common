@@ -15,13 +15,7 @@
  */
 package io.gravitee.common.utils;
 
-import io.reactivex.rxjava3.core.CompletableTransformer;
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.core.FlowableTransformer;
-import io.reactivex.rxjava3.core.Maybe;
-import io.reactivex.rxjava3.core.MaybeTransformer;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.core.SingleTransformer;
+import io.reactivex.rxjava3.core.*;
 import io.reactivex.rxjava3.functions.Function;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +34,7 @@ public class RxHelper {
 
     public static final Predicate<Throwable> TRUE_PREDICATE = t -> true;
     public static final Predicate<Object> FALSE_PREDICATE = o -> false;
+    public static final String RETRY_PREDICATE_IS_NULL_ERROR = "retryPredicate is null";
 
     /**
      * Returns a {@link FlowableTransformer} that can be used in a composition.
@@ -114,7 +109,7 @@ public class RxHelper {
         TimeUnit timeUnit,
         Predicate<Throwable> retryPredicate
     ) {
-        Objects.requireNonNull(retryPredicate, "retryPredicate is null");
+        Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
         // Negate the retryPredicate to skip the Throwable in operators
         final Predicate<Throwable> skipThrowable = retryPredicate.negate();
         return upstream ->
@@ -223,7 +218,7 @@ public class RxHelper {
      * @return a {@link CompletableTransformer} that will be applied.
      */
     public static CompletableTransformer retry(int times, int retryInterval, TimeUnit timeUnit, Predicate<Throwable> retryPredicate) {
-        Objects.requireNonNull(retryPredicate, "retryPredicate is null");
+        Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
         // Negate the retryPredicate to skip the Throwable in operators
         final Predicate<Throwable> skipThrowable = retryPredicate.negate();
         return upstream ->
@@ -326,7 +321,32 @@ public class RxHelper {
         final double factor,
         Predicate<Throwable> retryPredicate
     ) {
-        Objects.requireNonNull(retryPredicate, "retryPredicate is null");
+        return retryExponentialBackoff(initialDelay, maxDelay, timeUnit, factor, -1, retryPredicate);
+    }
+
+    /**
+     * It will progressively wait longer intervals between consecutive retries.
+     * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay and maxAttempt
+     *
+     * @param initialDelay  the initial delay to wait
+     * @param maxDelay      the max delay
+     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
+     * @param factor        factor used to compute next delay
+     * @param maxAttempt        maxAttempt max number of attempt
+     * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
+     * @return a {@link Function} that will be applied.
+     */
+    public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
+        final long initialDelay,
+        final long maxDelay,
+        final TimeUnit timeUnit,
+        final double factor,
+        final int maxAttempt,
+        Predicate<Throwable> retryPredicate
+    ) {
+        Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
+        record Attempt(Throwable throwable, int occurrence) {}
+
         return attempts ->
             attempts
                 .flatMapSingle(throwable -> {
@@ -336,9 +356,12 @@ public class RxHelper {
                         return Single.error(throwable);
                     }
                 })
-                .zipWith(Flowable.range(1, Integer.MAX_VALUE), (throwable, attemptNumber) -> attemptNumber)
-                .map(attemptNumber -> {
-                    long delayMs = Math.round(Math.pow(factor, attemptNumber.doubleValue() - 1) * timeUnit.toMillis(initialDelay));
+                .zipWith(Flowable.range(1, Integer.MAX_VALUE), Attempt::new)
+                .map(attempt -> {
+                    if (maxAttempt > 0 && attempt.occurrence() > maxAttempt) {
+                        throw attempt.throwable();
+                    }
+                    long delayMs = Math.round(Math.pow(factor, (double) attempt.occurrence() - 1) * timeUnit.toMillis(initialDelay));
                     if (maxDelay != -1) {
                         long maxDelayMs = timeUnit.toMillis(maxDelay);
                         delayMs = Math.min(maxDelayMs, delayMs);

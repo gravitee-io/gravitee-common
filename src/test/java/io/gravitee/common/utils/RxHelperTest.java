@@ -528,6 +528,27 @@ class RxHelperTest {
     }
 
     @Test
+    @DisplayName("Should retry and finally fail after 3 retries")
+    void shouldRetryWithMaxAttempt() {
+        try {
+            final TestScheduler testScheduler = new TestScheduler();
+            RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
+
+            @NonNull
+            TestSubscriber<Object> obs = Flowable
+                .generate(emitter -> emitter.onError(new RuntimeException("will never work")))
+                .retryWhen(RxHelper.retryExponentialBackoff(1, 1, TimeUnit.SECONDS, 1, 3, t -> true))
+                .test()
+                .assertNotComplete()
+                .assertNoValues();
+            testScheduler.advanceTimeBy(4, TimeUnit.SECONDS);
+            obs.assertError(err -> err.getMessage().equals("will never work"));
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
     @DisplayName("Should not retry exponentially according to filter predicate ")
     void shouldNotExponentiallyRetryFlowable() {
         try {

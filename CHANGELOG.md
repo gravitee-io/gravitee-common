@@ -1,3 +1,10 @@
+# [4.6.0](https://github.com/gravitee-io/gravitee-common/compare/4.5.1...4.6.0) (2024-11-26)
+
+
+### Features
+
+* rx helper backoff retry with max attempt ([d5f91f5](https://github.com/gravitee-io/gravitee-common/commit/d5f91f5df548752bd053357b7a4140523a6191d9))
+
 ## [4.5.1](https://github.com/gravitee-io/gravitee-common/compare/4.5.0...4.5.1) (2024-07-03)
 
 

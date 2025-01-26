@@ -39,7 +39,7 @@
         <bouncycastle.version>1.77</bouncycastle.version>
         <nimbus-jose-jwt.version>9.37.2</nimbus-jose-jwt.version>
         <freemarker.version>2.3.31</freemarker.version>
-        <gravitee-gateway-api.version>3.5.0</gravitee-gateway-api.version>
+        <gravitee-gateway-api.version>3.9.1</gravitee-gateway-api.version>
         <awaitability.version>4.2.2</awaitability.version>
     </properties>
 

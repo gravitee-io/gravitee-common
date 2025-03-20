@@ -16,6 +16,7 @@
 package io.gravitee.common.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,10 @@ public class TemplatedValueHashMap extends HashMap<String, String> {
     @Override
     public String get(Object key) {
         String value;
+
+        if (key instanceof List<?> list && !list.isEmpty()) {
+            return (value = super.get(list.get(0))) == null ? null : resolve(value);
+        }
         return (value = super.get(key)) == null ? null : resolve(value);
     }
 

@@ -15,8 +15,10 @@
  */
 package io.gravitee.common.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,44 +27,54 @@ import org.junit.jupiter.api.Test;
  * @author David BRASSELY (david at gravitee.io)
  * @author GraviteeSource Team
  */
-public class TemplatedValueHashMapTest {
+class TemplatedValueHashMapTest {
 
     @Test
-    public void should_returnNull() {
+    public void should_return_null() {
         Map<String, String> properties = new TemplatedValueHashMap();
 
-        Assertions.assertNull(properties.get("dummy_key"));
+        assertThat(properties.get("dummy_key")).isNull();
     }
 
     @Test
-    public void should_returnValue() {
+    public void should_return_value() {
         Map<String, String> properties = new TemplatedValueHashMap();
         properties.put("my_key", "my_value");
-        Assertions.assertEquals("my_value", properties.get("my_key"));
+        assertThat(properties.get("my_key")).isEqualTo("my_value");
     }
 
     @Test
-    public void should_returnResolveSingleValue() {
+    public void should_return_resolve_single_value() {
         Map<String, String> properties = new TemplatedValueHashMap();
         properties.put("my_key", "my_value");
         properties.put("other_key", "{{my_key}}");
-        Assertions.assertEquals("my_value", properties.get("other_key"));
+        assertThat(properties.get("other_key")).isEqualTo("my_value");
     }
 
     @Test
-    public void should_returnResolveMultipleValue() {
+    public void should_return_resolve_multiple_value() {
         Map<String, String> properties = new TemplatedValueHashMap();
         properties.put("my_key", "my_value");
         properties.put("my_key2", "other_value");
         properties.put("other_key", "{{my_key}} - {{my_key2}}");
-        Assertions.assertEquals("my_value - other_value", properties.get("other_key"));
+        assertThat(properties.get("other_key")).isEqualTo("my_value - other_value");
     }
 
     @Test
-    public void should_returnResolveUnknownValue() {
+    public void should_return_resolve_unknown_value() {
         Map<String, String> properties = new TemplatedValueHashMap();
         properties.put("my_key", "my_value");
         properties.put("other_key", "{{my_key2}}");
         assertThrows(IllegalStateException.class, () -> properties.get("other_key"));
+    }
+
+    @Test
+    public void should_return_resolve_value_with_list_key() {
+        Map<String, String> properties = new TemplatedValueHashMap();
+        properties.put("my_key", "my_value");
+        properties.put("my_key2", "my_value2");
+        properties.put("my_key3", "my_value3");
+
+        assertThat(properties.get(List.of("my_key2"))).isEqualTo("my_value2");
     }
 }

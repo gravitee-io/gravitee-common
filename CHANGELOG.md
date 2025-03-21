@@ -1,3 +1,10 @@
+## [4.5.2](https://github.com/gravitee-io/gravitee-common/compare/4.5.1...4.5.2) (2025-03-21)
+
+
+### Bug Fixes
+
+* make get by list of string from EL ([2c8da6b](https://github.com/gravitee-io/gravitee-common/commit/2c8da6b0a6d8b795a05aa318870d2538af650b50))
+
 ## [4.5.1](https://github.com/gravitee-io/gravitee-common/compare/4.5.0...4.5.1) (2024-07-03)
 
 

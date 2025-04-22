@@ -374,7 +374,7 @@ class RxHelperTest {
                             emitter.onComplete();
                         }
                     })
-                    .compose(RxHelper.retry(5, 10, TimeUnit.SECONDS))
+                    .compose(RxHelper.retryCompletable(5, 10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete()
                     .assertNoValues();
@@ -408,7 +408,7 @@ class RxHelperTest {
                             emitter.onComplete();
                         }
                     })
-                    .compose(RxHelper.retry(2, 10, TimeUnit.SECONDS))
+                    .compose(RxHelper.retryCompletable(2, 10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete()
                     .assertNoValues();
@@ -446,7 +446,7 @@ class RxHelperTest {
                             emitter.onComplete();
                         }
                     })
-                    .compose(RxHelper.retry(2, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
+                    .compose(RxHelper.retryCompletable(2, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
                     .test()
                     .assertNotComplete()
                     .assertNoValues();
@@ -477,7 +477,7 @@ class RxHelperTest {
                             emitter.onComplete();
                         }
                     })
-                    .compose(RxHelper.retry(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
+                    .compose(RxHelper.retryCompletable(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
                     .test()
                     .assertNotComplete()
                     .assertNoValues();

@@ -64,8 +64,8 @@ public class RxHelper {
      * Returns a {@link FlowableTransformer} that can be used in a composition.
      * It applies an interval for each element received in the {@link Flowable} upstream in opposition to {@link Flowable#delay(long, TimeUnit)} which will apply the delay only once for the {@link Flowable}
      *
-     * @param delay    the delay to apply between each element of the {@link Flowable}
-     * @param timeUnit the {@link TimeUnit}  of the delay
+     * @param delay              the delay to apply between each element of the {@link Flowable}
+     * @param timeUnit           the {@link TimeUnit}  of the delay
      * @param skipDelayPredicate the predicate to test if delay should be skipped, else delay is applied
      * @return a {@link FlowableTransformer} that will be applied.
      */
@@ -97,9 +97,9 @@ public class RxHelper {
      * Returns a {@link FlowableTransformer} that can be used in a composition.
      * It retries the {@link Flowable} X times with delay between each attempt
      *
-     * @param times         the attempts number
-     * @param retryInterval the delay between each retry
-     * @param timeUnit      the {@link TimeUnit} of the retryInterval
+     * @param times          the attempts number
+     * @param retryInterval  the delay between each retry
+     * @param timeUnit       the {@link TimeUnit} of the retryInterval
      * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
      * @return a {@link FlowableTransformer} that will be applied.
      */
@@ -134,10 +134,10 @@ public class RxHelper {
     /**
      * Same as {@link #retryFlowable(int, int, TimeUnit)} but with a {@link Maybe} instead.
      *
-     * @param times         the attempts number
-     * @param retryInterval the delay between each retry
-     * @param timeUnit      the {@link TimeUnit} of the retryInterval
-     * @param <R>           the value type.
+     * @param times          the attempts number
+     * @param retryInterval  the delay between each retry
+     * @param timeUnit       the {@link TimeUnit} of the retryInterval
+     * @param <R>            the value type.
      * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
      * @return a {@link MaybeTransformer} that will be applied.
      */
@@ -171,10 +171,10 @@ public class RxHelper {
     /**
      * Same as {@link #retryMaybe(int, int, TimeUnit)} but with a {@link Single} instead.
      *
-     * @param times         the attempts number
-     * @param retryInterval the delay between each retry
-     * @param timeUnit      the {@link TimeUnit} of the retryInterval
-     * @param <R>           the value type.
+     * @param times          the attempts number
+     * @param retryInterval  the delay between each retry
+     * @param timeUnit       the {@link TimeUnit} of the retryInterval
+     * @param <R>            the value type.
      * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
      * @return a {@link MaybeTransformer} that will be applied.
      */
@@ -201,10 +201,41 @@ public class RxHelper {
      * @param retryInterval the delay between each retry
      * @param timeUnit      the {@link TimeUnit} of the retryInterval
      * @return a {@link CompletableTransformer} that will be applied.
+     * @deprecated See {@link #retryCompletable(int, int, TimeUnit)}
      */
+    @Deprecated(forRemoval = true)
     public static CompletableTransformer retry(int times, int retryInterval, TimeUnit timeUnit) {
+        return retryCompletable(times, retryInterval, timeUnit, TRUE_PREDICATE);
+    }
+
+    /**
+     * Returns a {@link CompletableTransformer} that can be used in a composition.
+     * It retries the {@link Flowable} X times with delay between each attempt
+     *
+     * @param times          the attempts number
+     * @param retryInterval  the delay between each retry
+     * @param timeUnit       the {@link TimeUnit} of the retryInterval
+     * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
+     * @return a {@link CompletableTransformer} that will be applied.
+     * @deprecated See {@link #retryCompletable(int, int, TimeUnit, Predicate)}
+     */
+    @Deprecated(forRemoval = true)
+    public static CompletableTransformer retry(int times, int retryInterval, TimeUnit timeUnit, Predicate<Throwable> retryPredicate) {
+        return retryCompletable(times, retryInterval, timeUnit, retryPredicate);
+    }
+
+    /**
+     * Returns a {@link CompletableTransformer} that can be used in a composition.
+     * It retries the {@link Flowable} X times with delay between each attempt
+     *
+     * @param times         the attempts number
+     * @param retryInterval the delay between each retry
+     * @param timeUnit      the {@link TimeUnit} of the retryInterval
+     * @return a {@link CompletableTransformer} that will be applied.
+     */
+    public static CompletableTransformer retryCompletable(int times, int retryInterval, TimeUnit timeUnit) {
         // By default, we want to retry every throwable
-        return retry(times, retryInterval, timeUnit, TRUE_PREDICATE);
+        return retryCompletable(times, retryInterval, timeUnit, TRUE_PREDICATE);
     }
 
     /**
@@ -217,7 +248,12 @@ public class RxHelper {
      * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
      * @return a {@link CompletableTransformer} that will be applied.
      */
-    public static CompletableTransformer retry(int times, int retryInterval, TimeUnit timeUnit, Predicate<Throwable> retryPredicate) {
+    public static CompletableTransformer retryCompletable(
+        int times,
+        int retryInterval,
+        TimeUnit timeUnit,
+        Predicate<Throwable> retryPredicate
+    ) {
         Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
         // Negate the retryPredicate to skip the Throwable in operators
         final Predicate<Throwable> skipThrowable = retryPredicate.negate();
@@ -235,7 +271,7 @@ public class RxHelper {
      * Returns a {@link FlowableTransformer} that can be used in a composition.
      * It ignores the N first throwable then return the N+1 in error.
      *
-     * @param limit the number of throwables to ignore
+     * @param limit                  the number of throwables to ignore
      * @param throwDirectlyPredicate the predicate to check if limit should be computed or not. If it returns true, then {@link Maybe#error(Throwable)} is immediately emitted
      * @return a {@link FlowableTransformer} that will be applied.
      */
@@ -256,8 +292,8 @@ public class RxHelper {
      * It will progressively wait longer intervals between consecutive retries.
      * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay without any max limitation.
      *
-     * @param initialDelay  the initial delay to wait
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay
+     * @param initialDelay the initial delay to wait
+     * @param timeUnit     the {@link TimeUnit} of the initialDelay
      * @return a {@link Function} that will be applied.
      */
     public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
@@ -271,9 +307,9 @@ public class RxHelper {
      * It will progressively wait longer intervals between consecutive retries.
      * The initial delay is used as the beginning, then the factor of 2 is used to build the second delay until it reaches the maxDelay.
      *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
+     * @param initialDelay the initial delay to wait
+     * @param maxDelay     the max delay
+     * @param timeUnit     the {@link TimeUnit} of the initialDelay and maxDelay
      * @return a {@link Function} that will be applied.
      */
     public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
@@ -288,10 +324,10 @@ public class RxHelper {
      * It will progressively wait longer intervals between consecutive retries.
      * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay.
      *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @param factor        factor used to compute next delay
+     * @param initialDelay the initial delay to wait
+     * @param maxDelay     the max delay
+     * @param timeUnit     the {@link TimeUnit} of the initialDelay and maxDelay
+     * @param factor       factor used to compute next delay
      * @return a {@link Function} that will be applied.
      */
     public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryExponentialBackoff(
@@ -307,10 +343,10 @@ public class RxHelper {
      * It will progressively wait longer intervals between consecutive retries.
      * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay.
      *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @param factor        factor used to compute next delay
+     * @param initialDelay   the initial delay to wait
+     * @param maxDelay       the max delay
+     * @param timeUnit       the {@link TimeUnit} of the initialDelay and maxDelay
+     * @param factor         factor used to compute next delay
      * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
      * @return a {@link Function} that will be applied.
      */
@@ -328,11 +364,11 @@ public class RxHelper {
      * It will progressively wait longer intervals between consecutive retries.
      * The initial delay is used as the beginning, then the factor is used to build the second delay until it reaches the maxDelay and maxAttempt
      *
-     * @param initialDelay  the initial delay to wait
-     * @param maxDelay      the max delay
-     * @param timeUnit      the {@link TimeUnit} of the initialDelay and maxDelay
-     * @param factor        factor used to compute next delay
-     * @param maxAttempt        maxAttempt max number of attempt
+     * @param initialDelay   the initial delay to wait
+     * @param maxDelay       the max delay
+     * @param timeUnit       the {@link TimeUnit} of the initialDelay and maxDelay
+     * @param factor         factor used to compute next delay
+     * @param maxAttempt     maxAttempt max number of attempt
      * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
      * @return a {@link Function} that will be applied.
      */

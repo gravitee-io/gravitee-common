@@ -1,3 +1,11 @@
+# [4.7.0](https://github.com/gravitee-io/gravitee-common/compare/4.6.1...4.7.0) (2025-04-22)
+
+
+### Features
+
+* add retryCompletable ([4f9966c](https://github.com/gravitee-io/gravitee-common/commit/4f9966c6dc64a7c007d15007be91d1ac07367d00))
+* add retryLinear method ([fd4d687](https://github.com/gravitee-io/gravitee-common/commit/fd4d687658dbb91a46a418fdcaa553d5fbecfbf2))
+
 ## [4.6.1](https://github.com/gravitee-io/gravitee-common/compare/4.6.0...4.6.1) (2025-03-21)
 
 

@@ -15,7 +15,13 @@
  */
 package io.gravitee.common.utils;
 
-import io.reactivex.rxjava3.core.*;
+import io.reactivex.rxjava3.core.CompletableTransformer;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableTransformer;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.MaybeTransformer;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.core.SingleTransformer;
 import io.reactivex.rxjava3.functions.Function;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -110,12 +116,7 @@ public class RxHelper {
         Predicate<Throwable> retryPredicate
     ) {
         Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
-        // Negate the retryPredicate to skip the Throwable in operators
-        final Predicate<Throwable> skipThrowable = retryPredicate.negate();
-        return upstream ->
-            upstream.retryWhen(throwables ->
-                throwables.compose(delayElement(retryInterval, timeUnit, skipThrowable)).compose(takeThenThrow(times, skipThrowable))
-            );
+        return upstream -> upstream.retryWhen(retryLinear(times, retryInterval, timeUnit, retryPredicate));
     }
 
     /**
@@ -147,12 +148,8 @@ public class RxHelper {
         TimeUnit timeUnit,
         Predicate<Throwable> retryPredicate
     ) {
-        // Negate the retryPredicate to skip the Throwable in operators
-        final Predicate<Throwable> skipThrowable = retryPredicate.negate();
-        return upstream ->
-            upstream.retryWhen(throwables ->
-                throwables.compose(delayElement(retryInterval, timeUnit, skipThrowable)).compose(takeThenThrow(times, skipThrowable))
-            );
+        Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
+        return upstream -> upstream.retryWhen(retryLinear(times, retryInterval, timeUnit, retryPredicate));
     }
 
     /**
@@ -184,13 +181,8 @@ public class RxHelper {
         TimeUnit timeUnit,
         Predicate<Throwable> retryPredicate
     ) {
-        // Negate the retryPredicate to skip the Throwable in operators
-        // Negate the retryPredicate to skip the Throwable in operators
-        final Predicate<Throwable> skipThrowable = retryPredicate.negate();
-        return upstream ->
-            upstream.retryWhen(throwables ->
-                throwables.compose(delayElement(retryInterval, timeUnit, skipThrowable)).compose(takeThenThrow(times, skipThrowable))
-            );
+        Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
+        return upstream -> upstream.retryWhen(retryLinear(times, retryInterval, timeUnit, retryPredicate));
     }
 
     /**
@@ -255,37 +247,32 @@ public class RxHelper {
         Predicate<Throwable> retryPredicate
     ) {
         Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
-        // Negate the retryPredicate to skip the Throwable in operators
-        final Predicate<Throwable> skipThrowable = retryPredicate.negate();
-        return upstream ->
-            upstream.retryWhen(throwables ->
-                throwables
-                    // No need to delay element if we do not apply retry
-                    .compose(delayElement(retryInterval, timeUnit, skipThrowable))
-                    // No need to check limit if we do not apply retry, error should be emitted directly
-                    .compose(takeThenThrow(times, skipThrowable))
-            );
+        return upstream -> upstream.retryWhen(retryLinear(times, retryInterval, timeUnit, retryPredicate));
     }
 
     /**
-     * Returns a {@link FlowableTransformer} that can be used in a composition.
-     * It ignores the N first throwable then return the N+1 in error.
+     * It retries the {@link Flowable} X times with delay between each attempt
      *
-     * @param limit                  the number of throwables to ignore
-     * @param throwDirectlyPredicate the predicate to check if limit should be computed or not. If it returns true, then {@link Maybe#error(Throwable)} is immediately emitted
-     * @return a {@link FlowableTransformer} that will be applied.
+     * @param times          the attempts number
+     * @param retryInterval  the delay between each retry
+     * @param timeUnit       the {@link TimeUnit} of the retryInterval
+     * @param retryPredicate the predicate to test if instance of {@link Throwable} has to be retried, else, emits directly the error
      */
-    private static <R extends Throwable> FlowableTransformer<R, R> takeThenThrow(final int limit, Predicate<R> throwDirectlyPredicate) {
-        // By default, check the limit before returning a {@link Maybe#error}
-        final AtomicInteger tries = new AtomicInteger(0);
-        return upstream ->
-            upstream.flatMapMaybe(throwable -> {
-                if (tries.incrementAndGet() > limit || throwDirectlyPredicate.test(throwable)) {
-                    return Maybe.error(throwable);
-                } else {
-                    return Maybe.just(throwable);
-                }
-            });
+    public static Function<? super Flowable<Throwable>, ? extends Publisher<?>> retryLinear(
+        int times,
+        int retryInterval,
+        TimeUnit timeUnit,
+        Predicate<Throwable> retryPredicate
+    ) {
+        Objects.requireNonNull(retryPredicate, RETRY_PREDICATE_IS_NULL_ERROR);
+        // Negate the retryPredicate to skip the Throwable in operators
+        final Predicate<Throwable> skipThrowable = retryPredicate.negate();
+        return throwables ->
+            throwables
+                // No need to delay element if we do not apply retry
+                .compose(delayElement(retryInterval, timeUnit, skipThrowable))
+                // No need to check limit if we do not apply retry, error should be emitted directly
+                .compose(takeThenThrow(times, skipThrowable));
     }
 
     /**
@@ -405,5 +392,26 @@ public class RxHelper {
                     return delayMs;
                 })
                 .flatMap(delayMs -> Flowable.timer(delayMs, TimeUnit.MILLISECONDS));
+    }
+
+    /**
+     * Returns a {@link FlowableTransformer} that can be used in a composition.
+     * It ignores the N first throwable then return the N+1 in error.
+     *
+     * @param limit                  the number of throwables to ignore
+     * @param throwDirectlyPredicate the predicate to check if limit should be computed or not. If it returns true, then {@link Maybe#error(Throwable)} is immediately emitted
+     * @return a {@link FlowableTransformer} that will be applied.
+     */
+    private static <R extends Throwable> FlowableTransformer<R, R> takeThenThrow(final int limit, Predicate<R> throwDirectlyPredicate) {
+        // By default, check the limit before returning a {@link Maybe#error}
+        final AtomicInteger tries = new AtomicInteger(0);
+        return upstream ->
+            upstream.flatMapMaybe(throwable -> {
+                if (tries.incrementAndGet() > limit || throwDirectlyPredicate.test(throwable)) {
+                    return Maybe.error(throwable);
+                } else {
+                    return Maybe.just(throwable);
+                }
+            });
     }
 }

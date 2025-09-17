@@ -25,6 +25,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.net.ssl.SSLSession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,12 @@ import org.springframework.util.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CertificateUtils {
 
+    private static final Pattern BASE64_PATTERN = Pattern.compile("^[A-Za-z0-9+/=]+$");
+
+    public static boolean isBase64FlattenedCertBody(String certHeaderValue) {
+        return (certHeaderValue.length() > 100 && (certHeaderValue.length() % 4 == 0) && BASE64_PATTERN.matcher(certHeaderValue).matches());
+    }
+
     /**
      * This method gets the PeerCertificate from the HTTP Header using the header name provided as parameter.
      */
@@ -49,15 +56,21 @@ public class CertificateUtils {
 
         if (certHeaderValue != null) {
             try {
-                if (!certHeaderValue.contains("\n")) {
+                boolean hasFlattenedCertBody = isBase64FlattenedCertBody(certHeaderValue);
+
+                if (!certHeaderValue.contains("\n") && !hasFlattenedCertBody) {
                     certHeaderValue = URLDecoder.decode(certHeaderValue, Charset.defaultCharset());
                 }
                 certHeaderValue = certHeaderValue.replaceAll("\t", "\n");
                 CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+
+                byte[] byteInput = certHeaderValue.getBytes();
+                if (hasFlattenedCertBody) {
+                    byteInput = java.util.Base64.getDecoder().decode(certHeaderValue);
+                }
+
                 certificate =
-                    Optional.ofNullable(
-                        (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(certHeaderValue.getBytes()))
-                    );
+                    Optional.ofNullable((X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(byteInput)));
             } catch (Exception e) {
                 log.debug("Unable to retrieve peer certificate from request header '{}'", certHeader, e);
             }

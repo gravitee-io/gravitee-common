@@ -47,6 +47,7 @@ class CertificateUtilsTest {
     private static final String CLIENT_CERT_THUMBPRINT = "2oHrNOqScxD8EHkb7_GYmnNvWqGj5M31Dqsrk3Jl2Yk";
     private String clientCertificate;
     private X509Certificate clientX509Certificate;
+    private String rawBase64Certificate;
 
     @BeforeEach
     public void beforeEach() throws URISyntaxException, IOException, CertificateException {
@@ -55,6 +56,9 @@ class CertificateUtilsTest {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         clientX509Certificate =
             (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(clientCertificate.getBytes()));
+
+        rawBase64Certificate =
+            Files.readString(Paths.get(CertificateUtilsTest.class.getResource("/expected_flatten_b64_body.txt").toURI()));
     }
 
     @Test
@@ -85,6 +89,28 @@ class CertificateUtilsTest {
         assertThat(certificateOptional).isNotEmpty();
         X509Certificate certificate = certificateOptional.get();
         assertThat(certificate).isEqualTo(clientX509Certificate);
+    }
+
+    @Test
+    void should_extract_raw_base64_certificate_from_header() {
+        HttpHeaders httpHeaders = HttpHeaders.create();
+        httpHeaders.set(CLIENT_CERT_HEADER, rawBase64Certificate);
+        Optional<X509Certificate> certificateOptional = CertificateUtils.extractCertificate(httpHeaders, CLIENT_CERT_HEADER);
+
+        assertThat(certificateOptional).isNotEmpty();
+        X509Certificate certificate = certificateOptional.get();
+        assertThat(certificate).isEqualTo(clientX509Certificate);
+    }
+
+    @Test
+    void should_handle_invalid_certificate() {
+        String invalidCertificate = "This is not a valid certificate";
+
+        HttpHeaders httpHeaders = HttpHeaders.create();
+        httpHeaders.set(CLIENT_CERT_HEADER, invalidCertificate);
+        Optional<X509Certificate> certificateOptional = CertificateUtils.extractCertificate(httpHeaders, CLIENT_CERT_HEADER);
+
+        assertThat(certificateOptional).isEmpty();
     }
 
     @Test

@@ -1,3 +1,10 @@
+## [4.7.1](https://github.com/gravitee-io/gravitee-common/compare/4.7.0...4.7.1) (2025-09-22)
+
+
+### Bug Fixes
+
+* handle flatten base64 cert body in header ([01e9714](https://github.com/gravitee-io/gravitee-common/commit/01e9714ce338ba73443ca647f505535ddcef8531))
+
 # [4.7.0](https://github.com/gravitee-io/gravitee-common/compare/4.6.1...4.7.0) (2025-04-22)
 
 

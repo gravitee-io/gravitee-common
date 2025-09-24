@@ -1,3 +1,10 @@
+## [4.7.3](https://github.com/gravitee-io/gravitee-common/compare/4.7.2...4.7.3) (2025-09-24)
+
+
+### Bug Fixes
+
+* gravitee circleci version update ([c3a0a52](https://github.com/gravitee-io/gravitee-common/commit/c3a0a529349090fa725092461ef04a46078186f4))
+
 ## [4.7.2](https://github.com/gravitee-io/gravitee-common/compare/4.7.1...4.7.2) (2025-09-22)
 
 

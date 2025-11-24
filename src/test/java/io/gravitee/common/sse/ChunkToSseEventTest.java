@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableTransformer;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
@@ -28,231 +29,272 @@ import org.junit.jupiter.api.Test;
 class ChunkToSseEventTest {
 
     @Nested
-    class SingleEvent {
+    class ChunkToEvent {
 
-        @Test
-        void should_emit_single_complete_event() {
-            // Given
-            String sseEvent = "data: test message\n\n";
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
+        @Nested
+        class SingleEvent {
 
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+            @Test
+            void should_emit_single_complete_event() {
+                // Given
+                String sseEvent = "data: test message\n\n";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
 
-            // Then
-            result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
+            }
+
+            @Test
+            void should_emit_single_event_with_multiple_lines() {
+                // Given
+                String sseEvent = "event: message\ndata: test\nid: 123\n\n";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result
+                    .assertComplete()
+                    .assertValueCount(1)
+                    .assertValue(buffer -> buffer.equals(new ServerEvent("message", "test", "123", null)));
+            }
         }
 
-        @Test
-        void should_emit_single_event_with_multiple_lines() {
-            // Given
-            String sseEvent = "event: message\ndata: test\nid: 123\n\n";
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
+        @Nested
+        class MultipleEvents {
 
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+            @Test
+            void should_emit_multiple_complete_events_in_single_chunk() {
+                // Given
+                String sseEvents = "data: event1\n\ndata: event2\n\ndata: event3\n\n";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvents));
 
-            // Then
-            result
-                .assertComplete()
-                .assertValueCount(1)
-                .assertValue(buffer -> buffer.equals(new ServerEvent("message", "test", "123", null)));
-        }
-    }
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
 
-    @Nested
-    class MultipleEvents {
+                // Then
+                result.assertComplete().assertValueCount(3);
+                var values = result.values();
+                assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
+            }
 
-        @Test
-        void should_emit_multiple_complete_events_in_single_chunk() {
-            // Given
-            String sseEvents = "data: event1\n\ndata: event2\n\ndata: event3\n\n";
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvents));
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(3);
-            var values = result.values();
-            assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
-        }
-
-        @Test
-        void should_emit_events_across_multiple_chunks() {
-            // Given
-            Flowable<Buffer> upstream = Flowable.just(
-                Buffer.buffer("data: event1\n\n"),
-                Buffer.buffer("data: event2\n\n"),
-                Buffer.buffer("data: event3\n\n")
-            );
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(3);
-            var values = result.values();
-            assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
-        }
-    }
-
-    @Nested
-    class IncompleteEvents {
-
-        @Test
-        void should_buffer_incomplete_event_and_emit_when_complete() {
-            // Given
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: part1"), Buffer.buffer(" part2\n\n"));
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("part1 part2")));
-        }
-
-        @Test
-        void should_buffer_incomplete_event_split_across_multiple_chunks() {
-            // Given
-            Flowable<Buffer> upstream = Flowable.just(
-                Buffer.buffer("data: "),
-                Buffer.buffer("test "),
-                Buffer.buffer("message"),
-                Buffer.buffer("\n\n")
-            );
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
-        }
-
-        @Test
-        void should_emit_last_incomplete_event_on_completion() {
-            // Given
-            String incompleteEvent = "data: incomplete event without separator";
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(incompleteEvent));
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result
-                .assertComplete()
-                .assertValueCount(1)
-                .assertValue(buffer -> buffer.equals(new ServerEvent("incomplete event without separator")));
-        }
-
-        @Test
-        void should_emit_last_incomplete_event_after_complete_events() {
-            // Given
-            String sseData = "data: complete1\n\ndata: complete2\n\ndata: incomplete";
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseData));
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(3);
-            var values = result.values();
-            assertThat(values).containsExactly(new ServerEvent("complete1"), new ServerEvent("complete2"), new ServerEvent("incomplete"));
-        }
-    }
-
-    @Nested
-    class EdgeCases {
-
-        @Test
-        void should_handle_empty_upstream() {
-            // Given
-            Flowable<Buffer> upstream = Flowable.empty();
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertNoValues();
-        }
-
-        @Test
-        void should_handle_single_newline_separator() {
-            // Given
-            String sseEvent = "data: test\n";
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(1).assertValue(buffer -> new ServerEvent("test").equals(buffer));
-        }
-
-        @Test
-        void should_handle_multiple_consecutive_separators() {
-            // Given
-            String sseEvents = "data: test\n\n\n\ndata: next\n\n";
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvents));
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(3);
-            assertThat(result.values()).containsExactly(new ServerEvent("test"), new ServerEvent(null), new ServerEvent("next"));
-        }
-
-        @Test
-        void should_handle_event_separator_split_across_chunks() {
-            // Given
-            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: test\n"), Buffer.buffer("\ndata: next\n\n"));
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(2);
-            assertThat(result.values()).containsExactly(new ServerEvent("test"), new ServerEvent("next"));
-        }
-
-        @Test
-        void should_handle_complex_sse_stream() {
-            // Given
-            Flowable<Buffer> upstream = Flowable.just(
-                Buffer.buffer("event: start\ndata: {\"type\": \"start\"}\nid: 1\n\n"),
-                Buffer.buffer("event: message\ndata: {\"chunk\": \"hello"),
-                Buffer.buffer(" world\"}\nid: 2\n\ndata: simple\n\n")
-            );
-
-            // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
-
-            // Then
-            result.assertComplete().assertValueCount(3);
-            assertThat(result.values())
-                .containsExactly(
-                    new ServerEvent("start", "{\"type\": \"start\"}", "1", null),
-                    new ServerEvent("message", "{\"chunk\": \"hello world\"}", "2", null),
-                    new ServerEvent("simple")
+            @Test
+            void should_emit_events_across_multiple_chunks() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(
+                    Buffer.buffer("data: event1\n\n"),
+                    Buffer.buffer("data: event2\n\n"),
+                    Buffer.buffer("data: event3\n\n")
                 );
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(3);
+                var values = result.values();
+                assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
+            }
+        }
+
+        @Nested
+        class IncompleteEvents {
+
+            @Test
+            void should_buffer_incomplete_event_and_emit_when_complete() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: part1"), Buffer.buffer(" part2\n\n"));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("part1 part2")));
+            }
+
+            @Test
+            void should_buffer_incomplete_event_split_across_multiple_chunks() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(
+                    Buffer.buffer("data: "),
+                    Buffer.buffer("test "),
+                    Buffer.buffer("message"),
+                    Buffer.buffer("\n\n")
+                );
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
+            }
+
+            @Test
+            void should_emit_last_incomplete_event_on_completion() {
+                // Given
+                String incompleteEvent = "data: incomplete event without separator";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(incompleteEvent));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result
+                    .assertComplete()
+                    .assertValueCount(1)
+                    .assertValue(buffer -> buffer.equals(new ServerEvent("incomplete event without separator")));
+            }
+
+            @Test
+            void should_emit_last_incomplete_event_after_complete_events() {
+                // Given
+                String sseData = "data: complete1\n\ndata: complete2\n\ndata: incomplete";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseData));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(3);
+                var values = result.values();
+                assertThat(values)
+                    .containsExactly(new ServerEvent("complete1"), new ServerEvent("complete2"), new ServerEvent("incomplete"));
+            }
+        }
+
+        @Nested
+        class EdgeCases {
+
+            @Test
+            void should_handle_empty_upstream() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.empty();
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertNoValues();
+            }
+
+            @Test
+            void should_handle_single_newline_separator() {
+                // Given
+                String sseEvent = "data: test\n";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(1).assertValue(buffer -> new ServerEvent("test").equals(buffer));
+            }
+
+            @Test
+            void should_handle_multiple_consecutive_separators() {
+                // Given
+                String sseEvents = "data: test\n\n\n\ndata: next\n\n";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvents));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(3);
+                assertThat(result.values()).containsExactly(new ServerEvent("test"), new ServerEvent(null), new ServerEvent("next"));
+            }
+
+            @Test
+            void should_handle_event_separator_split_across_chunks() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: test\n"), Buffer.buffer("\ndata: next\n\n"));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(2);
+                assertThat(result.values()).containsExactly(new ServerEvent("test"), new ServerEvent("next"));
+            }
+
+            @Test
+            void should_handle_complex_sse_stream() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(
+                    Buffer.buffer("event: start\ndata: {\"type\": \"start\"}\nid: 1\n\n"),
+                    Buffer.buffer("event: message\ndata: {\"chunk\": \"hello"),
+                    Buffer.buffer(" world\"}\nid: 2\n\ndata: simple\n\n")
+                );
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete().assertValueCount(3);
+                assertThat(result.values())
+                    .containsExactly(
+                        new ServerEvent("start", "{\"type\": \"start\"}", "1", null),
+                        new ServerEvent("message", "{\"chunk\": \"hello world\"}", "2", null),
+                        new ServerEvent("simple")
+                    );
+            }
+        }
+
+        @Nested
+        class ErrorHandling {
+
+            @Test
+            void should_propagate_upstream_error() {
+                // Given
+                RuntimeException exception = new RuntimeException("Test error");
+                Flowable<Buffer> upstream = Flowable.error(exception);
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertError(RuntimeException.class).assertError(throwable -> throwable.getMessage().equals("Test error"));
+            }
         }
     }
 
     @Nested
-    class ErrorHandling {
+    class OnServerEvent {
 
         @Test
-        void should_propagate_upstream_error() {
+        void should_transform_server_event_and_convert_back_to_buffer() {
             // Given
-            RuntimeException exception = new RuntimeException("Test error");
-            Flowable<Buffer> upstream = Flowable.error(exception);
+            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: event1\n\n"), Buffer.buffer("data: event2\n\n"));
+            FlowableTransformer<ServerEvent, ServerEvent> transformer = upstreamEvents ->
+                upstreamEvents.map(event -> event.withData(event.data() + " transformed"));
 
             // When
-            var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+            var result = upstream.compose(ChunkToSseEvent.onServerEvent(transformer)).test();
 
             // Then
-            result.assertError(RuntimeException.class).assertError(throwable -> throwable.getMessage().equals("Test error"));
+            result
+                .assertComplete()
+                .assertValueCount(2)
+                .assertValueAt(0, buffer -> buffer.toString().contains("event1 transformed"))
+                .assertValueAt(1, buffer -> buffer.toString().contains("event2 transformed"));
+        }
+
+        @Test
+        void should_not_modify_events_with_identity_transformer() {
+            // Given
+            String sseEvent = "data: test\nid: 123\n\n";
+            Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
+            FlowableTransformer<ServerEvent, ServerEvent> transformer = upstreamEvents -> upstreamEvents;
+
+            // When
+            var result = upstream.compose(ChunkToSseEvent.onServerEvent(transformer)).test();
+
+            // Then
+            result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.toString().contains("data: test\nid: 123"));
         }
     }
 }

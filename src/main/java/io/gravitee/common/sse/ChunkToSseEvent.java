@@ -18,6 +18,7 @@ package io.gravitee.common.sse;
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.FlowableTransformer;
 import io.reactivex.rxjava3.core.MaybeObserver;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -45,5 +46,11 @@ public class ChunkToSseEvent {
                 }
             })
             .map(ServerEvent::parse);
+    }
+
+    public static @NonNull FlowableTransformer<Buffer, Buffer> onServerEvent(
+        @NonNull final FlowableTransformer<ServerEvent, ServerEvent> onChunks
+    ) {
+        return upstream -> chunkToEvent(upstream).compose(onChunks).map(ServerEvent::toBuffer);
     }
 }

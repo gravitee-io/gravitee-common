@@ -17,10 +17,23 @@ package io.gravitee.common.sse;
 
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.reactivex.rxjava3.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-public record ServerEvent(@Nullable String event, @Nullable String data, @Nullable String id, @Nullable Long retry) {
+public record ServerEvent(
+    @Nullable String event,
+    @Nullable String data,
+    @Nullable String id,
+    @Nullable Long retry,
+    @Nullable Buffer cachedBuffer
+) {
+    public ServerEvent(@Nullable String event, @Nullable String data, @Nullable String id, @Nullable Long retry) {
+        this(event, data, id, retry, null);
+    }
+
     public ServerEvent(@Nullable String data) {
-        this(null, data, null, null);
+        this(null, data, null, null, null);
     }
 
     public boolean isEmpty() {
@@ -35,7 +48,9 @@ public record ServerEvent(@Nullable String event, @Nullable String data, @Nullab
         StringBuilder data = new StringBuilder();
         String id = null;
         Long retry = null;
-        for (String line : buffer.toString().split("\n")) {
+
+        for (Buffer lineBuffer : BufferUtils.split(buffer, new byte[] { '\n' })) {
+            String line = lineBuffer.toString().strip();
             if (line.startsWith("event:")) {
                 event = line.substring(6).trim();
             } else if (line.startsWith("data:")) {
@@ -56,10 +71,14 @@ public record ServerEvent(@Nullable String event, @Nullable String data, @Nullab
 
         String strData = data.isEmpty() ? null : data.toString();
 
-        return new ServerEvent(event, strData, id, retry);
+        return new ServerEvent(event, strData, id, retry, buffer);
     }
 
     public Buffer toBuffer() {
+        if (cachedBuffer != null) {
+            return cachedBuffer;
+        }
+
         StringBuilder buffer = new StringBuilder();
         if (event != null) {
             buffer.append("event: ").append(event).append('\n');
@@ -76,5 +95,77 @@ public record ServerEvent(@Nullable String event, @Nullable String data, @Nullab
             buffer.append("retry: ").append(retry).append('\n');
         }
         return buffer.isEmpty() ? Buffer.buffer() : Buffer.buffer(buffer.append('\n').toString());
+    }
+
+    /**
+     * Create a new ServerEvent with the given data, attempting to preserve the original buffer's structure.
+     * @param data the new data
+     * @return a new ServerEvent instance with the updated data
+     */
+    public ServerEvent withData(String data) {
+        if (Objects.equals(this.data, data)) {
+            return this;
+        }
+
+        if (cachedBuffer == null) {
+            return new ServerEvent(this.event, data, this.id, this.retry, null);
+        }
+
+        List<String> newLines = new ArrayList<>();
+        boolean dataLinesReplaced = false;
+
+        for (Buffer bufferLine : BufferUtils.split(this.cachedBuffer, new byte[] { '\n' })) {
+            String lineStr = bufferLine.toString();
+            if (lineStr.startsWith("data:")) {
+                if (!dataLinesReplaced) {
+                    if (data != null) {
+                        if (data.isEmpty()) {
+                            newLines.add("data: \n");
+                        }
+
+                        data.lines().map(line -> "data: " + line + "\n").forEach(newLines::add);
+                    }
+                    dataLinesReplaced = true;
+                }
+            } else {
+                newLines.add(lineStr);
+            }
+        }
+
+        // If data was not in the original buffer, add it before the final empty line
+        if (!dataLinesReplaced && data != null) {
+            int lastNonEmpty = newLines.size() - 1;
+            while (lastNonEmpty >= 0 && newLines.get(lastNonEmpty).isBlank()) {
+                lastNonEmpty--;
+            }
+            for (String dataLine : data.split("\n")) {
+                newLines.add(lastNonEmpty + 1, "data: " + dataLine + "\n");
+            }
+        }
+
+        return new ServerEvent(this.event, data, this.id, this.retry, Buffer.buffer(String.join("", newLines)));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ServerEvent that = (ServerEvent) o;
+        return (
+            Objects.equals(event, that.event) &&
+            Objects.equals(data, that.data) &&
+            Objects.equals(id, that.id) &&
+            Objects.equals(retry, that.retry)
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(event, data, id, retry);
+    }
+
+    @Override
+    public String toString() {
+        return "ServerEvent[" + "event=" + event + ", data=" + data + ", id=" + id + ", retry=" + retry + ']';
     }
 }

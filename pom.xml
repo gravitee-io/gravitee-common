@@ -41,6 +41,7 @@
         <freemarker.version>2.3.34</freemarker.version>
         <gravitee-gateway-api.version>3.9.1</gravitee-gateway-api.version>
         <awaitability.version>4.2.2</awaitability.version>
+        <jmh-core.version>1.37</jmh-core.version>
     </properties>
 
     <dependencyManagement>
@@ -171,6 +172,12 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>${awaitability.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh-core.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -17,7 +17,6 @@ package io.gravitee.common.sse;
 
 import io.gravitee.gateway.api.buffer.Buffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
@@ -26,9 +25,18 @@ import lombok.experimental.UtilityClass;
 public class BufferUtils {
 
     private static Buffer[] split(Buffer buffer, int index) {
-        var first = Buffer.buffer(Arrays.copyOf(buffer.getBytes(), index));
-        var second = Buffer.buffer(Arrays.copyOfRange(buffer.getBytes(), index, buffer.length()));
-        return new Buffer[] { first, second };
+        final io.netty.buffer.ByteBuf nativeBuffer = buffer.getNativeBuffer();
+        final int readerIndex = nativeBuffer.readerIndex();
+        final int readableBytes = nativeBuffer.readableBytes();
+
+        final byte[] firstBytes = new byte[index];
+        nativeBuffer.getBytes(readerIndex, firstBytes, 0, index);
+
+        final int secondLength = readableBytes - index;
+        final byte[] secondBytes = new byte[secondLength];
+        nativeBuffer.getBytes(readerIndex + index, secondBytes, 0, secondLength);
+
+        return new Buffer[] { Buffer.buffer(firstBytes), Buffer.buffer(secondBytes) };
     }
 
     public static List<Buffer> split(Buffer buffer, byte[] seq) {
@@ -50,11 +58,17 @@ public class BufferUtils {
     }
 
     public static OptionalInt searchSeq(Buffer buffer, byte[] seq, int startIdx) {
-        byte[] bytes = buffer.getBytes();
-        for (int i = startIdx; i < buffer.length(); i++) {
+        io.netty.buffer.ByteBuf nativeBuffer = buffer.getNativeBuffer();
+        int readerIndex = nativeBuffer.readerIndex();
+        int readableBytes = nativeBuffer.readableBytes();
+
+        for (int i = startIdx; i <= readableBytes - seq.length; i++) {
             boolean found = true;
-            for (int j = 0; found && j < seq.length; j++) {
-                found = i + j < buffer.length() && bytes[i + j] == seq[j];
+            for (int j = 0; j < seq.length; j++) {
+                if (nativeBuffer.getByte(readerIndex + i + j) != seq[j]) {
+                    found = false;
+                    break;
+                }
             }
             if (found) {
                 return OptionalInt.of(i);

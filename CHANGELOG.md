@@ -1,3 +1,12 @@
+# [4.8.0-alpha.1](https://github.com/gravitee-io/gravitee-common/compare/4.7.3...4.8.0-alpha.1) (2025-11-26)
+
+
+### Features
+
+* improve ServerEvent to change only data into event buffer ([cff8c8d](https://github.com/gravitee-io/gravitee-common/commit/cff8c8d2387666625458e997872eec40c361cbd2))
+* move BufferImpl & BufferFactoryImpl from APIM into common ([39967af](https://github.com/gravitee-io/gravitee-common/commit/39967af81d38d9d619eeaedfa31cf9ea2dbc562c))
+* move ServerEvent & ChunkToSseEvent from llm-proxy-reactor ([c95ef2c](https://github.com/gravitee-io/gravitee-common/commit/c95ef2c35c65c8560614ba160636c8138058be53))
+
 ## [4.7.3](https://github.com/gravitee-io/gravitee-common/compare/4.7.2...4.7.3) (2025-09-24)
 
 

@@ -77,7 +77,7 @@ class ChunkToSseEventTest {
                 var result = ChunkToSseEvent.chunkToEvent(upstream).test();
 
                 // Then
-                result.assertComplete().assertValueCount(3);
+                result.assertComplete();
                 var values = result.values();
                 assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
             }
@@ -95,7 +95,44 @@ class ChunkToSseEventTest {
                 var result = ChunkToSseEvent.chunkToEvent(upstream).test();
 
                 // Then
-                result.assertComplete().assertValueCount(3);
+                result.assertComplete();
+                var values = result.values();
+                assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
+            }
+
+            @Test
+            void should_emit_events_across_multiple_chunks_others_separators() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(
+                    Buffer.buffer("data: event1\r\n\n"),
+                    Buffer.buffer("data: event2\revent: 2\r\r"),
+                    Buffer.buffer("data: event3\n\n")
+                );
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
+                var values = result.values();
+                assertThat(values)
+                    .containsExactly(new ServerEvent("event1"), new ServerEvent("2", "event2", null, null), new ServerEvent("event3"));
+            }
+
+            @Test
+            void should_emit_events_across_multiple_chunks_not_aligned() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(
+                    Buffer.buffer("data: event1\r"),
+                    Buffer.buffer("\ndata: event2\n\n"),
+                    Buffer.buffer("data: event3\n\n")
+                );
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
                 var values = result.values();
                 assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
             }

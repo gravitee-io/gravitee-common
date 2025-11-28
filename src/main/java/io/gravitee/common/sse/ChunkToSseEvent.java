@@ -20,23 +20,36 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.FlowableTransformer;
 import io.reactivex.rxjava3.core.MaybeObserver;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 public class ChunkToSseEvent {
 
-    private static final byte[] EVENT_SEPARATOR = "\n\n".getBytes();
+    // ref: https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream
+    private static final Pattern EVENT_SEPARATOR = Pattern.compile("(\\r\\n|\\r|\\n){2}");
 
     public static @NonNull Flowable<ServerEvent> chunkToEvent(@NonNull Flowable<Buffer> upstream) {
         var sb = new AtomicReference<>(Buffer.buffer());
         return upstream
             .concatMap(buffer -> {
                 sb.get().appendBuffer(buffer);
-                var split = BufferUtils.split(sb.get(), EVENT_SEPARATOR);
-                if (split.size() > 1) {
-                    var last = split.get(split.size() - 1);
-                    sb.set(last);
+                final String content = sb.get().toString(StandardCharsets.UTF_8);
+                final var ready = new ArrayList<Buffer>();
+                final var matcher = EVENT_SEPARATOR.matcher(content);
+                int lastEnd = 0;
+                while (matcher.find()) {
+                    ready.add(Buffer.buffer(content.substring(lastEnd, matcher.start())));
+                    lastEnd = matcher.end();
                 }
-                return Flowable.fromIterable(split).take(split.size() - 1);
+
+                if (lastEnd > 0) {
+                    sb.set(Buffer.buffer(content.substring(lastEnd)));
+                }
+
+                return Flowable.fromIterable(ready);
             })
             .concatWith((MaybeObserver<? super Buffer> observer) -> {
                 if (sb.get().length() > 0) {
@@ -52,5 +65,10 @@ public class ChunkToSseEvent {
         @NonNull final FlowableTransformer<ServerEvent, ServerEvent> onChunks
     ) {
         return upstream -> chunkToEvent(upstream).compose(onChunks).map(ServerEvent::toBuffer);
+    }
+
+    public static List<Buffer> split(Buffer buffer) {
+        String[] split = EVENT_SEPARATOR.split(buffer.toString(StandardCharsets.UTF_8), 2);
+        return split.length == 2 ? List.of(Buffer.buffer(split[0]), Buffer.buffer(split[1])) : List.of(buffer);
     }
 }

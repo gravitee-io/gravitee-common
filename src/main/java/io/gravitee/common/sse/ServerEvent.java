@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public record ServerEvent(
     @Nullable String event,
@@ -28,6 +29,7 @@ public record ServerEvent(
     @Nullable Long retry,
     @Nullable Buffer cachedBuffer
 ) {
+    private static final Pattern LINE_SEPARATOR = Pattern.compile("(\\r\\n|\\r|\\n)");
     public ServerEvent(@Nullable String event, @Nullable String data, @Nullable String id, @Nullable Long retry) {
         this(event, data, id, retry, null);
     }
@@ -49,8 +51,8 @@ public record ServerEvent(
         String id = null;
         Long retry = null;
 
-        for (Buffer lineBuffer : BufferUtils.split(buffer, new byte[] { '\n' })) {
-            String line = lineBuffer.toString().strip();
+        for (var lineBuffer : LINE_SEPARATOR.split(buffer.toString())) {
+            String line = lineBuffer.strip();
             if (line.startsWith("event:")) {
                 event = line.substring(6).trim();
             } else if (line.startsWith("data:")) {
@@ -114,16 +116,15 @@ public record ServerEvent(
         List<String> newLines = new ArrayList<>();
         boolean dataLinesReplaced = false;
 
-        for (Buffer bufferLine : BufferUtils.split(this.cachedBuffer, new byte[] { '\n' })) {
-            String lineStr = bufferLine.toString();
+        for (var lineStr : LINE_SEPARATOR.split(this.cachedBuffer.toString())) {
             if (lineStr.startsWith("data:")) {
                 if (!dataLinesReplaced) {
                     if (data != null) {
                         if (data.isEmpty()) {
-                            newLines.add("data: \n");
+                            newLines.add("data: ");
                         }
 
-                        data.lines().map(line -> "data: " + line + "\n").forEach(newLines::add);
+                        data.lines().map(line -> "data: " + line).forEach(newLines::add);
                     }
                     dataLinesReplaced = true;
                 }
@@ -138,12 +139,12 @@ public record ServerEvent(
             while (lastNonEmpty >= 0 && newLines.get(lastNonEmpty).isBlank()) {
                 lastNonEmpty--;
             }
-            for (String dataLine : data.split("\n")) {
-                newLines.add(lastNonEmpty + 1, "data: " + dataLine + "\n");
+            for (String dataLine : LINE_SEPARATOR.split(data.toString())) {
+                newLines.add(lastNonEmpty + 1, "data: " + dataLine);
             }
         }
 
-        return new ServerEvent(this.event, data, this.id, this.retry, Buffer.buffer(String.join("", newLines)));
+        return new ServerEvent(this.event, data, this.id, this.retry, Buffer.buffer(String.join("\n", newLines) + "\n\n"));
     }
 
     @Override

@@ -1,3 +1,10 @@
+# [4.8.0-alpha.2](https://github.com/gravitee-io/gravitee-common/compare/4.8.0-alpha.1...4.8.0-alpha.2) (2025-11-28)
+
+
+### Bug Fixes
+
+* allow use cr lf / cr / lf as separator ([4faeccb](https://github.com/gravitee-io/gravitee-common/commit/4faeccb51c23fe092226c9bcfd9ccb34203a183b))
+
 # [4.8.0-alpha.1](https://github.com/gravitee-io/gravitee-common/compare/4.7.3...4.8.0-alpha.1) (2025-11-26)
 
 

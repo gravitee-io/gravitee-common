@@ -41,7 +41,7 @@ public class ChunkToSseEvent {
                 final var matcher = EVENT_SEPARATOR.matcher(content);
                 int lastEnd = 0;
                 while (matcher.find()) {
-                    ready.add(Buffer.buffer(content.substring(lastEnd, matcher.start())));
+                    ready.add(Buffer.buffer(content.substring(lastEnd, matcher.end())));
                     lastEnd = matcher.end();
                 }
 

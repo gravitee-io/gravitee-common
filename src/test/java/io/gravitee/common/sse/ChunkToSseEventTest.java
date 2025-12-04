@@ -80,6 +80,7 @@ class ChunkToSseEventTest {
                 result.assertComplete();
                 var values = result.values();
                 assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
+                assertThat(values.get(0).toBuffer().toString()).isEqualTo("data: event1\n\n");
             }
 
             @Test

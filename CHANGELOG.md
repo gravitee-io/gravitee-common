@@ -1,3 +1,10 @@
+# [4.8.0-alpha.3](https://github.com/gravitee-io/gravitee-common/compare/4.8.0-alpha.2...4.8.0-alpha.3) (2025-12-04)
+
+
+### Bug Fixes
+
+* **sse:** include event separator in SSE event extraction ([2b72723](https://github.com/gravitee-io/gravitee-common/commit/2b727239f4fa1483751c1579f0ae8dade4609876))
+
 # [4.8.0-alpha.2](https://github.com/gravitee-io/gravitee-common/compare/4.8.0-alpha.1...4.8.0-alpha.2) (2025-11-28)
 
 

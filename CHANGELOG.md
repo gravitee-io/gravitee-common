@@ -1,3 +1,18 @@
+# [4.8.0](https://github.com/gravitee-io/gravitee-common/compare/4.7.3...4.8.0) (2025-12-12)
+
+
+### Bug Fixes
+
+* allow use cr lf / cr / lf as separator ([fe3d241](https://github.com/gravitee-io/gravitee-common/commit/fe3d241320905fc2338ed2c53be92c46b7481fd9))
+* **sse:** include event separator in SSE event extraction ([18f575b](https://github.com/gravitee-io/gravitee-common/commit/18f575b0bf6a4929e846429202fc416d961fd9f7))
+
+
+### Features
+
+* improve ServerEvent to change only data into event buffer ([2311d9c](https://github.com/gravitee-io/gravitee-common/commit/2311d9c9a88b7d144389fcdadf96d0d6061fc111))
+* move BufferImpl & BufferFactoryImpl from APIM into common ([add19d0](https://github.com/gravitee-io/gravitee-common/commit/add19d0f55bea39ebec9474efcf30b3571911e39))
+* move ServerEvent & ChunkToSseEvent from llm-proxy-reactor ([826b46a](https://github.com/gravitee-io/gravitee-common/commit/826b46a1b0f195cdb7fb7bfdc8dab3ce420db66e))
+
 # [4.8.0-alpha.3](https://github.com/gravitee-io/gravitee-common/compare/4.8.0-alpha.2...4.8.0-alpha.3) (2025-12-04)
 
 

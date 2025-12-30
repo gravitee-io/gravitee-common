@@ -35,7 +35,7 @@
 
     <properties>
         <gravitee-bom.version>6.0.62</gravitee-bom.version>
-        <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
+        <java-uuid-generator.version>5.2.0</java-uuid-generator.version>
         <bouncycastle.version>1.80</bouncycastle.version>
         <nimbus-jose-jwt.version>9.48</nimbus-jose-jwt.version>
         <freemarker.version>2.3.34</freemarker.version>

@@ -34,12 +34,11 @@
     <name>Gravitee.io APIM - Common</name>
 
     <properties>
-        <gravitee-bom.version>6.0.62</gravitee-bom.version>
+        <gravitee-bom.version>9.0.0-beta.2</gravitee-bom.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
-        <bouncycastle.version>1.80</bouncycastle.version>
         <nimbus-jose-jwt.version>9.48</nimbus-jose-jwt.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gravitee-gateway-api.version>3.9.1</gravitee-gateway-api.version>
+        <gravitee-gateway-api.version>5.0.0-beta.2</gravitee-gateway-api.version>
         <awaitability.version>4.2.2</awaitability.version>
         <jmh-core.version>1.37</jmh-core.version>
     </properties>
@@ -99,14 +98,12 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>${bouncycastle.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>${bouncycastle.version}</version>
             <scope>provided</scope>
         </dependency>
 

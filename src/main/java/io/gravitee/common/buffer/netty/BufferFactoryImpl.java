@@ -18,6 +18,7 @@ package io.gravitee.common.buffer.netty;
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.gravitee.gateway.api.buffer.BufferFactory;
 import io.netty.buffer.ByteBuf;
+import io.vertx.core.internal.buffer.BufferInternal;
 
 /**
  * @author David BRASSELY (david at gravitee.io)
@@ -32,12 +33,7 @@ public class BufferFactoryImpl implements BufferFactory {
 
     @Override
     public Buffer buffer(io.vertx.core.buffer.Buffer vertxBuffer) {
-        return new BufferImpl(vertxBuffer.getByteBuf());
-    }
-
-    @Override
-    public Buffer buffer(io.vertx.rxjava3.core.buffer.Buffer vertxBuffer) {
-        return new BufferImpl(vertxBuffer.getByteBuf());
+        return new BufferImpl(((BufferInternal) vertxBuffer).getByteBuf());
     }
 
     @Override

@@ -54,11 +54,13 @@ class CertificateUtilsTest {
         clientCertificate = Files.readString(Paths.get(CertificateUtilsTest.class.getResource("/client.crt").toURI()));
 
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-        clientX509Certificate =
-            (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(clientCertificate.getBytes()));
+        clientX509Certificate = (X509Certificate) certificateFactory.generateCertificate(
+            new ByteArrayInputStream(clientCertificate.getBytes())
+        );
 
-        rawBase64Certificate =
-            Files.readString(Paths.get(CertificateUtilsTest.class.getResource("/expected_flatten_b64_body.txt").toURI()));
+        rawBase64Certificate = Files.readString(
+            Paths.get(CertificateUtilsTest.class.getResource("/expected_flatten_b64_body.txt").toURI())
+        );
     }
 
     @Test

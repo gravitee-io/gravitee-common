@@ -64,8 +64,7 @@ class LinkedMultiValueMapTest {
         map.set(testObjectHolder.get("third"), "value");
         map.set(testObjectHolder.get("fourth"), "value");
 
-        final List<KeyObject> toBeContained = Arrays
-            .stream(keysName.split(","))
+        final List<KeyObject> toBeContained = Arrays.stream(keysName.split(","))
             .map(key -> testObjectHolder.get(key))
             .collect(Collectors.toList());
 
@@ -81,8 +80,7 @@ class LinkedMultiValueMapTest {
         map.set(testObjectHolder.get("third"), "value");
         map.set(testObjectHolder.get("fourth"), "value");
 
-        final List<KeyObject> toBeContained = Arrays
-            .stream(keysName.split(","))
+        final List<KeyObject> toBeContained = Arrays.stream(keysName.split(","))
             .map(key -> testObjectHolder.get(key))
             .collect(Collectors.toList());
 

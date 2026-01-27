@@ -265,7 +265,8 @@ public class BlockingArrayQueue<E> extends AbstractList<E> implements BlockingQu
 
     @Override
     public boolean add(E e) {
-        if (offer(e)) return true; else throw new IllegalStateException();
+        if (offer(e)) return true;
+        else throw new IllegalStateException();
     }
 
     @Override

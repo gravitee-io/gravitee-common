@@ -496,7 +496,10 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     @Override
     public boolean containsAllKeys(Collection<String> keys) {
         final LinkedCaseInsensitiveMap<Object> headers = (LinkedCaseInsensitiveMap) this.headers;
-        final List<String> lowercaseKeys = keys.stream().map(s -> s.toLowerCase(headers.getLocale())).collect(Collectors.toList());
+        final List<String> lowercaseKeys = keys
+            .stream()
+            .map(s -> s.toLowerCase(headers.getLocale()))
+            .collect(Collectors.toList());
         return headers.insensitiveKeySet().containsAll(lowercaseKeys);
     }
 

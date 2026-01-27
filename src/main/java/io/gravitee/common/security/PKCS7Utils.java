@@ -90,12 +90,8 @@ public class PKCS7Utils {
      * @throws CertificateException     if there is an error in processing the X.509 certificates
      * @throws NoSuchAlgorithmException if the algorithm required for KeyStore operations is unavailable
      */
-    public static Optional<KeyStore> pkcs7ToTruststore(
-        byte[] data,
-        String password,
-        IntFunction<String> aliasGenerator,
-        boolean allowEmpty
-    ) throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
+    public static Optional<KeyStore> pkcs7ToTruststore(byte[] data, String password, IntFunction<String> aliasGenerator, boolean allowEmpty)
+        throws KeyStoreException, CertificateException, NoSuchAlgorithmException {
         try {
             Collection<X509CertificateHolder> certHolders = new CMSSignedData(data).getCertificates().getMatches(null);
 

@@ -97,7 +97,11 @@ public final class EnvironmentUtils {
         if (configuredTags.isPresent()) {
             List<String> tagList = configuredTags.get();
 
-            final List<String> inclusionTags = tagList.stream().map(String::trim).filter(tag -> !tag.startsWith("!")).toList();
+            final List<String> inclusionTags = tagList
+                .stream()
+                .map(String::trim)
+                .filter(tag -> !tag.startsWith("!"))
+                .toList();
 
             final List<String> exclusionTags = tagList
                 .stream()

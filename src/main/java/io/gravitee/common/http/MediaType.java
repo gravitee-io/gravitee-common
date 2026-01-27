@@ -171,7 +171,7 @@ public class MediaType {
         if (s.length() < 2) {
             return false;
         } else {
-            return s.startsWith("\"") && s.endsWith("\"") || s.startsWith("'") && s.endsWith("'");
+            return (s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'"));
         }
     }
 

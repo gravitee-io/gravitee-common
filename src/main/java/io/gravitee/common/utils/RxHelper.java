@@ -51,7 +51,11 @@ public class RxHelper {
      * @return a {@link FlowableTransformer} that will be applied.
      */
     public static <R> FlowableTransformer<R, R> mergeWithFirst(Flowable<R> other) {
-        return upstream -> other.materialize().mergeWith(upstream.materialize()).dematerialize(n -> n);
+        return upstream ->
+            other
+                .materialize()
+                .mergeWith(upstream.materialize())
+                .dematerialize(n -> n);
     }
 
     /**

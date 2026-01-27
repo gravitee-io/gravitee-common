@@ -29,17 +29,16 @@ public class MemoryUtils {
         final int defaultValue = 64;
         int value = defaultValue;
         try {
-            value =
-                Integer.parseInt(
-                    AccessController.doPrivileged(
-                        new PrivilegedAction<String>() {
-                            @Override
-                            public String run() {
-                                return System.getProperty("org.eclipse.jetty.util.cacheLineBytes", String.valueOf(defaultValue));
-                            }
+            value = Integer.parseInt(
+                AccessController.doPrivileged(
+                    new PrivilegedAction<String>() {
+                        @Override
+                        public String run() {
+                            return System.getProperty("org.eclipse.jetty.util.cacheLineBytes", String.valueOf(defaultValue));
                         }
-                    )
-                );
+                    }
+                )
+            );
         } catch (Exception ignored) {}
         cacheLineBytes = value;
     }

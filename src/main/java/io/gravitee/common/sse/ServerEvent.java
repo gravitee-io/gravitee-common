@@ -30,6 +30,7 @@ public record ServerEvent(
     @Nullable Buffer cachedBuffer
 ) {
     private static final Pattern LINE_SEPARATOR = Pattern.compile("(\\r\\n|\\r|\\n)");
+
     public ServerEvent(@Nullable String event, @Nullable String data, @Nullable String id, @Nullable Long retry) {
         this(event, data, id, retry, null);
     }
@@ -124,7 +125,10 @@ public record ServerEvent(
                             newLines.add("data: ");
                         }
 
-                        data.lines().map(line -> "data: " + line).forEach(newLines::add);
+                        data
+                            .lines()
+                            .map(line -> "data: " + line)
+                            .forEach(newLines::add);
                     }
                     dataLinesReplaced = true;
                 }

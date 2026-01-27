@@ -78,7 +78,7 @@ public class URIUtils {
             int i;
             int paramNameStart = questionMarkIndex + 1;
             int paramValueStart = -1;
-            loop:for (i = questionMarkIndex + 1; i < end; i++) {
+            loop: for (i = questionMarkIndex + 1; i < end; i++) {
                 switch (uri.charAt(i)) {
                     case QUERYPARAM_VALUE_SEPARATOR_CHAR:
                         if (paramNameStart == i) {

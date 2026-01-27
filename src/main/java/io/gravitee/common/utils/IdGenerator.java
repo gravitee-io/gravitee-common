@@ -43,8 +43,7 @@ public final class IdGenerator {
             return null;
         }
 
-        return Normalizer
-            .normalize(name, Normalizer.Form.NFD)
+        return Normalizer.normalize(name, Normalizer.Form.NFD)
             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
             .toLowerCase()
             .replaceAll("[^a-z\\d\\s-]", "")

@@ -96,7 +96,9 @@ class EventManagerImplTest {
             cut.unsubscribeForEvents(eventListener, SampleEventType.class);
             cut.publishEvent(SampleEventType.DEPLOY, "value1");
 
-            await().atMost(30, TimeUnit.SECONDS).untilAsserted(() -> assertThat(contentReceived).isEmpty());
+            await()
+                .atMost(30, TimeUnit.SECONDS)
+                .untilAsserted(() -> assertThat(contentReceived).isEmpty());
         }
 
         @Test
@@ -124,7 +126,9 @@ class EventManagerImplTest {
             cut.unsubscribeForEvents(eventListener, SampleEventType.class);
             cut.publishEvent(SampleEventType.DEPLOY, "value1");
 
-            await().atMost(30, TimeUnit.SECONDS).untilAsserted(() -> assertThat(contentReceived).isEmpty());
+            await()
+                .atMost(30, TimeUnit.SECONDS)
+                .untilAsserted(() -> assertThat(contentReceived).isEmpty());
         }
 
         @Test

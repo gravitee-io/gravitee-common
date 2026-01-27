@@ -44,7 +44,10 @@ class ChunkToSseEventTest {
                 var result = ChunkToSseEvent.chunkToEvent(upstream).test();
 
                 // Then
-                result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
+                result
+                    .assertComplete()
+                    .assertValueCount(1)
+                    .assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
             }
 
             @Test
@@ -116,8 +119,11 @@ class ChunkToSseEventTest {
                 // Then
                 result.assertComplete();
                 var values = result.values();
-                assertThat(values)
-                    .containsExactly(new ServerEvent("event1"), new ServerEvent("2", "event2", null, null), new ServerEvent("event3"));
+                assertThat(values).containsExactly(
+                    new ServerEvent("event1"),
+                    new ServerEvent("2", "event2", null, null),
+                    new ServerEvent("event3")
+                );
             }
 
             @Test
@@ -151,7 +157,10 @@ class ChunkToSseEventTest {
                 var result = ChunkToSseEvent.chunkToEvent(upstream).test();
 
                 // Then
-                result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("part1 part2")));
+                result
+                    .assertComplete()
+                    .assertValueCount(1)
+                    .assertValue(buffer -> buffer.equals(new ServerEvent("part1 part2")));
             }
 
             @Test
@@ -168,7 +177,10 @@ class ChunkToSseEventTest {
                 var result = ChunkToSseEvent.chunkToEvent(upstream).test();
 
                 // Then
-                result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
+                result
+                    .assertComplete()
+                    .assertValueCount(1)
+                    .assertValue(buffer -> buffer.equals(new ServerEvent("test message")));
             }
 
             @Test
@@ -199,8 +211,11 @@ class ChunkToSseEventTest {
                 // Then
                 result.assertComplete().assertValueCount(3);
                 var values = result.values();
-                assertThat(values)
-                    .containsExactly(new ServerEvent("complete1"), new ServerEvent("complete2"), new ServerEvent("incomplete"));
+                assertThat(values).containsExactly(
+                    new ServerEvent("complete1"),
+                    new ServerEvent("complete2"),
+                    new ServerEvent("incomplete")
+                );
             }
         }
 
@@ -229,7 +244,10 @@ class ChunkToSseEventTest {
                 var result = ChunkToSseEvent.chunkToEvent(upstream).test();
 
                 // Then
-                result.assertComplete().assertValueCount(1).assertValue(buffer -> new ServerEvent("test").equals(buffer));
+                result
+                    .assertComplete()
+                    .assertValueCount(1)
+                    .assertValue(buffer -> new ServerEvent("test").equals(buffer));
             }
 
             @Test
@@ -273,12 +291,11 @@ class ChunkToSseEventTest {
 
                 // Then
                 result.assertComplete().assertValueCount(3);
-                assertThat(result.values())
-                    .containsExactly(
-                        new ServerEvent("start", "{\"type\": \"start\"}", "1", null),
-                        new ServerEvent("message", "{\"chunk\": \"hello world\"}", "2", null),
-                        new ServerEvent("simple")
-                    );
+                assertThat(result.values()).containsExactly(
+                    new ServerEvent("start", "{\"type\": \"start\"}", "1", null),
+                    new ServerEvent("message", "{\"chunk\": \"hello world\"}", "2", null),
+                    new ServerEvent("simple")
+                );
             }
         }
 
@@ -332,7 +349,10 @@ class ChunkToSseEventTest {
             var result = upstream.compose(ChunkToSseEvent.onServerEvent(transformer)).test();
 
             // Then
-            result.assertComplete().assertValueCount(1).assertValue(buffer -> buffer.toString().contains("data: test\nid: 123"));
+            result
+                .assertComplete()
+                .assertValueCount(1)
+                .assertValue(buffer -> buffer.toString().contains("data: test\nid: 123"));
         }
     }
 }

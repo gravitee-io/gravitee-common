@@ -69,8 +69,9 @@ public class CertificateUtils {
                     byteInput = java.util.Base64.getDecoder().decode(certHeaderValue);
                 }
 
-                certificate =
-                    Optional.ofNullable((X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(byteInput)));
+                certificate = Optional.ofNullable(
+                    (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(byteInput))
+                );
             } catch (Exception e) {
                 log.debug("Unable to retrieve peer certificate from request header '{}'", certHeader, e);
             }

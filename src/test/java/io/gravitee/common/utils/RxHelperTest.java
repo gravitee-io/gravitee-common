@@ -54,8 +54,7 @@ class RxHelperTest {
                 RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
 
                 final RuntimeException exception = new RuntimeException();
-                final TestSubscriber<Serializable> obs = Flowable
-                    .fromArray(exception, "attempt1", 12)
+                final TestSubscriber<Serializable> obs = Flowable.fromArray(exception, "attempt1", 12)
                     .compose(RxHelper.delayElement(10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete();
@@ -87,8 +86,7 @@ class RxHelperTest {
                 RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
 
                 final RuntimeException exception = new RuntimeException();
-                final TestSubscriber<Serializable> obs = Flowable
-                    .fromArray(exception, "attempt1", "notDelayed", 12, "notDelayed")
+                final TestSubscriber<Serializable> obs = Flowable.fromArray(exception, "attempt1", "notDelayed", 12, "notDelayed")
                     .compose(RxHelper.delayElement(10, TimeUnit.SECONDS, o -> o == "notDelayed"))
                     .test()
                     .assertNotComplete();
@@ -128,17 +126,16 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestSubscriber<Object> obs = Flowable
-                    .generate(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 2) {
-                            emitter.onError(new RuntimeException());
-                        } else if (cpt <= 4) {
-                            emitter.onNext(cpt);
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestSubscriber<Object> obs = Flowable.generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt <= 4) {
+                        emitter.onNext(cpt);
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .compose(RxHelper.retryFlowable(5, 10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete()
@@ -150,7 +147,10 @@ class RxHelperTest {
 
                 // both exception has been thrown, values emit normally
                 testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-                obs.assertComplete().assertValueAt(0, value -> value.equals(3)).assertValueAt(1, value -> value.equals(4));
+                obs
+                    .assertComplete()
+                    .assertValueAt(0, value -> value.equals(3))
+                    .assertValueAt(1, value -> value.equals(4));
             } finally {
                 RxJavaPlugins.reset();
             }
@@ -164,15 +164,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestSubscriber<Object> obs = Flowable
-                    .generate(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 2) {
-                            emitter.onError(new NonRetryableException());
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestSubscriber<Object> obs = Flowable.generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .compose(RxHelper.retryFlowable(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
                     .test()
                     .assertNotComplete()
@@ -193,15 +192,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestSubscriber<Object> obs = Flowable
-                    .generate(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 3) {
-                            emitter.onError(new RuntimeException());
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestSubscriber<Object> obs = Flowable.generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 3) {
+                        emitter.onError(new RuntimeException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .compose(RxHelper.retryFlowable(2, 10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete()
@@ -235,15 +233,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Integer> obs = Maybe
-                    .<Integer>create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt < 5) {
-                            emitter.onError(new RuntimeException());
-                        } else {
-                            emitter.onSuccess(cpt);
-                        }
-                    })
+                TestObserver<Integer> obs = Maybe.<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new RuntimeException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
                     .compose(RxHelper.retryMaybe(5, 10, TimeUnit.SECONDS))
                     .test();
 
@@ -269,15 +266,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Integer> obs = Maybe
-                    .<Integer>create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt < 5) {
-                            emitter.onError(new NonRetryableException());
-                        } else {
-                            emitter.onSuccess(cpt);
-                        }
-                    })
+                TestObserver<Integer> obs = Maybe.<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
                     .compose(RxHelper.retryMaybe(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
                     .test();
 
@@ -300,15 +296,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Integer> obs = Single
-                    .<Integer>create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt < 5) {
-                            emitter.onError(new RuntimeException());
-                        } else {
-                            emitter.onSuccess(cpt);
-                        }
-                    })
+                TestObserver<Integer> obs = Single.<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new RuntimeException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
                     .compose(RxHelper.retrySingle(5, 10, TimeUnit.SECONDS))
                     .test();
 
@@ -334,15 +329,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Integer> obs = Single
-                    .<Integer>create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt < 5) {
-                            emitter.onError(new NonRetryableException());
-                        } else {
-                            emitter.onSuccess(cpt);
-                        }
-                    })
+                TestObserver<Integer> obs = Single.<Integer>create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt < 5) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onSuccess(cpt);
+                    }
+                })
                     .compose(RxHelper.retrySingle(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
                     .test();
 
@@ -365,15 +359,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Void> obs = Completable
-                    .create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 2) {
-                            emitter.onError(new RuntimeException());
-                        } else if (cpt <= 4) {
-                            emitter.onComplete();
-                        }
-                    })
+                TestObserver<Void> obs = Completable.create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt <= 4) {
+                        emitter.onComplete();
+                    }
+                })
                     .compose(RxHelper.retryCompletable(5, 10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete()
@@ -399,15 +392,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Void> obs = Completable
-                    .create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 3) {
-                            emitter.onError(new RuntimeException());
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestObserver<Void> obs = Completable.create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 3) {
+                        emitter.onError(new RuntimeException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .compose(RxHelper.retryCompletable(2, 10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete()
@@ -437,15 +429,14 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Void> obs = Completable
-                    .create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 3) {
-                            emitter.onError(new NonRetryableException());
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestObserver<Void> obs = Completable.create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 3) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .compose(RxHelper.retryCompletable(2, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
                     .test()
                     .assertNotComplete()
@@ -466,17 +457,16 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestObserver<Void> obs = Completable
-                    .create(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 3) {
-                            emitter.onError(new RuntimeException());
-                        } else if (cpt <= 5) {
-                            emitter.onError(new NonRetryableException());
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestObserver<Void> obs = Completable.create(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 3) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt <= 5) {
+                        emitter.onError(new NonRetryableException());
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .compose(RxHelper.retryCompletable(5, 10, TimeUnit.SECONDS, t -> !(t instanceof NonRetryableException)))
                     .test()
                     .assertNotComplete()
@@ -510,17 +500,16 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestSubscriber<Object> obs = Flowable
-                    .generate(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 2) {
-                            emitter.onError(new RuntimeException());
-                        } else if (cpt <= 4) {
-                            emitter.onNext(cpt);
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestSubscriber<Object> obs = Flowable.generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt <= 4) {
+                        emitter.onNext(cpt);
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .retryWhen(RxHelper.retryExponentialBackoff(10, TimeUnit.SECONDS))
                     .test()
                     .assertNotComplete()
@@ -535,7 +524,10 @@ class RxHelperTest {
                 obs.assertNotComplete().assertNoValues();
 
                 testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-                obs.assertComplete().assertValueAt(0, value -> value.equals(3)).assertValueAt(1, value -> value.equals(4));
+                obs
+                    .assertComplete()
+                    .assertValueAt(0, value -> value.equals(3))
+                    .assertValueAt(1, value -> value.equals(4));
             } finally {
                 RxJavaPlugins.reset();
             }
@@ -548,8 +540,7 @@ class RxHelperTest {
                 RxJavaPlugins.setComputationSchedulerHandler(s -> testScheduler);
 
                 @NonNull
-                TestSubscriber<Object> obs = Flowable
-                    .generate(emitter -> emitter.onError(new RuntimeException("will never work")))
+                TestSubscriber<Object> obs = Flowable.generate(emitter -> emitter.onError(new RuntimeException("will never work")))
                     .retryWhen(RxHelper.retryExponentialBackoff(1, 1, TimeUnit.SECONDS, 1, 3, t -> true))
                     .test()
                     .assertNotComplete()
@@ -569,19 +560,18 @@ class RxHelperTest {
 
                 AtomicInteger atomicCpt = new AtomicInteger(0);
                 @NonNull
-                TestSubscriber<Object> obs = Flowable
-                    .generate(emitter -> {
-                        int cpt = atomicCpt.incrementAndGet();
-                        if (cpt <= 2) {
-                            emitter.onError(new RuntimeException());
-                        } else if (cpt == 3) {
-                            emitter.onError(new NonRetryableException());
-                        } else if (cpt == 4) {
-                            emitter.onNext(cpt);
-                        } else {
-                            emitter.onComplete();
-                        }
-                    })
+                TestSubscriber<Object> obs = Flowable.generate(emitter -> {
+                    int cpt = atomicCpt.incrementAndGet();
+                    if (cpt <= 2) {
+                        emitter.onError(new RuntimeException());
+                    } else if (cpt == 3) {
+                        emitter.onError(new NonRetryableException());
+                    } else if (cpt == 4) {
+                        emitter.onNext(cpt);
+                    } else {
+                        emitter.onComplete();
+                    }
+                })
                     .retryWhen(RxHelper.retryExponentialBackoff(10, 10, TimeUnit.SECONDS, 2, t -> !(t instanceof NonRetryableException)))
                     .test()
                     .assertNotComplete()

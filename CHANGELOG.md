@@ -1,3 +1,10 @@
+# [4.9.0](https://github.com/gravitee-io/gravitee-common/compare/4.8.0...4.9.0) (2026-02-05)
+
+
+### Features
+
+* add PKCS7 utility class ([954fabc](https://github.com/gravitee-io/gravitee-common/commit/954fabc96ffe2d7068ff4e0febc767676abb1e11))
+
 # [4.8.0](https://github.com/gravitee-io/gravitee-common/compare/4.7.3...4.8.0) (2025-12-12)
 
 

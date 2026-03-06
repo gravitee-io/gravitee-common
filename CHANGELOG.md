@@ -1,3 +1,21 @@
+# [5.0.0-beta.1](https://github.com/gravitee-io/gravitee-common/compare/4.9.0...5.0.0-beta.1) (2026-03-06)
+
+
+### Bug Fixes
+
+* **deps:** update gravitee orb ([0753de1](https://github.com/gravitee-io/gravitee-common/commit/0753de1a47bc487a3f2e8466d8ae7c1fc23e80ad))
+* **deps:** update gravitee-parent and formatting ([0066c97](https://github.com/gravitee-io/gravitee-common/commit/0066c970db65d5e9f07e7e9949149e81dda6b052))
+
+
+### Features
+
+* upgrade to vert.x 5 ([81d551f](https://github.com/gravitee-io/gravitee-common/commit/81d551f46a0aae0379bf662b2b0afa8e9d3398be))
+
+
+### BREAKING CHANGES
+
+* upgrade to vert.x 5
+
 # [4.9.0](https://github.com/gravitee-io/gravitee-common/compare/4.8.0...4.9.0) (2026-02-05)
 
 

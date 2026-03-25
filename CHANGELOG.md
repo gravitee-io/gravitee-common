@@ -1,3 +1,10 @@
+## [4.9.1](https://github.com/gravitee-io/gravitee-common/compare/4.9.0...4.9.1) (2026-03-25)
+
+
+### Bug Fixes
+
+* add Private Network Access header constants (APIM-13215) ([62de7fb](https://github.com/gravitee-io/gravitee-common/commit/62de7fb576547905063e871cbbe3d73a2ab43125))
+
 # [4.9.0](https://github.com/gravitee-io/gravitee-common/compare/4.8.0...4.9.0) (2026-02-05)
 
 

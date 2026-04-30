@@ -1,3 +1,10 @@
+## [4.8.1](https://github.com/gravitee-io/gravitee-common/compare/4.8.0...4.8.1) (2026-04-30)
+
+
+### Bug Fixes
+
+* add Private Network Access header constants (APIM-13215) ([68b7a5e](https://github.com/gravitee-io/gravitee-common/commit/68b7a5ee5eb4b4d556a004d783cddb89ea064058))
+
 # [4.8.0](https://github.com/gravitee-io/gravitee-common/compare/4.7.3...4.8.0) (2025-12-12)
 
 

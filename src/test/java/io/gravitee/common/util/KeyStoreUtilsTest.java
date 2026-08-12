@@ -166,6 +166,20 @@ public class KeyStoreUtilsTest {
     }
 
     @Nested
+    class InitSelfSigned {
+
+        @Test
+        public void should_init_self_signed_pkcs12_keystore() throws Exception {
+            final KeyStore keyStore = KeyStoreUtils.initSelfSigned("localhost", "secret");
+
+            assertThat(keyStore.getType()).isEqualTo(TYPE_PKCS12);
+            assertThat(keyStore.aliases().asIterator()).toIterable().hasSize(1).contains(DEFAULT_ALIAS);
+            assertThat(keyStore.getCertificate(DEFAULT_ALIAS)).isNotNull();
+            assertThat(keyStore.getKey(DEFAULT_ALIAS, "secret".toCharArray())).isNotNull();
+        }
+    }
+
+    @Nested
     class Merge {
 
         @Test

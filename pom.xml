@@ -37,6 +37,9 @@
         <gravitee-bom.version>9.0.0</gravitee-bom.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
         <bouncycastle.version>1.84</bouncycastle.version>
+        <bc-fips.version>2.1.1</bc-fips.version>
+        <bcpkix-fips.version>2.1.10</bcpkix-fips.version>
+        <bcutil-fips.version>2.1.6</bcutil-fips.version>
         <nimbus-jose-jwt.version>9.48</nimbus-jose-jwt.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gravitee-gateway-api.version>6.0.0</gravitee-gateway-api.version>
@@ -95,7 +98,9 @@
             <version>${java-uuid-generator.version}</version>
         </dependency>
 
-        <!-- Bouncy Castle -->
+        <!-- Bouncy Castle: both non-FIPS and FIPS artifacts are declared as provided so this module compiles
+             against either. At runtime, the consuming application puts only the relevant jars (FIPS or
+             non-FIPS) on the classpath depending on whether it runs in FIPS mode. -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
@@ -105,6 +110,27 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bc-fips</artifactId>
+            <version>${bc-fips.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-fips</artifactId>
+            <version>${bcpkix-fips.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcutil-fips</artifactId>
+            <version>${bcutil-fips.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -179,4 +205,45 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- bcprov-jdk18on/bcpkix-jdk18on (non-FIPS) and bc-fips/bcpkix-fips/bcutil-fips both implement
+                 the org.bouncycastle.crypto.* packages under different signers, so the JVM refuses to load
+                 both variants in the same classpath (SecurityException: signer information does not match).
+                 KeyStoreUtilsFipsTest therefore runs as its own Surefire execution, on a classpath from which
+                 the non-FIPS jars are excluded, and KeyStoreUtils.FIPS_MODE (a static final field evaluated
+                 once per JVM) is set by registering BCFIPS before anything else in that run touches it. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/KeyStoreUtilsFipsTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>fips-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/KeyStoreUtilsFipsTest.java</include>
+                            </includes>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExclude>org.bouncycastle:bcprov-jdk18on</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.bouncycastle:bcpkix-jdk18on</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.bouncycastle:bcutil-jdk18on</classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

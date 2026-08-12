@@ -27,7 +27,9 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -48,7 +51,6 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -65,15 +67,75 @@ public class KeyStoreUtils {
     public static final String TYPE_JKS = "JKS";
     public static final String TYPE_PEM = "PEM";
     public static final String TYPE_PKCS12 = "PKCS12";
+    public static final String TYPE_BCFKS = "BCFKS";
+
+    /**
+     * PKCS12 private key entry protection (PBEWithHmacSHA256AndAES_256) has no available provider under a
+     * BC-FIPS "approved only" JVM (SunJCE is absent from the provider list). BCFKS uses BC-FIPS's own
+     * approved key-wrapping instead, so it's used in place of PKCS12 whenever BC-FIPS is the active provider.
+     *
+     * <p>This is evaluated once, when {@link KeyStoreUtils} is first loaded, and never re-evaluated for the
+     * rest of the JVM's lifetime. Applications that need FIPS mode must therefore register the BCFIPS
+     * provider (e.g. via a static {@code java.security} provider entry, or an explicit
+     * {@code Security.addProvider(new BouncyCastleFipsProvider())}) before this class is first touched.
+     * Registering BCFIPS after that point will not be picked up.
+     */
+    private static final boolean FIPS_MODE = Security.getProvider("BCFIPS") != null;
 
     public static final String DEFAULT_ALIAS = "dummy-entry";
-    public static final String DEFAULT_KEYSTORE_TYPE = TYPE_PKCS12;
+    public static final String DEFAULT_KEYSTORE_TYPE = FIPS_MODE ? TYPE_BCFKS : TYPE_PKCS12;
     private static final int DNSNAME = 2;
     private static final Date DEFAULT_NOT_BEFORE = new Date(System.currentTimeMillis() - 31536000000L);
     private static final Date DEFAULT_NOT_AFTER = new Date(253402300799000L);
     private static final int DEFAULT_KEY_LENGTH_BITS = 2048;
     private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256WithRSAEncryption";
     private static final String DEFAULT_ALGORITHM = "RSA";
+
+    private static final String BC_PROVIDER_CLASS = "org.bouncycastle.jce.provider.BouncyCastleProvider";
+    private static final String BC_FIPS_PROVIDER_CLASS = "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider";
+
+    /**
+     * Lazily-initialized, cached provider instances, one per variant. Providers are meant to be constructed
+     * once and reused for the life of the JVM (constructing {@code BouncyCastleFipsProvider} also runs
+     * power-on self-tests), so a single instance of whichever variant is active is shared across calls
+     * instead of being rebuilt on every {@link #bouncyCastleProvider()} call.
+     */
+    private static final AtomicReference<Provider> nonFipsProviderInstance = new AtomicReference<>();
+    private static final AtomicReference<Provider> fipsProviderInstance = new AtomicReference<>();
+
+    /**
+     * Returns a Bouncy Castle {@link Provider} instance matching the active JVM mode: the FIPS-validated
+     * provider when BC-FIPS is the registered security provider, or the regular (non-FIPS) provider otherwise.
+     * Both providers are instantiated via reflection (by class name, not a direct reference) so only the class
+     * matching the active mode is ever resolved by the JVM — a direct {@code new BouncyCastleProvider()} or
+     * {@code new BouncyCastleFipsProvider()} reference gets resolved by the JVM verifier as soon as this class
+     * loads, regardless of which branch runs, which would force both bcprov-jdk18on and bc-fips onto every
+     * consumer's classpath even though only one variant is meant to be present at a time.
+     */
+    private static Provider bouncyCastleProvider() {
+        return FIPS_MODE
+            ? cachedProvider(fipsProviderInstance, BC_FIPS_PROVIDER_CLASS)
+            : cachedProvider(nonFipsProviderInstance, BC_PROVIDER_CLASS);
+    }
+
+    private static Provider cachedProvider(AtomicReference<Provider> cache, String providerClassName) {
+        Provider provider = cache.get();
+        if (provider == null) {
+            provider = instantiateProvider(providerClassName);
+            if (!cache.compareAndSet(null, provider)) {
+                provider = cache.get();
+            }
+        }
+        return provider;
+    }
+
+    private static Provider instantiateProvider(String providerClassName) {
+        try {
+            return (Provider) Class.forName(providerClassName).getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(String.format("Bouncy Castle provider [%s] is not on the classpath", providerClassName), e);
+        }
+    }
 
     /**
      * Initializes and returns a {@link KeyStore} from a file path.
@@ -147,7 +209,7 @@ public class KeyStoreUtils {
             ContentSigner signer = new JcaContentSignerBuilder(DEFAULT_SIGNATURE_ALGORITHM).build(privateKey);
             X509CertificateHolder certHolder = builder.build(signer);
 
-            final JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider());
+            final JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider(bouncyCastleProvider());
 
             X509Certificate certificate = converter.getCertificate(certHolder);
             certificate.verify(keypair.getPublic());
@@ -315,7 +377,7 @@ public class KeyStoreUtils {
      * @return the certificate chain or an {@link IllegalArgumentException} if the certificate chain cannot be read.
      */
     public static Certificate[] loadPemCertificates(String pem) throws Exception {
-        JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider());
+        JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider(bouncyCastleProvider());
 
         final PemReader pemReader = new PemReader(new StringReader(pem));
         final List<X509Certificate> certificates = new ArrayList<>();
@@ -345,7 +407,7 @@ public class KeyStoreUtils {
      * @return the private key or an {@link IllegalArgumentException} if the private key cannot be read or has not been found.
      */
     public static PrivateKey loadPemPrivateKey(String pem) throws IOException {
-        final JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        final JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(bouncyCastleProvider());
         PemReader pemReader = new PemReader(new StringReader(pem));
 
         try (PEMParser pemParser = new PEMParser(pemReader)) {

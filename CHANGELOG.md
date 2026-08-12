@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/gravitee-io/gravitee-common/compare/5.0.0...5.1.0) (2026-08-12)
+
+
+### Features
+
+* make keystore utils FIPS compliant ([8bfcf3a](https://github.com/gravitee-io/gravitee-common/commit/8bfcf3aaadede329da573e85dff77bd3ad53bff8))
+
 # [5.0.0](https://github.com/gravitee-io/gravitee-common/compare/4.9.1...5.0.0) (2026-06-17)
 
 

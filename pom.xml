@@ -29,7 +29,7 @@
 
     <groupId>io.gravitee.common</groupId>
     <artifactId>gravitee-common</artifactId>
-    <version>5.0.0</version>
+    <version>5.1.0</version>
 
     <name>Gravitee.io APIM - Common</name>
 

@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/gravitee-io/gravitee-common/compare/5.1.0...5.2.0) (2026-08-26)
+
+
+### Features
+
+* **http:** add RequestPathNormalizer from the APIM gateway ([7f8163b](https://github.com/gravitee-io/gravitee-common/commit/7f8163b4a6156ab4cfbf271279dde39f9967ed7a))
+
 # [5.1.0](https://github.com/gravitee-io/gravitee-common/compare/5.0.0...5.1.0) (2026-08-12)
 
 

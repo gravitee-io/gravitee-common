@@ -39,7 +39,7 @@
         <bouncycastle.version>1.84</bouncycastle.version>
         <bc-fips.version>2.1.3</bc-fips.version>
         <bcpkix-fips.version>2.1.12</bcpkix-fips.version>
-        <bcutil-fips.version>2.1.6</bcutil-fips.version>
+        <bcutil-fips.version>2.1.7</bcutil-fips.version>
         <nimbus-jose-jwt.version>9.48</nimbus-jose-jwt.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gravitee-gateway-api.version>6.0.0</gravitee-gateway-api.version>

@@ -36,7 +36,6 @@
     <properties>
         <gravitee-bom.version>9.0.0</gravitee-bom.version>
         <java-uuid-generator.version>3.1.4</java-uuid-generator.version>
-        <bouncycastle.version>1.84</bouncycastle.version>
         <bc-fips.version>2.1.3</bc-fips.version>
         <bcpkix-fips.version>2.1.12</bcpkix-fips.version>
         <bcutil-fips.version>2.1.7</bcutil-fips.version>

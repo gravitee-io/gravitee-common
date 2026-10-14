@@ -290,7 +290,7 @@ class ChunkToSseEventTest {
         }
 
         @Nested
-        class CrlfLineEndings {
+        class LineEndings {
 
             @Test
             void should_emit_one_event_for_crlf_terminated_lines() {
@@ -333,6 +333,21 @@ class ChunkToSseEventTest {
                 assertThat(result.values()).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"));
                 assertThat(result.values().get(0).toBuffer().toString()).isEqualTo("data: event1\r\n\r\n");
                 assertThat(result.values().get(1).toBuffer().toString()).isEqualTo("data: event2\r\n\r\n");
+            }
+
+            @Test
+            void should_handle_cr_only_event_separator_split_across_chunks() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: a\r"), Buffer.buffer("\rdata: b\r\r"));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
+                assertThat(result.values()).containsExactly(new ServerEvent("a"), new ServerEvent("b"));
+                assertThat(result.values().get(0).toBuffer().toString()).isEqualTo("data: a\r\r");
+                assertThat(result.values().get(1).toBuffer().toString()).isEqualTo("data: b\r\r");
             }
 
             @Test
@@ -388,10 +403,12 @@ class ChunkToSseEventTest {
                 for (int offset = 0; offset < stream.length; offset += 512) {
                     chunks.add(Buffer.buffer(Arrays.copyOfRange(stream, offset, Math.min(stream.length, offset + 512))));
                 }
+                Flowable<Buffer> upstream = Flowable.fromIterable(chunks);
 
                 // When
-                List<ServerEvent> events = assertTimeoutPreemptively(Duration.ofSeconds(10), () ->
-                    ChunkToSseEvent.chunkToEvent(Flowable.fromIterable(chunks)).toList().blockingGet()
+                List<ServerEvent> events = assertTimeoutPreemptively(
+                    Duration.ofSeconds(10),
+                    () -> ChunkToSseEvent.chunkToEvent(upstream).toList().blockingGet()
                 );
 
                 // Then

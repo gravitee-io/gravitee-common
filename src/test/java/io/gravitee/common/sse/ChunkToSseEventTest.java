@@ -435,6 +435,68 @@ class ChunkToSseEventTest {
     }
 
     @Nested
+    class Split {
+
+        @Test
+        void should_split_on_the_first_blank_line() {
+            var parts = ChunkToSseEvent.split(Buffer.buffer("data: a\n\ndata: b\n\n"));
+
+            assertThat(parts).extracting(Buffer::toString).containsExactly("data: a", "data: b\n\n");
+        }
+
+        @Test
+        void should_return_the_buffer_itself_when_there_is_no_blank_line() {
+            Buffer buffer = Buffer.buffer("data: a\ndata: b\n");
+
+            assertThat(ChunkToSseEvent.split(buffer)).containsExactly(buffer);
+        }
+
+        @Test
+        void should_return_an_empty_first_part_when_the_buffer_starts_with_a_blank_line() {
+            var parts = ChunkToSseEvent.split(Buffer.buffer("\n\ndata: a\n\n"));
+
+            assertThat(parts).extracting(Buffer::toString).containsExactly("", "data: a\n\n");
+        }
+
+        @Test
+        void should_return_an_empty_second_part_when_the_buffer_ends_with_the_blank_line() {
+            var parts = ChunkToSseEvent.split(Buffer.buffer("data: a\n\n"));
+
+            assertThat(parts).extracting(Buffer::toString).containsExactly("data: a", "");
+        }
+
+        @Test
+        void should_split_on_cr_only_line_endings() {
+            var parts = ChunkToSseEvent.split(Buffer.buffer("data: a\r\rdata: b\r\r"));
+
+            assertThat(parts).extracting(Buffer::toString).containsExactly("data: a", "data: b\r\r");
+        }
+
+        @Test
+        void should_not_split_on_a_single_crlf() {
+            var parts = ChunkToSseEvent.split(Buffer.buffer("data: a\r\ndata: b\r\n\r\ndata: c\r\n\r\n"));
+
+            assertThat(parts).extracting(Buffer::toString).containsExactly("data: a\r\ndata: b", "data: c\r\n\r\n");
+        }
+
+        @Test
+        void should_return_the_bytes_unchanged() {
+            byte[] first = { 'd', 'a', 't', 'a', ':', ' ', (byte) 0xC3, 'x' };
+            byte[] second = { 'd', 'a', 't', 'a', ':', ' ', (byte) 0xFF, '\n', '\n' };
+            var input = new ByteArrayOutputStream();
+            input.writeBytes(first);
+            input.writeBytes(new byte[] { '\n', '\n' });
+            input.writeBytes(second);
+
+            var parts = ChunkToSseEvent.split(Buffer.buffer(input.toByteArray()));
+
+            assertThat(parts).hasSize(2);
+            assertThat(parts.get(0).getBytes()).isEqualTo(first);
+            assertThat(parts.get(1).getBytes()).isEqualTo(second);
+        }
+    }
+
+    @Nested
     class OnServerEvent {
 
         @Test

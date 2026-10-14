@@ -16,10 +16,17 @@
 package io.gravitee.common.sse;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.FlowableTransformer;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
@@ -141,7 +148,7 @@ class ChunkToSseEventTest {
                 // Then
                 result.assertComplete();
                 var values = result.values();
-                assertThat(values).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"), new ServerEvent("event3"));
+                assertThat(values).containsExactly(new ServerEvent("event1\nevent2"), new ServerEvent("event3"));
             }
         }
 
@@ -296,6 +303,101 @@ class ChunkToSseEventTest {
                     new ServerEvent("message", "{\"chunk\": \"hello world\"}", "2", null),
                     new ServerEvent("simple")
                 );
+            }
+        }
+
+        @Nested
+        class CrlfLineEndings {
+
+            @Test
+            void should_emit_one_event_for_crlf_terminated_lines() {
+                // Given
+                String sseEvent = "event: message\r\ndata: {\"id\":1}\r\nid: 7\r\n\r\n";
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer(sseEvent));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
+                assertThat(result.values()).containsExactly(new ServerEvent("message", "{\"id\":1}", "7", null));
+                assertThat(result.values().get(0).toBuffer().toString()).isEqualTo(sseEvent);
+            }
+
+            @Test
+            void should_join_multi_line_data_terminated_by_crlf() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: line1\r\ndata: line2\r\n\r\n"));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
+                assertThat(result.values()).containsExactly(new ServerEvent("line1\nline2"));
+            }
+
+            @Test
+            void should_end_event_after_the_whole_crlf_when_lf_is_followed_by_crlf_split_across_chunks() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: a\n\r"), Buffer.buffer("\ndata: b\n\n"));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
+                assertThat(result.values()).containsExactly(new ServerEvent("a"), new ServerEvent("b"));
+                assertThat(result.values().get(0).toBuffer().toString()).isEqualTo("data: a\n\r\n");
+                assertThat(result.values().get(1).toBuffer().toString()).isEqualTo("data: b\n\n");
+            }
+        }
+
+        @Nested
+        class MultiByteCharacters {
+
+            @Test
+            void should_keep_a_multi_byte_character_split_across_chunks() {
+                // Given
+                byte[] stream = "data: first\n\ndata: price 10€\n\n".getBytes(StandardCharsets.UTF_8);
+                int insideEuroSign = "data: first\n\ndata: price 10".getBytes(StandardCharsets.UTF_8).length + 1;
+                Flowable<Buffer> upstream = Flowable.just(
+                    Buffer.buffer(Arrays.copyOfRange(stream, 0, insideEuroSign)),
+                    Buffer.buffer(Arrays.copyOfRange(stream, insideEuroSign, stream.length))
+                );
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
+                assertThat(result.values()).containsExactly(new ServerEvent("first"), new ServerEvent("price 10€"));
+                var forwarded = new ByteArrayOutputStream();
+                result.values().forEach(event -> forwarded.writeBytes(event.toBuffer().getBytes()));
+                assertThat(forwarded.toByteArray()).isEqualTo(stream);
+            }
+        }
+
+        @Nested
+        class LargeEvents {
+
+            @Test
+            void should_frame_a_large_event_received_in_many_small_chunks_in_linear_time() {
+                // Given
+                String data = "x".repeat(2 * 1024 * 1024);
+                byte[] stream = ("event: message\ndata: " + data + "\n\n").getBytes(StandardCharsets.UTF_8);
+                List<Buffer> chunks = new ArrayList<>();
+                for (int offset = 0; offset < stream.length; offset += 512) {
+                    chunks.add(Buffer.buffer(Arrays.copyOfRange(stream, offset, Math.min(stream.length, offset + 512))));
+                }
+
+                // When
+                List<ServerEvent> events = assertTimeoutPreemptively(Duration.ofSeconds(10), () ->
+                    ChunkToSseEvent.chunkToEvent(Flowable.fromIterable(chunks)).toList().blockingGet()
+                );
+
+                // Then
+                assertThat(events).containsExactly(new ServerEvent("message", data, null, null));
             }
         }
 

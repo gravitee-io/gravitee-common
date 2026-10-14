@@ -57,6 +57,27 @@ class ServerEventTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("lineEndingCases")
+    void should_parse_event_whatever_the_line_endings(String serialized, ServerEvent event) {
+        Buffer input = Buffer.buffer(serialized);
+
+        ServerEvent parsed = ServerEvent.parse(input);
+
+        assertThat(parsed).isEqualTo(event);
+        assertThat(parsed.toBuffer()).isEqualTo(input);
+    }
+
+    static Stream<Arguments> lineEndingCases() {
+        return Stream.of(
+            arguments("event: e1\r\ndata: a\r\ndata: b\r\nid: 7\r\n\r\n", new ServerEvent("e1", "a\nb", "7", null)),
+            arguments("event: e1\rdata: a\rretry: 5\r\r", new ServerEvent("e1", "a", null, 5L)),
+            arguments("data: a\r\ndata: b\ndata: c\rid: 1\n\n", new ServerEvent(null, "a\nb\nc", "1", null)),
+            arguments("  data:   padded  \n: comment\nunknown: x\n\n", new ServerEvent(null, "padded", null, null)),
+            arguments("retry: abc\ndata: x\n\n", new ServerEvent(null, "x", null, null))
+        );
+    }
+
     @Test
     void should_update_data_and_preserve_order() {
         var originalBuffer = Buffer.buffer("event: message\nid: 1\ndata: old data\n\n");

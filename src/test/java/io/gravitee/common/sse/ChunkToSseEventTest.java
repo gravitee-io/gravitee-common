@@ -321,6 +321,21 @@ class ChunkToSseEventTest {
             }
 
             @Test
+            void should_handle_crlf_event_separator_split_across_chunks() {
+                // Given
+                Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: event1\r\n\r"), Buffer.buffer("\ndata: event2\r\n\r\n"));
+
+                // When
+                var result = ChunkToSseEvent.chunkToEvent(upstream).test();
+
+                // Then
+                result.assertComplete();
+                assertThat(result.values()).containsExactly(new ServerEvent("event1"), new ServerEvent("event2"));
+                assertThat(result.values().get(0).toBuffer().toString()).isEqualTo("data: event1\r\n\r\n");
+                assertThat(result.values().get(1).toBuffer().toString()).isEqualTo("data: event2\r\n\r\n");
+            }
+
+            @Test
             void should_end_event_after_the_whole_crlf_when_lf_is_followed_by_crlf_split_across_chunks() {
                 // Given
                 Flowable<Buffer> upstream = Flowable.just(Buffer.buffer("data: a\n\r"), Buffer.buffer("\ndata: b\n\n"));

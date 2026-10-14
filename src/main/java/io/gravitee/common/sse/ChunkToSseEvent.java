@@ -20,16 +20,15 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.FlowableTransformer;
 import io.reactivex.rxjava3.core.Maybe;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
+/**
+ * Line endings (CRLF, LF or CR) and blank lines as defined by
+ * https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream
+ */
 public class ChunkToSseEvent {
-
-    // ref: https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream
-    private static final Pattern EVENT_SEPARATOR = Pattern.compile("(\\r\\n|\\r|\\n){2}");
 
     public static @NonNull Flowable<ServerEvent> chunkToEvent(@NonNull Flowable<Buffer> upstream) {
         return Flowable.defer(() -> {
@@ -44,9 +43,38 @@ public class ChunkToSseEvent {
         return upstream -> chunkToEvent(upstream).compose(onChunks).map(ServerEvent::toBuffer);
     }
 
+    /**
+     * Splits a buffer at its first blank line into what precedes it and what follows it, the blank line itself being
+     * dropped. Returns the buffer alone when it holds no blank line.
+     */
     public static List<Buffer> split(Buffer buffer) {
-        String[] split = EVENT_SEPARATOR.split(buffer.toString(StandardCharsets.UTF_8), 2);
-        return split.length == 2 ? List.of(Buffer.buffer(split[0]), Buffer.buffer(split[1])) : List.of(buffer);
+        byte[] bytes = buffer.getBytes();
+        int i = 0;
+        while (i < bytes.length) {
+            if (!isLineTerminator(bytes[i])) {
+                i++;
+                continue;
+            }
+            int afterFirst = endOfLineTerminator(bytes, i);
+            if (afterFirst < bytes.length && isLineTerminator(bytes[afterFirst])) {
+                int afterSecond = endOfLineTerminator(bytes, afterFirst);
+                return List.of(
+                    Buffer.buffer(Arrays.copyOfRange(bytes, 0, i)),
+                    Buffer.buffer(Arrays.copyOfRange(bytes, afterSecond, bytes.length))
+                );
+            }
+            i = afterFirst;
+        }
+        return List.of(buffer);
+    }
+
+    /** End of the line terminator at {@code i} of a complete buffer, where a CR ending the buffer stands alone. */
+    private static int endOfLineTerminator(byte[] bytes, int i) {
+        return bytes[i] == '\r' && i + 1 < bytes.length && bytes[i + 1] == '\n' ? i + 2 : i + 1;
+    }
+
+    private static boolean isLineTerminator(byte b) {
+        return b == '\n' || b == '\r';
     }
 
     /**
@@ -136,10 +164,6 @@ public class ChunkToSseEvent {
                 return -1;
             }
             return pending[i + 1] == '\n' ? i + 2 : i + 1;
-        }
-
-        private static boolean isLineTerminator(byte b) {
-            return b == '\n' || b == '\r';
         }
     }
 }

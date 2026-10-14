@@ -51,8 +51,16 @@ public record ServerEvent(
         String id = null;
         Long retry = null;
 
-        for (var lineBuffer : LINE_SEPARATOR.split(buffer.toString())) {
-            String line = lineBuffer.strip();
+        String content = buffer.toString();
+        int lineStart = 0;
+        while (lineStart < content.length()) {
+            int lineEnd = lineStart;
+            while (lineEnd < content.length() && !isLineTerminator(content.charAt(lineEnd))) {
+                lineEnd++;
+            }
+            String line = content.substring(lineStart, lineEnd).strip();
+            lineStart = content.startsWith("\r\n", lineEnd) ? lineEnd + 2 : lineEnd + 1;
+
             if (line.startsWith("event:")) {
                 event = line.substring(6).trim();
             } else if (line.startsWith("data:")) {
@@ -74,6 +82,10 @@ public record ServerEvent(
         String strData = data.isEmpty() ? null : data.toString();
 
         return new ServerEvent(event, strData, id, retry, buffer);
+    }
+
+    private static boolean isLineTerminator(char c) {
+        return c == '\n' || c == '\r';
     }
 
     public Buffer toBuffer() {

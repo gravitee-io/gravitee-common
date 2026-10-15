@@ -1,3 +1,11 @@
+## [4.8.2](https://github.com/gravitee-io/gravitee-common/compare/4.8.1...4.8.2) (2026-10-15)
+
+
+### Bug Fixes
+
+* **sse:** parse event streams in linear time, CRLF and UTF-8 safe ([818fcca](https://github.com/gravitee-io/gravitee-common/commit/818fccaaa873db1b3fcffc7d955896fcb5637d57))
+* **sse:** split buffers on spec blank lines and keep bytes intact ([ebc89bf](https://github.com/gravitee-io/gravitee-common/commit/ebc89bfde908ad98130a4df770a4d5e5e982097d))
+
 ## [4.8.1](https://github.com/gravitee-io/gravitee-common/compare/4.8.0...4.8.1) (2026-04-30)
 
 

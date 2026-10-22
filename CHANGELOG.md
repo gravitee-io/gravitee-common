@@ -1,3 +1,10 @@
+## [4.8.3](https://github.com/gravitee-io/gravitee-common/compare/4.8.2...4.8.3) (2026-10-22)
+
+
+### Bug Fixes
+
+* **sse:** rewrite event data without a regex over the whole event ([5c4c0a7](https://github.com/gravitee-io/gravitee-common/commit/5c4c0a7768df9856b4393a113ff6bcac65f8625e))
+
 ## [4.8.2](https://github.com/gravitee-io/gravitee-common/compare/4.8.1...4.8.2) (2026-10-15)
 
 

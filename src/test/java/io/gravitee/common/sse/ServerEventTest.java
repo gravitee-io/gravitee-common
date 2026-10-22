@@ -89,6 +89,24 @@ class ServerEventTest {
         assertThat(updatedEvent.toBuffer().toString()).isEqualTo("event: message\nid: 1\ndata: new data\n\n");
     }
 
+    @ParameterizedTest
+    @MethodSource("lineEndingUpdateCases")
+    void should_update_data_whatever_the_line_endings(String serialized) {
+        var event = ServerEvent.parse(Buffer.buffer(serialized));
+
+        var updatedEvent = event.withData("new data");
+
+        assertThat(updatedEvent.toBuffer().toString()).isEqualTo("event: message\nid: 1\ndata: new data\n\n");
+    }
+
+    static Stream<Arguments> lineEndingUpdateCases() {
+        return Stream.of(
+            arguments("event: message\r\nid: 1\r\ndata: old data\r\n\r\n"),
+            arguments("event: message\rid: 1\rdata: old data\r\r"),
+            arguments("event: message\r\nid: 1\rdata: old\ndata: data\n\n")
+        );
+    }
+
     @Test
     void should_update_data_on_manually_created_event() {
         var event = new ServerEvent("event", "old data", "id", 123L);

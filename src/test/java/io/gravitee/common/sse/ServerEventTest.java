@@ -19,13 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import io.gravitee.gateway.api.buffer.Buffer;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ServerEventTest {
@@ -223,5 +228,57 @@ class ServerEventTest {
 
         assertThat(updatedEvent.data()).isEqualTo("foo\n\nbar");
         assertThat(updatedEvent.toBuffer().toString()).isEqualTo("id: 1\ndata: foo\ndata: \ndata: bar\n\n");
+    }
+
+    @Nested
+    class IsTerminated {
+
+        @ParameterizedTest
+        @ValueSource(
+            strings = {
+                "data: a\n\n", "data: a\r\r", "data: a\r\n\r\n", "data: a\n\r\n", "data: a\r\n\n", "data: a\n\r", "\n", "\r", "\r\n",
+            }
+        )
+        void should_be_terminated_when_the_bytes_end_with_a_blank_line(String serialized) {
+            assertThat(ServerEvent.parse(Buffer.buffer(serialized)).isTerminated()).isTrue();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = { "", "data: a", "data: a\n", "data: a\r", "data: a\r\n", "data: a\ndata: b\r\n" })
+        void should_not_be_terminated_when_the_bytes_do_not_end_with_a_blank_line(String serialized) {
+            assertThat(ServerEvent.parse(Buffer.buffer(serialized)).isTerminated()).isFalse();
+        }
+
+        @Test
+        void should_be_terminated_when_built_from_its_fields() {
+            assertThat(new ServerEvent("a").isTerminated()).isTrue();
+        }
+
+        @Test
+        void should_be_terminated_once_its_data_is_rewritten() {
+            ServerEvent event = ServerEvent.parse(Buffer.buffer("data: a"));
+
+            assertThat(event.withData("b").isTerminated()).isTrue();
+        }
+
+        @Test
+        void should_stay_unterminated_when_its_data_is_rewritten_to_the_same_value() {
+            ServerEvent event = ServerEvent.parse(Buffer.buffer("data: a"));
+
+            assertThat(event.withData("a").isTerminated()).isFalse();
+        }
+
+        @Test
+        void should_be_terminated_when_parsed_from_null() {
+            assertThat(ServerEvent.parse(null).isTerminated()).isTrue();
+        }
+
+        @Test
+        void should_only_look_at_the_readable_bytes() {
+            ByteBuf bytes = Unpooled.buffer(16).writeBytes("x\n".getBytes(StandardCharsets.UTF_8));
+            bytes.readerIndex(1);
+
+            assertThat(ServerEvent.parse(Buffer.buffer(bytes)).isTerminated()).isTrue();
+        }
     }
 }

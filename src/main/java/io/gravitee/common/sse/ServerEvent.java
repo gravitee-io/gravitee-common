@@ -16,6 +16,7 @@
 package io.gravitee.common.sse;
 
 import io.gravitee.gateway.api.buffer.Buffer;
+import io.netty.buffer.ByteBuf;
 import io.reactivex.rxjava3.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,33 @@ public record ServerEvent(
 
     public boolean isEmpty() {
         return event == null && data == null && id == null && retry == null;
+    }
+
+    /**
+     * Whether this event ends with a blank line, as it does in a well-formed stream. Only an event parsed from bytes
+     * that do not end with a blank line is not terminated, e.g. the last event of a body truncated at a maximum size,
+     * or an empty buffer. An event built from its fields, including one parsed from {@code null}, is terminated, and
+     * so is one rewritten to new data by {@link #withData(String)}.
+     *
+     * @return {@code false} when the bytes this event was parsed from do not end with a blank line
+     */
+    public boolean isTerminated() {
+        if (cachedBuffer == null) {
+            return true;
+        }
+        ByteBuf bytes = cachedBuffer.getNativeBuffer();
+        int start = bytes.readerIndex();
+        int last = bytes.writerIndex() - 1;
+        if (last < start || !isLineTerminator(bytes.getByte(last))) {
+            return false;
+        }
+        int beforeLastLineTerminator = bytes.getByte(last) == '\n' && last > start && bytes.getByte(last - 1) == '\r' ? last - 2 : last - 1;
+        // The last line is blank when nothing precedes its line terminator, or another line terminator does.
+        return beforeLastLineTerminator < start || isLineTerminator(bytes.getByte(beforeLastLineTerminator));
+    }
+
+    private static boolean isLineTerminator(byte b) {
+        return b == '\n' || b == '\r';
     }
 
     public static ServerEvent parse(@Nullable Buffer buffer) {

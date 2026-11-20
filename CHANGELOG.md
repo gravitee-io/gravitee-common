@@ -1,3 +1,10 @@
+# [5.3.0](https://github.com/gravitee-io/gravitee-common/compare/5.2.2...5.3.0) (2026-11-20)
+
+
+### Features
+
+* **sse:** frame a whole buffer into events synchronously ([e9616a3](https://github.com/gravitee-io/gravitee-common/commit/e9616a3ab3879cc2168a4edb77905b137856ceac))
+
 ## [5.2.2](https://github.com/gravitee-io/gravitee-common/compare/5.2.1...5.2.2) (2026-10-22)
 
 

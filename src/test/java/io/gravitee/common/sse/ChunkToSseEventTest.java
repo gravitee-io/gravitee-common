@@ -513,6 +513,131 @@ class ChunkToSseEventTest {
     }
 
     @Nested
+    class Events {
+
+        @Test
+        void should_return_no_event_for_an_empty_buffer() {
+            assertThat(ChunkToSseEvent.events(Buffer.buffer())).isEmpty();
+        }
+
+        @Test
+        void should_cut_events_on_lf_blank_lines() {
+            var events = ChunkToSseEvent.events(Buffer.buffer("data: a\n\nevent: e\ndata: b\n\n"));
+
+            assertThat(events).containsExactly(new ServerEvent("a"), new ServerEvent("e", "b", null, null));
+            assertThat(events)
+                .extracting(event -> event.cachedBuffer().toString())
+                .containsExactly("data: a\n\n", "event: e\ndata: b\n\n");
+            assertThat(events).allMatch(ServerEvent::isTerminated);
+        }
+
+        @Test
+        void should_cut_events_on_crlf_blank_lines_only() {
+            var events = ChunkToSseEvent.events(Buffer.buffer("data: a\r\ndata: b\r\n\r\nid: 2\r\ndata: c\r\n\r\n"));
+
+            assertThat(events).containsExactly(new ServerEvent(null, "a\nb", null, null), new ServerEvent(null, "c", "2", null));
+            assertThat(events).allMatch(ServerEvent::isTerminated);
+        }
+
+        @Test
+        void should_cut_events_on_cr_blank_lines() {
+            var events = ChunkToSseEvent.events(Buffer.buffer("data: a\r\rdata: b\revent: e\r\r"));
+
+            assertThat(events).containsExactly(new ServerEvent("a"), new ServerEvent("e", "b", null, null));
+            assertThat(events).allMatch(ServerEvent::isTerminated);
+        }
+
+        @Test
+        void should_join_multi_line_data() {
+            var events = ChunkToSseEvent.events(Buffer.buffer("data: line1\ndata: line2\ndata: line3\n\n"));
+
+            assertThat(events).containsExactly(new ServerEvent("line1\nline2\nline3"));
+        }
+
+        @Test
+        void should_keep_a_comment_only_event() {
+            var events = ChunkToSseEvent.events(Buffer.buffer(": keep-alive\n\ndata: a\n: note\n\n"));
+
+            assertThat(events).hasSize(2);
+            assertThat(events.get(0).isEmpty()).isTrue();
+            assertThat(events.get(0).toBuffer().toString()).isEqualTo(": keep-alive\n\n");
+            assertThat(events.get(1)).isEqualTo(new ServerEvent("a"));
+            assertThat(events.get(1).toBuffer().toString()).isEqualTo("data: a\n: note\n\n");
+        }
+
+        @Test
+        void should_return_an_unterminated_last_event() {
+            var events = ChunkToSseEvent.events(Buffer.buffer("data: {\"a\":1}\n\ndata: {\"b\":"));
+
+            assertThat(events).containsExactly(new ServerEvent("{\"a\":1}"), new ServerEvent("{\"b\":"));
+            assertThat(events).extracting(ServerEvent::isTerminated).containsExactly(true, false);
+            assertThat(events.get(1).toBuffer().toString()).isEqualTo("data: {\"b\":");
+        }
+
+        @Test
+        void should_return_an_unterminated_last_event_ending_with_a_single_line_ending() {
+            var events = ChunkToSseEvent.events(Buffer.buffer("data: a\r\n\r\ndata: b\r\n"));
+
+            assertThat(events).containsExactly(new ServerEvent("a"), new ServerEvent("b"));
+            assertThat(events).extracting(ServerEvent::isTerminated).containsExactly(true, false);
+        }
+
+        @Test
+        void should_keep_the_bytes_of_every_event_unchanged() {
+            byte[] first = { 'd', 'a', 't', 'a', ':', ' ', (byte) 0xC3, (byte) 0xA9, '\n', '\n' };
+            byte[] second = { 'd', 'a', 't', 'a', ':', ' ', (byte) 0xFF, '\r', '\n' };
+            var input = new ByteArrayOutputStream();
+            input.writeBytes(first);
+            input.writeBytes(second);
+
+            var events = ChunkToSseEvent.events(Buffer.buffer(input.toByteArray()));
+
+            assertThat(events).hasSize(2);
+            assertThat(events.get(0).toBuffer().getBytes()).isEqualTo(first);
+            assertThat(events.get(1).toBuffer().getBytes()).isEqualTo(second);
+        }
+
+        @Test
+        void should_frame_as_chunk_to_event_does() {
+            Buffer stream = Buffer.buffer(": comment\r\n\r\nevent: a\rdata: 1\r\rid: 2\ndata: x\ndata: y\n\n\ndata: z\r\n\ndata: tail\r");
+
+            var events = ChunkToSseEvent.events(stream);
+            var expected = ChunkToSseEvent.chunkToEvent(Flowable.just(stream)).toList().blockingGet();
+
+            assertThat(events).isEqualTo(expected);
+            assertThat(events)
+                .extracting(event -> event.toBuffer().toString())
+                .isEqualTo(
+                    expected
+                        .stream()
+                        .map(event -> event.toBuffer().toString())
+                        .toList()
+                );
+            assertThat(
+                String.join(
+                    "",
+                    events
+                        .stream()
+                        .map(event -> event.toBuffer().toString())
+                        .toList()
+                )
+            ).isEqualTo(stream.toString());
+        }
+
+        @Test
+        void should_frame_many_events_in_linear_time() {
+            int count = 200_000;
+            String stream = "data: {\"n\":1}\n\n".repeat(count);
+
+            List<ServerEvent> events = assertTimeoutPreemptively(Duration.ofSeconds(10), () ->
+                ChunkToSseEvent.events(Buffer.buffer(stream))
+            );
+
+            assertThat(events).hasSize(count).allMatch(ServerEvent::isTerminated);
+        }
+    }
+
+    @Nested
     class OnServerEvent {
 
         @Test

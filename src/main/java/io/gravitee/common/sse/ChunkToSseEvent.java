@@ -17,6 +17,7 @@ package io.gravitee.common.sse;
 
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.annotations.Nullable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.FlowableTransformer;
 import io.reactivex.rxjava3.core.Maybe;
@@ -33,8 +34,29 @@ public class ChunkToSseEvent {
     public static @NonNull Flowable<ServerEvent> chunkToEvent(@NonNull Flowable<Buffer> upstream) {
         return Flowable.defer(() -> {
             var framer = new EventFramer();
-            return upstream.concatMapIterable(framer::push).concatWith(Maybe.defer(framer::flush)).map(ServerEvent::parse);
+            return upstream.concatMapIterable(framer::push).concatWith(Maybe.fromCallable(framer::flush)).map(ServerEvent::parse);
         });
+    }
+
+    /**
+     * Cuts a whole buffer into events, synchronously, as {@link #chunkToEvent(Flowable)} does for a stream of chunks:
+     * the bytes after the last blank line, if any, make the last event, which {@link ServerEvent#isTerminated()} then
+     * reports as not terminated.
+     *
+     * @param buffer the bytes of an event stream
+     * @return the events of the buffer, in order; none for an empty buffer
+     */
+    public static @NonNull List<ServerEvent> events(@NonNull Buffer buffer) {
+        var framer = new EventFramer();
+        List<ServerEvent> events = new ArrayList<>();
+        for (Buffer event : framer.push(buffer)) {
+            events.add(ServerEvent.parse(event));
+        }
+        Buffer rest = framer.flush();
+        if (rest != null) {
+            events.add(ServerEvent.parse(rest));
+        }
+        return events;
     }
 
     public static @NonNull FlowableTransformer<Buffer, Buffer> onServerEvent(
@@ -104,8 +126,10 @@ public class ChunkToSseEvent {
             return events;
         }
 
-        Maybe<Buffer> flush() {
-            return length > 0 ? Maybe.just(Buffer.buffer(Arrays.copyOf(pending, length))) : Maybe.empty();
+        /** The bytes received after the last blank line, or {@code null} when there are none. */
+        @Nullable
+        Buffer flush() {
+            return length > 0 ? Buffer.buffer(Arrays.copyOf(pending, length)) : null;
         }
 
         private void append(byte[] bytes) {
